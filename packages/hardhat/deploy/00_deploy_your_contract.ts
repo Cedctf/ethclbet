@@ -3,12 +3,12 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { Contract } from "ethers";
 
 /**
- * Deploys a contract named "YourContract" using the deployer account and
- * constructor arguments set to the deployer address
+ * Deploys a contract named "SimpleBet" using the deployer account and
+ * constructor arguments set to a domain string for SiweAuth
  *
  * @param hre HardhatRuntimeEnvironment object.
  */
-const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+const deploySimpleBet: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   /*
     On localhost, the deployer account is the one that comes with Hardhat, which is already funded.
 
@@ -22,10 +22,23 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  await deploy("YourContract", {
+  // Determine the appropriate domain based on the network
+  const networkName = hre.network.name;
+  let domain = "localhost";
+
+  if (networkName === "sapphireTestnet") {
+    domain = "testnet.sapphire.oasis.io";
+  } else if (networkName !== "localhost" && networkName !== "hardhat") {
+    // For other testnets/mainnets, use a generic domain or customize as needed
+    domain = "app.example.com";
+  }
+
+  console.log(`Deploying SimpleBet to ${networkName} with domain: ${domain}`);
+
+  await deploy("SimpleBet", {
     from: deployer,
-    // Contract constructor arguments
-    args: [deployer],
+    // Contract constructor arguments - SimpleBet requires a domain string for SiweAuth
+    args: [domain],
     log: true,
     // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
     // automatically mining the contract deployment transaction. There is no effect on live networks.
@@ -33,12 +46,13 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   });
 
   // Get the deployed contract to interact with it after deploying.
-  const yourContract = await hre.ethers.getContract<Contract>("YourContract", deployer);
-  console.log("👋 Initial greeting:", await yourContract.greeting());
+  const simpleBet = await hre.ethers.getContract<Contract>("SimpleBet", deployer);
+  console.log("SimpleBet deployed! Owner:", await simpleBet.getOwner());
+  console.log("Total bets:", await simpleBet.getTotalBets());
 };
 
-export default deployYourContract;
+export default deploySimpleBet;
 
 // Tags are useful if you have multiple deploy files and only want to run one of them.
-// e.g. yarn deploy --tags YourContract
-deployYourContract.tags = ["YourContract"];
+// e.g. yarn deploy --tags SimpleBet
+deploySimpleBet.tags = ["SimpleBet"];

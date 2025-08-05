@@ -2932,6 +2932,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@oasisprotocol/sapphire-contracts@npm:^0.2.14":
+  version: 0.2.14
+  resolution: "@oasisprotocol/sapphire-contracts@npm:0.2.14"
+  dependencies:
+    "@openzeppelin/contracts": ^5.0.2
+  checksum: 0093e4b1b7bd9b0118b5bb424d5844fd49cc95c8d6eb237f1769d7ab1d1b1419f31bb8397ea602aad7af25bdf3947e86475e7cda96446a50539aa4f834ac1d16
+  languageName: node
+  linkType: hard
+
 "@oclif/core@npm:^4, @oclif/core@npm:^4.5.2":
   version: 4.5.2
   resolution: "@oclif/core@npm:4.5.2"
@@ -2983,6 +2992,13 @@ __metadata:
     which: ^4.0.0
     yarn: ^1.22.22
   checksum: ccae80457f467304162f50f2025e4516aaca33a5d11ee81a6c056a81c9ef067ca3f951a27c09620aeba50f4c69e8bba6be2c745ff2f2e87aef5d62d99447e2cb
+  languageName: node
+  linkType: hard
+
+"@openzeppelin/contracts@npm:^5.0.2":
+  version: 5.4.0
+  resolution: "@openzeppelin/contracts@npm:5.4.0"
+  checksum: 8a0c64266f5213801029251fdc9815798917b311b7fc9acb94db13a479a3a0d044e0312f57e739f13b87161105157cb8da023124b4f026cf6b72a718a333ef64
   languageName: node
   linkType: hard
 
@@ -3403,6 +3419,7 @@ __metadata:
     "@nomicfoundation/hardhat-ethers": ~3.0.8
     "@nomicfoundation/hardhat-network-helpers": ~1.0.11
     "@nomicfoundation/hardhat-verify": ~2.0.10
+    "@oasisprotocol/sapphire-contracts": ^0.2.14
     "@openzeppelin/contracts": ~5.0.2
     "@typechain/ethers-v5": ~11.1.2
     "@typechain/ethers-v6": ~0.5.1

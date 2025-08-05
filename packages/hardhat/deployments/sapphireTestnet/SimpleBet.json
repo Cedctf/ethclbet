@@ -1,0 +1,947 @@
+{
+  "address": "0x6E005eDE5f15b8df8c2d4dD191b27DE42dE0b0e2",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "domain",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "A13e_RevokedAuthToken",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SiweAuth_AddressMismatch",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SiweAuth_ChainIdMismatch",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SiweAuth_DomainMismatch",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SiweAuth_Expired",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SiweAuth_NotBeforeInFuture",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SiweParser_InvalidAddressLength",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SiweParser_InvalidNonce",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "betId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum SimpleBet.BetOutcome",
+          "name": "outcome",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "BetPlaced",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "betId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum SimpleBet.BetStatus",
+          "name": "status",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "payout",
+          "type": "uint256"
+        }
+      ],
+      "name": "BetResolved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "FundsWithdrawn",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "_betMetas",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum SimpleBet.BetOutcome",
+          "name": "outcome",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum SimpleBet.BetStatus",
+          "name": "status",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "createdAt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "description",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "betId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "token",
+          "type": "bytes"
+        }
+      ],
+      "name": "cancelBet",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "domain",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "offset",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "count",
+          "type": "uint256"
+        }
+      ],
+      "name": "getAllBets",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum SimpleBet.BetOutcome",
+              "name": "outcome",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum SimpleBet.BetStatus",
+              "name": "status",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint256",
+              "name": "createdAt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "description",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct SimpleBet.Bet[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "betIndex",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "token",
+          "type": "bytes"
+        }
+      ],
+      "name": "getBetSecret",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getContractBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getOwner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTotalBets",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "getUserBetCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "token",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "offset",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "count",
+          "type": "uint256"
+        }
+      ],
+      "name": "getUserBets",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum SimpleBet.BetOutcome",
+              "name": "outcome",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum SimpleBet.BetStatus",
+              "name": "status",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint256",
+              "name": "createdAt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "description",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct SimpleBet.Bet[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "siweMsg",
+          "type": "string"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "v",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct SignatureRSV",
+          "name": "sig",
+          "type": "tuple"
+        }
+      ],
+      "name": "login",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "token",
+          "type": "bytes"
+        }
+      ],
+      "name": "ownerWithdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum SimpleBet.BetOutcome",
+          "name": "outcome",
+          "type": "uint8"
+        },
+        {
+          "internalType": "string",
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "internalType": "bytes",
+          "name": "secretData",
+          "type": "bytes"
+        }
+      ],
+      "name": "placeBet",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "betId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "won",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes",
+          "name": "token",
+          "type": "bytes"
+        }
+      ],
+      "name": "resolveBet",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "userBalances",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdrawBalance",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xd49f31ca930c16765b07d8ee323a560b33e2308937a4561f2f41de821a8c8f8e",
+  "receipt": {
+    "to": null,
+    "from": "0x8fdd8FF672BEf99e33A1F821ECDC57571391e9B5",
+    "contractAddress": "0x6E005eDE5f15b8df8c2d4dD191b27DE42dE0b0e2",
+    "transactionIndex": 0,
+    "gasUsed": "3536653",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x7c97e58ce37e10462eddd30904e7f52d4e444264935b6f427d539b96c23c32a9",
+    "transactionHash": "0xd49f31ca930c16765b07d8ee323a560b33e2308937a4561f2f41de821a8c8f8e",
+    "logs": [],
+    "blockNumber": 12891276,
+    "cumulativeGasUsed": "3536653",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "testnet.sapphire.oasis.io"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "1da90d69c1bb29d92a13f70a5bf8016c",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"domain\",\"type\":\"string\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"A13e_RevokedAuthToken\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SiweAuth_AddressMismatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SiweAuth_ChainIdMismatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SiweAuth_DomainMismatch\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SiweAuth_Expired\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SiweAuth_NotBeforeInFuture\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SiweParser_InvalidAddressLength\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"SiweParser_InvalidNonce\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"betId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"enum SimpleBet.BetOutcome\",\"name\":\"outcome\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"BetPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"betId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"enum SimpleBet.BetStatus\",\"name\":\"status\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"payout\",\"type\":\"uint256\"}],\"name\":\"BetResolved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"FundsWithdrawn\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"_betMetas\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"enum SimpleBet.BetOutcome\",\"name\":\"outcome\",\"type\":\"uint8\"},{\"internalType\":\"enum SimpleBet.BetStatus\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"createdAt\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"betId\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"token\",\"type\":\"bytes\"}],\"name\":\"cancelBet\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"domain\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"offset\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"count\",\"type\":\"uint256\"}],\"name\":\"getAllBets\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"enum SimpleBet.BetOutcome\",\"name\":\"outcome\",\"type\":\"uint8\"},{\"internalType\":\"enum SimpleBet.BetStatus\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"createdAt\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"}],\"internalType\":\"struct SimpleBet.Bet[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"betIndex\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"token\",\"type\":\"bytes\"}],\"name\":\"getBetSecret\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getContractBalance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getOwner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getTotalBets\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"}],\"name\":\"getUserBetCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"token\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"offset\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"count\",\"type\":\"uint256\"}],\"name\":\"getUserBets\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"enum SimpleBet.BetOutcome\",\"name\":\"outcome\",\"type\":\"uint8\"},{\"internalType\":\"enum SimpleBet.BetStatus\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"createdAt\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"}],\"internalType\":\"struct SimpleBet.Bet[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"siweMsg\",\"type\":\"string\"},{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"r\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"s\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"v\",\"type\":\"uint256\"}],\"internalType\":\"struct SignatureRSV\",\"name\":\"sig\",\"type\":\"tuple\"}],\"name\":\"login\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"token\",\"type\":\"bytes\"}],\"name\":\"ownerWithdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum SimpleBet.BetOutcome\",\"name\":\"outcome\",\"type\":\"uint8\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"internalType\":\"bytes\",\"name\":\"secretData\",\"type\":\"bytes\"}],\"name\":\"placeBet\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"betId\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"won\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"token\",\"type\":\"bytes\"}],\"name\":\"resolveBet\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"userBalances\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"withdrawBalance\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"A simple betting smart contract with SiweAuth integration for Oasis Sapphire Users can place bets, contract acts as escrow, and owner can manage funds\",\"kind\":\"dev\",\"methods\":{\"cancelBet(uint256,bytes)\":{\"details\":\"Cancel a bet and refund (only owner)\",\"params\":{\"betId\":\"The bet ID to cancel\",\"token\":\"SIWE authentication token for owner\"}},\"domain()\":{\"returns\":{\"_0\":\"The domain string\"}},\"getAllBets(uint256,uint256)\":{\"details\":\"Get all bet metadata (paginated)\",\"params\":{\"count\":\"Number of bets to return\",\"offset\":\"Pagination offset\"}},\"getBetSecret(uint256,bytes)\":{\"details\":\"Get secret data for a specific bet (only bet owner can access)\",\"params\":{\"betIndex\":\"Index of the bet in the _betMetas array\",\"token\":\"SIWE authentication token\"}},\"getContractBalance()\":{\"details\":\"Get contract balance\"},\"getOwner()\":{\"details\":\"Get owner address\"},\"getTotalBets()\":{\"details\":\"Get total number of bets\"},\"getUserBetCount(address)\":{\"details\":\"Get user's total bet count\",\"params\":{\"user\":\"User address\"}},\"getUserBets(bytes,uint256,uint256)\":{\"details\":\"Get user's bets using SIWE authentication\",\"params\":{\"count\":\"Number of bets to return\",\"offset\":\"Pagination offset\",\"token\":\"SIWE authentication token\"}},\"login(string,(bytes32,bytes32,uint256))\":{\"params\":{\"sig\":\"The signature of the SIWE message\",\"siweMsg\":\"The signed SIWE message\"},\"returns\":{\"_0\":\"The encrypted authentication token\"}},\"ownerWithdraw(uint256,bytes)\":{\"details\":\"Owner withdraws contract funds (only owner)\",\"params\":{\"amount\":\"Amount to withdraw\",\"token\":\"SIWE authentication token for owner\"}},\"placeBet(uint8,string,bytes)\":{\"details\":\"Place a bet with amount and outcome\",\"params\":{\"description\":\"Public description of the bet\",\"outcome\":\"The outcome to bet on (YES/NO)\",\"secretData\":\"Private data associated with the bet\"}},\"resolveBet(uint256,bool,bytes)\":{\"details\":\"Resolve a bet (only owner)\",\"params\":{\"betId\":\"The bet ID to resolve\",\"token\":\"SIWE authentication token for owner\",\"won\":\"Whether the bet won or lost\"}},\"withdrawBalance()\":{\"details\":\"Withdraw user balance\"}},\"title\":\"SimpleBet\",\"version\":1},\"userdoc\":{\"errors\":{\"A13e_RevokedAuthToken()\":[{\"notice\":\"The authentication token was revoked\"}],\"SiweAuth_AddressMismatch()\":[{\"notice\":\"User address in the SIWE message does not match the message signer's address\"}],\"SiweAuth_ChainIdMismatch()\":[{\"notice\":\"Chain ID in the SIWE message does not match the actual chain ID\"}],\"SiweAuth_DomainMismatch()\":[{\"notice\":\"Domain in the SIWE message does not match the domain of a dApp\"}],\"SiweAuth_Expired()\":[{\"notice\":\"Validity of the authentication token or the Expires value in the SIWE message is in the past\"}],\"SiweAuth_NotBeforeInFuture()\":[{\"notice\":\"The Not before value in the SIWE message is still in the future\"}],\"SiweParser_InvalidAddressLength()\":[{\"notice\":\"Invalid length of the hex-encoded address\"}],\"SiweParser_InvalidNonce()\":[{\"notice\":\"Invalid length of the nonce\"}]},\"kind\":\"user\",\"methods\":{\"domain()\":{\"notice\":\"Return the domain associated with the dApp.\"},\"login(string,(bytes32,bytes32,uint256))\":{\"notice\":\"Login using a SIWE message and signature\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/SimpleBet.sol\":\"SimpleBet\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@oasisprotocol/sapphire-contracts/contracts/DateTime.sol\":{\"content\":\"// SPDX-License-Identifier: Apache-2.0\\npragma solidity ^0.8.0;\\n\\n/**\\n * @title Utility for converting date and time to timestamp\\n * @notice Considers leap year, but not leap second.\\n * @custom:attribution https://github.com/pipermerriam/ethereum-datetime/blob/master/contracts/DateTime.sol\\n */\\nlibrary DateTime {\\n    uint16 private constant ORIGIN_YEAR = 1970;\\n\\n    function isLeapYear(uint16 year) internal pure returns (bool) {\\n        if (year % 4 != 0) {\\n            return false;\\n        }\\n        if (year % 100 != 0) {\\n            return true;\\n        }\\n        if (year % 400 != 0) {\\n            return false;\\n        }\\n        return true;\\n    }\\n\\n    /**\\n     * @notice Convert year, month, day, hour, minute, second to Unix timestamp.\\n     * @dev Leap second is not supported.\\n     */\\n    function toTimestamp(\\n        uint16 year,\\n        uint8 month,\\n        uint8 day,\\n        uint8 hour,\\n        uint8 minute,\\n        uint8 second\\n    ) internal pure returns (uint256 timestamp) {\\n        uint16 i;\\n\\n        // Year\\n        // TODO: Rewrite to O(1) time implementation.\\n        for (i = ORIGIN_YEAR; i < year; i++) {\\n            if (isLeapYear(i)) {\\n                timestamp += 366 days;\\n            } else {\\n                timestamp += 365 days;\\n            }\\n        }\\n\\n        // Month\\n        // TODO: Use constants for monthDayCounts (hex-encoded string?), rewrite to O(1) time implementation.\\n        uint32[12] memory monthDayCounts;\\n        monthDayCounts[0] = 31;\\n        if (isLeapYear(year)) {\\n            monthDayCounts[1] = 29;\\n        } else {\\n            monthDayCounts[1] = 28;\\n        }\\n        monthDayCounts[2] = 31;\\n        monthDayCounts[3] = 30;\\n        monthDayCounts[4] = 31;\\n        monthDayCounts[5] = 30;\\n        monthDayCounts[6] = 31;\\n        monthDayCounts[7] = 31;\\n        monthDayCounts[8] = 30;\\n        monthDayCounts[9] = 31;\\n        monthDayCounts[10] = 30;\\n        monthDayCounts[11] = 31;\\n\\n        for (i = 1; i < month; i++) {\\n            timestamp += monthDayCounts[i - 1] * 1 days;\\n        }\\n\\n        // Day\\n        timestamp += uint32(day - 1) * 1 days;\\n\\n        // Hour\\n        timestamp += uint32(hour) * 1 hours;\\n\\n        // Minute\\n        timestamp += uint16(minute) * 1 minutes;\\n\\n        // Second\\n        timestamp += second;\\n\\n        return timestamp;\\n    }\\n}\\n\",\"keccak256\":\"0x16056b81d29bc53c50a27a243d5215f21e164b2f95b4031bed6686fa83d02b73\",\"license\":\"Apache-2.0\"},\"@oasisprotocol/sapphire-contracts/contracts/EthereumUtils.sol\":{\"content\":\"// SPDX-License-Identifier: Apache-2.0\\n\\npragma solidity ^0.8.0;\\n\\nimport {Sapphire} from \\\"./Sapphire.sol\\\";\\n\\nstruct SignatureRSV {\\n    bytes32 r;\\n    bytes32 s;\\n    uint256 v;\\n}\\n\\nlibrary EthereumUtils {\\n    uint256 internal constant K256_P =\\n        0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f;\\n\\n    // (p+1)//4\\n    uint256 internal constant K256_P_PLUS_1_OVER_4 =\\n        0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffbfffff0c;\\n\\n    address internal constant PRECOMPILE_BIGMODEXP = address(0x5);\\n\\n    error expmod_Error();\\n\\n    function expmod(\\n        uint256 base,\\n        uint256 exponent,\\n        uint256 modulus\\n    ) internal view returns (uint256 out) {\\n        (bool success, bytes memory result) = PRECOMPILE_BIGMODEXP.staticcall(\\n            abi.encodePacked(\\n                uint256(0x20), // length of base\\n                uint256(0x20), // length of exponent\\n                uint256(0x20), // length of modulus\\n                base,\\n                exponent,\\n                modulus\\n            )\\n        );\\n\\n        if (!success) revert expmod_Error();\\n\\n        out = uint256(bytes32(result));\\n    }\\n\\n    error k256DeriveY_Invalid_Prefix_Error();\\n\\n    /**\\n     * @notice Recover Y coordinate from X coordinate and sign bit.\\n     * @param prefix 0x02 or 0x03 indicates sign bit of compressed point.\\n     * @param x X coordinate.\\n     */\\n    function k256DeriveY(uint8 prefix, uint256 x)\\n        internal\\n        view\\n        returns (uint256 y)\\n    {\\n        if (prefix != 0x02 && prefix != 0x03)\\n            revert k256DeriveY_Invalid_Prefix_Error();\\n\\n        // x^3 + ax + b, where a=0, b=7\\n        y = addmod(mulmod(x, mulmod(x, x, K256_P), K256_P), 7, K256_P);\\n\\n        // find square root of quadratic residue\\n        y = expmod(y, K256_P_PLUS_1_OVER_4, K256_P);\\n\\n        // negate y if indicated by sign bit\\n        if ((y + prefix) % 2 != 0) {\\n            y = K256_P - y;\\n        }\\n    }\\n\\n    error k256Decompress_Invalid_Length_Error();\\n\\n    /**\\n     * @notice Decompress SEC P256 k1 point.\\n     * @param pk 33 byte compressed public key.\\n     * @return x X coordinate.\\n     * @return y Y coordinate.\\n     */\\n    function k256Decompress(bytes memory pk)\\n        internal\\n        view\\n        returns (uint256 x, uint256 y)\\n    {\\n        if (pk.length != 33) revert k256Decompress_Invalid_Length_Error();\\n        assembly {\\n            // skip 32 byte length prefix, plus one byte sign prefix\\n            x := mload(add(pk, 33))\\n        }\\n        y = k256DeriveY(uint8(pk[0]), x);\\n    }\\n\\n    function k256PubkeyToEthereumAddress(bytes memory pubkey)\\n        internal\\n        view\\n        returns (address)\\n    {\\n        (uint256 x, uint256 y) = k256Decompress(pubkey);\\n        return toEthereumAddress(x, y);\\n    }\\n\\n    /**\\n     * @notice Convert SEC P256 k1 curve point to Ethereum address.\\n     * @param x X coordinate.\\n     * @param y Y coordinate.\\n     * @custom:see https://gavwood.com/paper.pdf (pp. 212)\\n     */\\n    function toEthereumAddress(uint256 x, uint256 y)\\n        internal\\n        pure\\n        returns (address)\\n    {\\n        bytes32 digest = keccak256(abi.encodePacked(x, y));\\n\\n        return address(uint160((uint256(digest) << 96) >> 96));\\n    }\\n\\n    error DER_Split_Error();\\n\\n    /**\\n     * @notice Extracts the `r` and `s` parameters from a DER encoded ECDSA\\n     * signature.\\n     *\\n     * The signature is an ASN1 encoded SEQUENCE of the variable length `r` and\\n     * `s` INTEGERs.\\n     *\\n     * ```\\n     * | 0x30 | len(z) | 0x02 | len(r) |  r   | 0x02 | len(s) |  s   | = hex value\\n     * |  1   |   1    |   1  |   1    | 1-33 |  1   |   1    | 1-33 | = byte length\\n     * ```\\n     *\\n     * If the highest bit of either `r` or `s` is set, it will be prefix padded\\n     * with a zero byte. There is exponentially decreasing probability that\\n     * either `r` or `s` will be below 32 bytes. There is a very high\\n     * probability that either `r` or `s` will be 33 bytes. This function only\\n     * works if either `r` or `s` are 256bits or lower.\\n     *\\n     * @param der DER encoded ECDSA signature\\n     * @return rsv ECDSA R point X coordinate, and S scalar\\n     * @custom:see https://bitcoin.stackexchange.com/questions/58853/how-do-you-figure-out-the-r-and-s-out-of-a-signature-using-python\\n     */\\n    function splitDERSignature(bytes memory der)\\n        internal\\n        pure\\n        returns (SignatureRSV memory rsv)\\n    {\\n        if (der.length < 8) revert DER_Split_Error();\\n        if (der[0] != 0x30) revert DER_Split_Error();\\n        if (der[2] != 0x02) revert DER_Split_Error();\\n\\n        uint256 zLen = uint8(der[1]);\\n        uint256 rLen = uint8(der[3]);\\n        if (rLen > 33) revert DER_Split_Error();\\n\\n        uint256 sOffset = 4 + rLen;\\n        uint256 sLen = uint8(der[sOffset + 1]);\\n        if (sLen > 33) revert DER_Split_Error();\\n        if (der[sOffset] != 0x02) revert DER_Split_Error();\\n\\n        if (rLen + sLen + 4 != zLen) revert DER_Split_Error();\\n        if (der.length != zLen + 2) revert DER_Split_Error();\\n\\n        sOffset += 2;\\n        uint256 rOffset = 4;\\n\\n        if (rLen == 33) {\\n            if (der[4] != 0x00) revert DER_Split_Error();\\n            rOffset += 1;\\n            rLen -= 1;\\n        }\\n\\n        if (sLen == 33) {\\n            if (der[sOffset] != 0x00) revert DER_Split_Error();\\n            sOffset += 1;\\n            sLen -= 1;\\n        }\\n\\n        bytes32 r;\\n        bytes32 s;\\n\\n        assembly {\\n            r := mload(add(der, add(32, rOffset)))\\n            s := mload(add(der, add(32, sOffset)))\\n        }\\n\\n        // When length of either `r` or `s` is below 32 bytes\\n        // the 32 byte `mload` will suffix it with unknown stuff\\n        // shift right to remove the unknown stuff, prefixing with zeros instead\\n\\n        if (rLen < 32) {\\n            r >>= 8 * (32 - rLen);\\n        }\\n\\n        if (sLen < 32) {\\n            s >>= 8 * (32 - sLen);\\n        }\\n\\n        rsv.r = r;\\n        rsv.s = s;\\n    }\\n\\n    error recoverV_Error();\\n\\n    function recoverV(\\n        address pubkeyAddr,\\n        bytes32 digest,\\n        SignatureRSV memory rsv\\n    ) internal pure {\\n        rsv.v = 27;\\n\\n        if (ecrecover(digest, uint8(rsv.v), rsv.r, rsv.s) != pubkeyAddr) {\\n            rsv.v = 28;\\n\\n            if (ecrecover(digest, uint8(rsv.v), rsv.r, rsv.s) != pubkeyAddr) {\\n                revert recoverV_Error();\\n            }\\n        }\\n    }\\n\\n    /**\\n     * @notice Convert a Secp256k1PrehashedKeccak256 signature to one accepted\\n     * by ecrecover.\\n     * @param pubkey 33 byte compressed public key.\\n     * @param digest 32 byte pre-hashed message digest.\\n     * @param signature ASN.1 DER encoded signature, as returned from\\n     * [`Sapphire.sign`](../Sapphire.sol/library.Sapphire.md#sign).\\n     * @return pubkeyAddr 20 byte Ethereum address.\\n     * @return rsv Ethereum EcDSA RSV signature values.\\n     * @custom:see https://gavwood.com/paper.pdf (pp. 206)\\n     */\\n    function toEthereumSignature(\\n        bytes memory pubkey,\\n        bytes32 digest,\\n        bytes memory signature\\n    ) internal view returns (address pubkeyAddr, SignatureRSV memory rsv) {\\n        pubkeyAddr = k256PubkeyToEthereumAddress(pubkey);\\n\\n        rsv = splitDERSignature(signature);\\n\\n        recoverV(pubkeyAddr, digest, rsv);\\n    }\\n\\n    function sign(\\n        address pubkeyAddr,\\n        bytes32 secretKey,\\n        bytes32 digest\\n    ) internal view returns (SignatureRSV memory rsv) {\\n        bytes memory signature = Sapphire.sign(\\n            Sapphire.SigningAlg.Secp256k1PrehashedKeccak256,\\n            abi.encodePacked(secretKey),\\n            abi.encodePacked(digest),\\n            \\\"\\\"\\n        );\\n\\n        rsv = splitDERSignature(signature);\\n\\n        recoverV(pubkeyAddr, digest, rsv);\\n    }\\n\\n    /**\\n     * @notice Generate an Ethereum compatible SEC P256 k1 keypair and\\n     * corresponding public address.\\n     * @return pubkeyAddr Ethereum address.\\n     * @return secretKey Secret key used for signing.\\n     */\\n    function generateKeypair()\\n        internal\\n        view\\n        returns (address pubkeyAddr, bytes32 secretKey)\\n    {\\n        bytes memory randSeed = Sapphire.randomBytes(32, \\\"\\\");\\n\\n        secretKey = bytes32(randSeed);\\n\\n        (bytes memory pk, ) = Sapphire.generateSigningKeyPair(\\n            Sapphire.SigningAlg.Secp256k1PrehashedKeccak256,\\n            randSeed\\n        );\\n\\n        pubkeyAddr = k256PubkeyToEthereumAddress(pk);\\n    }\\n}\\n\",\"keccak256\":\"0x79e34844793f4a8970d31eb4cbdd91e060fb93da4cbd28b7b8aad5c22e1f6666\",\"license\":\"Apache-2.0\"},\"@oasisprotocol/sapphire-contracts/contracts/Sapphire.sol\":{\"content\":\"// SPDX-License-Identifier: Apache-2.0\\npragma solidity ^0.8.0;\\n\\n/**\\n * @title Sapphire\\n * @notice This library provides a number of convenient wrappers for\\n * cryptographic operations such as the x25519 key derivation, Deoxys-II-based\\n * encryption and decryption, signing key generation, message digest signing and\\n * verification, gas padding and hashing.\\n *\\n * Most of the mentioned functions are implemented as Sapphire's precompiles and\\n * are cheap to call.\\n *\\n * #### Calling Precompiles Manually\\n *\\n * You can override the wrappers and call Sapphire precompiles by dispatching\\n * calls to specific well-known contract addresses, as described below. The\\n * __Precompile address__ section of each function will show you the address\\n * of the corresponding precompile.\\n *\\n * Input parameters should be packed into a contiguous memory region with each\\n * chunk of data padded to 32 bytes as usual. The recommended way to construct\\n * parameter byte sequences in Solidity is with `abi.encode` and `abi.decode`,\\n * which will transparently handle things like putting `bytes` lengths in the\\n * correct position.\\n */\\nlibrary Sapphire {\\n    // Oasis-specific, confidential precompiles\\n    address internal constant RANDOM_BYTES =\\n        0x0100000000000000000000000000000000000001;\\n    address internal constant DERIVE_KEY =\\n        0x0100000000000000000000000000000000000002;\\n    address internal constant ENCRYPT =\\n        0x0100000000000000000000000000000000000003;\\n    address internal constant DECRYPT =\\n        0x0100000000000000000000000000000000000004;\\n    address internal constant GENERATE_SIGNING_KEYPAIR =\\n        0x0100000000000000000000000000000000000005;\\n    address internal constant SIGN_DIGEST =\\n        0x0100000000000000000000000000000000000006;\\n    address internal constant VERIFY_DIGEST =\\n        0x0100000000000000000000000000000000000007;\\n    address internal constant CURVE25519_PUBLIC_KEY =\\n        0x0100000000000000000000000000000000000008;\\n    address internal constant GAS_USED =\\n        0x0100000000000000000000000000000000000009;\\n    address internal constant PAD_GAS =\\n        0x010000000000000000000000000000000000000a;\\n\\n    // Oasis-specific, general precompiles\\n    address internal constant SHA512_256 =\\n        0x0100000000000000000000000000000000000101;\\n    address internal constant SHA512 =\\n        0x0100000000000000000000000000000000000102;\\n    address internal constant SHA384 =\\n        0x0100000000000000000000000000000000000104;\\n\\n    type Curve25519PublicKey is bytes32;\\n    type Curve25519SecretKey is bytes32;\\n\\n    enum SigningAlg {\\n        /// Ed25519 signature over the provided message using SHA-512/265 with a domain separator.\\n        /// Can be used to sign transactions for the Oasis consensus layer and SDK paratimes.\\n        Ed25519Oasis,\\n        /// Ed25519 signature over the provided message.\\n        Ed25519Pure,\\n        /// Ed25519 signature over the provided prehashed SHA-512 digest.\\n        Ed25519PrehashedSha512,\\n        /// Secp256k1 signature over the provided message using SHA-512/256 with a domain separator.\\n        /// Can be used to sign transactions for the Oasis consensus layer and SDK paratimes.\\n        Secp256k1Oasis,\\n        /// Secp256k1 over the provided Keccak256 digest.\\n        /// Can be used to sign transactions for Ethereum-compatible networks.\\n        Secp256k1PrehashedKeccak256,\\n        /// Secp256k1 signature over the provided SHA-256 digest.\\n        Secp256k1PrehashedSha256,\\n        /// Sr25519 signature over the provided message.\\n        Sr25519,\\n        /// Secp256r1 signature over the provided SHA-256 digest.\\n        Secp256r1PrehashedSha256,\\n        /// Secp384r1 signature over the provided SHA-384 digest.\\n        Secp384r1PrehashedSha384\\n    }\\n\\n    /**\\n     * @notice Generate `num_bytes` pseudo-random bytes, with an optional\\n     * personalization string (`pers`) added into the hashing algorithm to\\n     * increase domain separation when needed.\\n     *\\n     * #### Precompile address\\n     *\\n     * `0x0100000000000000000000000000000000000001`\\n     *\\n     * #### Gas cost\\n     *\\n     * 10,000 minimum plus 240 per output word plus 60 per word of the\\n     * personalization string.\\n     *\\n     * #### Implementation details\\n     *\\n     * The mode (e.g. simulation or \\\"view call\\\" vs transaction execution) is fed\\n     * to TupleHash (among other block-dependent components) to derive the \\\"key\\n     * id\\\", which is then used to derive a per-block VRF key from\\n     * epoch-ephemeral entropy (using KMAC256 and cSHAKE) so a different key\\n     * id will result in a unique per-block VRF key. This per-block VRF key is\\n     * then used to create the per-block root RNG which is then used to derive\\n     * domain-separated (using Merlin transcripts) per-transaction random RNGs\\n     * which are then exposed via this precompile. The KMAC, cSHAKE and\\n     * TupleHash algorithms are SHA-3 derived functions defined in [NIST\\n     * Special Publication 800-185](https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-185.pdf).\\n     *\\n     * #### Example\\n     *\\n     * ```solidity\\n     * bytes memory randomPad = Sapphire.randomBytes(64, \\\"\\\");\\n     * ```\\n     *\\n     * @param numBytes The number of bytes to return.\\n     * @param pers An optional personalization string to increase domain\\n     *        separation.\\n     * @return The random bytes. If the number of bytes requested is too large\\n     *         (over 1024), a smaller amount (1024) will be returned.\\n     */\\n    function randomBytes(uint256 numBytes, bytes memory pers)\\n        internal\\n        view\\n        returns (bytes memory)\\n    {\\n        (bool success, bytes memory entropy) = RANDOM_BYTES.staticcall(\\n            abi.encode(numBytes, pers)\\n        );\\n        require(success, \\\"randomBytes: failed\\\");\\n        return entropy;\\n    }\\n\\n    /**\\n     * @notice Generates a Curve25519 keypair.\\n     * @param pers An optional personalization string used to add domain\\n     * separation.\\n     * @return pk The Curve25519 public key. Useful for key exchange.\\n     * @return sk The Curve25519 secret key. Pairs well with\\n     * [deriveSymmetricKey](#derivesymmetrickey).\\n     */\\n    function generateCurve25519KeyPair(bytes memory pers)\\n        internal\\n        view\\n        returns (Curve25519PublicKey pk, Curve25519SecretKey sk)\\n    {\\n        bytes memory scalar = randomBytes(32, pers);\\n        // Twiddle some bits, as per RFC 7748 \\u00a75.\\n        scalar[0] &= 0xf8; // Make it a multiple of 8 to avoid small subgroup attacks.\\n        scalar[31] &= 0x7f; // Clamp to < 2^255 - 19\\n        scalar[31] |= 0x40; // Clamp to >= 2^254\\n        (bool success, bytes memory pkBytes) = CURVE25519_PUBLIC_KEY.staticcall(\\n            scalar\\n        );\\n        require(success, \\\"gen curve25519 pk: failed\\\");\\n        return (\\n            Curve25519PublicKey.wrap(bytes32(pkBytes)),\\n            Curve25519SecretKey.wrap(bytes32(scalar))\\n        );\\n    }\\n\\n    /**\\n     * @notice Derive a symmetric key from a pair of keys using x25519.\\n     *\\n     * #### Precompile address\\n     *\\n     * `0x0100000000000000000000000000000000000002`\\n     *\\n     * #### Gas cost\\n     *\\n     * 100,000\\n     *\\n     * #### Example\\n     *\\n     * ```solidity\\n     * bytes32 publicKey = ... ;\\n     * bytes32 privateKey = ... ;\\n     * bytes32 symmetric = Sapphire.deriveSymmetricKey(publicKey, privateKey);\\n     * ```\\n     *\\n     * @param peerPublicKey The peer's public key.\\n     * @param secretKey Your secret key.\\n     * @return A derived symmetric key.\\n     */\\n    function deriveSymmetricKey(\\n        Curve25519PublicKey peerPublicKey,\\n        Curve25519SecretKey secretKey\\n    ) internal view returns (bytes32) {\\n        (bool success, bytes memory symmetric) = DERIVE_KEY.staticcall(\\n            abi.encode(peerPublicKey, secretKey)\\n        );\\n        require(success, \\\"deriveSymmetricKey: failed\\\");\\n        return bytes32(symmetric);\\n    }\\n\\n    /**\\n     * @notice Encrypt and authenticate the plaintext and additional data using\\n     * DeoxysII.\\n     *\\n     * #### Precompile address\\n     *\\n     * `0x0100000000000000000000000000000000000003`\\n     *\\n     * #### Gas cost\\n     *\\n     * 50,000 minimum plus 100 per word of input\\n     *\\n     * #### Example\\n     *\\n     * ```solidity\\n     * bytes32 key = ... ;\\n     * bytes32 nonce = ... ;\\n     * bytes memory text = \\\"plain text\\\";\\n     * bytes memory ad = \\\"additional data\\\";\\n     * bytes memory encrypted = Sapphire.encrypt(key, nonce, text, ad);\\n     * bytes memory decrypted = Sapphire.decrypt(key, nonce, encrypted, ad);\\n     * ```\\n     *\\n     * @param key The key to use for encryption.\\n     * @param nonce The nonce. Note that only the first 15 bytes of this\\n     * parameter are used.\\n     * @param plaintext The plaintext to encrypt and authenticate.\\n     * @param additionalData The additional data to authenticate.\\n     * @return The ciphertext with appended auth tag.\\n     */\\n    function encrypt(\\n        bytes32 key,\\n        bytes32 nonce,\\n        bytes memory plaintext,\\n        bytes memory additionalData\\n    ) internal view returns (bytes memory) {\\n        (bool success, bytes memory ciphertext) = ENCRYPT.staticcall(\\n            abi.encode(key, nonce, plaintext, additionalData)\\n        );\\n        require(success, \\\"encrypt: failed\\\");\\n        return ciphertext;\\n    }\\n\\n    /**\\n     * @notice Decrypt and authenticate the ciphertext and additional data using\\n     * DeoxysII. Reverts if the auth tag is incorrect.\\n     *\\n     * #### Precompile address\\n     *\\n     * `0x0100000000000000000000000000000000000004`\\n     *\\n     * #### Gas cost\\n     *\\n     * 50,000 minimum plus 100 per word of input\\n     *\\n     * #### Example\\n     *\\n     * ```solidity\\n     * bytes32 key = ... ;\\n     * bytes32 nonce = ... ;\\n     * bytes memory text = \\\"plain text\\\";\\n     * bytes memory ad = \\\"additional data\\\";\\n     * bytes memory encrypted = Sapphire.encrypt(key, nonce, text, ad);\\n     * bytes memory decrypted = Sapphire.decrypt(key, nonce, encrypted, ad);\\n     * ```\\n     *\\n     * @param key The key to use for decryption.\\n     * @param nonce The nonce. Note that only the first 15 bytes of this\\n     * parameter are used.\\n     * @param ciphertext The ciphertext with tag to decrypt and authenticate.\\n     * @param additionalData The additional data to authenticate against the\\n     * ciphertext.\\n     * @return The original plaintext.\\n     */\\n    function decrypt(\\n        bytes32 key,\\n        bytes32 nonce,\\n        bytes memory ciphertext,\\n        bytes memory additionalData\\n    ) internal view returns (bytes memory) {\\n        (bool success, bytes memory plaintext) = DECRYPT.staticcall(\\n            abi.encode(key, nonce, ciphertext, additionalData)\\n        );\\n        require(success, \\\"decrypt: failed\\\");\\n        return plaintext;\\n    }\\n\\n    /**\\n     * @notice Generate a public/private key pair using the specified method and\\n     * seed. The available methods are items in the\\n     * [`Sapphire.SigningAlg`](#signingalg) enum. Note, however, that the\\n     * generation method ignores subvariants, so all three Ed25519-based are\\n     * equivalent, and all Secp256k1 & Secp256r1 based methods are equivalent.\\n     * Sr25519 is not available and will return an error.\\n     *\\n     * #### Precompile address\\n     * `0x0100000000000000000000000000000000000005`\\n     *\\n     * #### Gas Cost\\n     *\\n     * ##### Ed25519: 1,000 gas\\n     *\\n     * - `0` (`Ed25519Oasis`)\\n     * - `1` (`Ed25519Pure`)\\n     * - `2` (`Ed25519PrehashedSha512`)\\n     *\\n     * ##### Secp256k1: 1,500 gas.\\n     * - `3` (`Secp256k1Oasis`)\\n     * - `4` (`Secp256k1PrehashedKeccak256`)\\n     * - `5` (`Secp256k1PrehashedSha256`)\\n     *\\n     * ##### Secp256r1: 4,000 gas\\n     * - `7` (`Secp256r1PrehashedSha256`)\\n     *\\n     * ##### Secp384r1: 18,000 gas\\n     * - `8` (`Secp384r1PrehashedSha384`)\\n     *\\n     * #### Key Formats\\n     *\\n     * ##### Ed25519\\n     *\\n     * Public key: 32 bytes\\n     * Secret key: 32 bytes\\n     *\\n     * ##### Secp256k1 & Secp256r1\\n     *\\n     * Public key: 33 bytes, compressed format (`0x02` or `0x03` prefix, then 32\\n     * byte X coordinate).\\n     * Secret key: 32 bytes\\n     *\\n     * ##### Secp384r1\\n     *\\n     * Public key: 49 bytes, compressed format (`0x02` or `0x03` prefix, then 48\\n     * byte X coordinate).\\n     * Secret key: 48 bytes\\n     *\\n     * #### Example\\n     *\\n     * ```solidity\\n     * bytes memory seed = hex\\\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\\\";\\n     * bytes memory publicKey;\\n     * bytes memory privateKey;\\n     * (publicKey, privateKey) = Sapphire.generateSigningKeyPair(Sapphire.SigningAlg.Ed25519Pure, seed);\\n     * ```\\n     *\\n     * @param alg The signing alg for which to generate a keypair.\\n     * @param seed The seed to use for generating the key pair. You can use the\\n     * `randomBytes` method if you don't already have a seed.\\n     * @return publicKey The public part of the keypair.\\n     * @return secretKey The secret part of the keypair.\\n     */\\n    function generateSigningKeyPair(SigningAlg alg, bytes memory seed)\\n        internal\\n        view\\n        returns (bytes memory publicKey, bytes memory secretKey)\\n    {\\n        (bool success, bytes memory keypair) = GENERATE_SIGNING_KEYPAIR\\n            .staticcall(abi.encode(alg, seed));\\n        require(success, \\\"gen signing keypair: failed\\\");\\n        return abi.decode(keypair, (bytes, bytes));\\n    }\\n\\n    /**\\n     * @notice Sign a message within the provided context using the specified\\n     * algorithm, and return the signature. The `context_or_digest` and\\n     * `messages` parameters change in meaning slightly depending on the method\\n     * requested. For methods that take a context in addition to the message you\\n     * must pass the context in the `context_or_digest` parameter and use\\n     * `message` as expected. For methods that take a pre-existing hash of the\\n     * message, pass that in `context_or_digest` and leave `message` empty.\\n     * Specifically the `Ed25519Oasis` and `Secp256k1Oasis` variants take both a\\n     * context and a message (each are variable length `bytes`), the context\\n     * serves as a domain separator.\\n     *\\n     * #### Precompile address\\n     *\\n     * `0x0100000000000000000000000000000000000006`\\n     *\\n     * #### Gas cost\\n     *\\n     * See below for the method-dependent base cost, plus 8 gas per 32 bytes of\\n     * context and message except digest.\\n     *\\n     * #### Signing algorithms\\n     *\\n     * - `0` (`Ed25519Oasis`): 1,500 gas, variable length context and message.\\n     * - `1` (`Ed25519Pure`): 1,500 gas, empty context, variable length message.\\n     * - `2` (`Ed25519PrehashedSha512`): 1,500 gas, pre-existing SHA-512 hash\\n     *   (64 bytes) as context, empty message.\\n     * - `3` (`Secp256k1Oasis`): 3,000 gas, variable length context and message\\n     * - `4` (`Secp256k1PrehashedKeccak256`): 3,000 gas, pre-existing hash\\n     *   (32 bytes) as context, empty message.\\n     * - `5` (`Secp256k1PrehashedSha256`): 3,000 gas, pre-existing hash (32\\n     *   bytes) as context, empty message.\\n     * - `7` (`Secp256r1PrehashedSha256`): 9,000 gas, pre-existing hash (32\\n     *   bytes) as context, empty message.\\n     * - `8` (`Secp384r1PrehashedSha384`): 43,200 gas, pre-existing hash (32\\n     *   bytes) as context, empty message.\\n     *\\n     * #### Example\\n     *\\n     * ```solidity\\n     * Sapphire.SigningAlg alg = Sapphire.SigningAlg.Ed25519Pure;\\n     * bytes memory pk;\\n     * bytes memory sk;\\n     * (pk, sk) = Sapphire.generateSigningKeyPair(alg, Sapphire.randomBytes(32, \\\"\\\"));\\n     * bytes memory signature = Sapphire.sign(alg, sk, \\\"\\\", \\\"signed message\\\");\\n     * ```\\n     *\\n     * @param alg The signing algorithm to use.\\n     * @param secretKey The secret key to use for signing. The key must be valid\\n     * for use with the requested algorithm.\\n     * @param contextOrHash Domain-Separator Context, or precomputed hash bytes.\\n     * @param message Message to sign, should be zero-length if precomputed hash\\n     * given.\\n     * @return signature The resulting signature.\\n     * @custom:see @oasisprotocol/oasis-sdk :: precompile/confidential.rs :: call_sign\\n     */\\n    function sign(\\n        SigningAlg alg,\\n        bytes memory secretKey,\\n        bytes memory contextOrHash,\\n        bytes memory message\\n    ) internal view returns (bytes memory signature) {\\n        (bool success, bytes memory sig) = SIGN_DIGEST.staticcall(\\n            abi.encode(alg, secretKey, contextOrHash, message)\\n        );\\n        require(success, \\\"sign: failed\\\");\\n        return sig;\\n    }\\n\\n    /**\\n     * @notice Verifies that the provided digest was signed with using the\\n     * secret key corresponding to the provided private key and the specified\\n     * signing algorithm.\\n     *\\n     * The `method`, `context_or_digest` and `message` parameters have the same\\n     * meaning as described above in the [sign()](#sign) function.\\n     *\\n     * #### Precompile address\\n     *\\n     * `0x0100000000000000000000000000000000000007`\\n     *\\n     * #### Gas cost\\n     *\\n     * The algorithm-specific base cost below, with an additional **8 gas per\\n     * 32 bytes** of `context` and `message` for the `Ed25519Oasis`,\\n     * `Ed25519Pure` and `Secp256k1Oasis` algorithms.\\n     *\\n     * - `0` (`Ed25519Oasis`): 2,000 gas\\n     * - `1` (`Ed25519Pure`): 2,000 gas\\n     * - `2` (`Ed25519PrehashedSha512`): 2,000 gas\\n     * - `3` (`Secp256k1Oasis`): 3,000 gas\\n     * - `4` (`Secp256k1PrehashedKeccak256`): 3,000 gas\\n     * - `5` (`Secp256k1PrehashedSha256`): 3,000 gas\\n     * - `7` (`Secp256r1PrehashedSha256`): 7,900 gas\\n     * - `8` (`Secp384r1PrehashedSha384`): 37,920 gas\\n     *\\n     * #### Example\\n     *\\n     * ```solidity\\n     * Sapphire.SigningAlg alg = Sapphire.SigningAlg.Secp256k1PrehashedKeccak256;\\n     * bytes memory pk;\\n     * bytes memory sk;\\n     * bytes memory digest = abi.encodePacked(keccak256(\\\"signed message\\\"));\\n     * (pk, sk) = Sapphire.generateSigningKeyPair(alg, Sapphire.randomBytes(32, \\\"\\\"));\\n     * bytes memory signature = Sapphire.sign(alg, sk, digest, \\\"\\\");\\n     * require( Sapphire.verify(alg, pk, digest, \\\"\\\", signature) );\\n     * ```\\n     *\\n     * @param alg The signing algorithm by which the signature was generated.\\n     * @param publicKey The public key against which to check the signature.\\n     * @param contextOrHash Domain-Separator Context, or precomputed hash bytes\\n     * @param message The hash of the message that was signed, should be\\n     * zero-length if precomputed hash was given.\\n     * @param signature The signature to check.\\n     * @return verified Whether the signature is valid for the given parameters.\\n     * @custom:see @oasisprotocol/oasis-sdk :: precompile/confidential.rs :: call_verify\\n     */\\n    function verify(\\n        SigningAlg alg,\\n        bytes memory publicKey,\\n        bytes memory contextOrHash,\\n        bytes memory message,\\n        bytes memory signature\\n    ) internal view returns (bool verified) {\\n        (bool success, bytes memory v) = VERIFY_DIGEST.staticcall(\\n            abi.encode(alg, publicKey, contextOrHash, message, signature)\\n        );\\n        require(success, \\\"verify: failed\\\");\\n        return abi.decode(v, (bool));\\n    }\\n\\n    /**\\n     * @notice Set the current transactions gas usage to a specific amount\\n     * @dev Will cause a reversion if the current usage is more than the amount.\\n     * @param toAmount Gas usage will be set to this amount\\n     * @custom:see @oasisprotocol/oasis-sdk :: precompile/gas.rs :: call_pad_gas\\n     *\\n     */\\n    function padGas(uint128 toAmount) internal view {\\n        (bool success, ) = PAD_GAS.staticcall(abi.encode(toAmount));\\n        require(success, \\\"verify: failed\\\");\\n    }\\n\\n    /**\\n     * @notice Returns the amount of gas currently used by the transaction\\n     * @custom:see @oasisprotocol/oasis-sdk :: precompile/gas.rs :: call_gas_used\\n     */\\n    function gasUsed() internal view returns (uint64) {\\n        (bool success, bytes memory v) = GAS_USED.staticcall(\\\"\\\");\\n        require(success, \\\"gasused: failed\\\");\\n        return abi.decode(v, (uint64));\\n    }\\n}\\n\\n/**\\n * @notice Hash the input data with SHA-512/256, according to\\n * [NIST.FIPS.180-4](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf).\\n *\\n * #### Precompile address\\n *\\n * `0x0100000000000000000000000000000000000102`\\n *\\n * #### Gas cost\\n *\\n * 115 gas, then 13 gas per word\\n *\\n * #### Example\\n *\\n * ```solidity\\n * bytes32 result = sha512_256(abi.encodePacked(\\\"input data\\\"));\\n * ```\\n *\\n * #### Warning: SHA-512 vs SHA-512/256 Length-Extension Attacks\\n *\\n * [SHA-512](function.sha512.md#sha512) is vulnerable to [length-extension\\n * attacks](https://en.wikipedia.org/wiki/Length_extension_attack), which are\\n * relevant if you are computing the hash of a secret message. The\\n * [SHA-512/256](function.sha512_256.md#sha512_256) variant is **not**\\n * vulnerable to length-extension attacks.\\n *\\n * @param input Bytes to hash.\\n * @return result 32 byte digest.\\n * @custom:standard https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf\\n * @custom:see @oasisprotocol/oasis-sdk :: precompile/sha2.rs :: call_sha512_256\\n */\\nfunction sha512_256(bytes memory input) view returns (bytes32 result) {\\n    (bool success, bytes memory output) = Sapphire.SHA512_256.staticcall(input);\\n\\n    require(success, \\\"sha512_256\\\");\\n\\n    return bytes32(output);\\n}\\n\\n/**\\n * @notice Hash the input data with SHA-512, according to\\n * [NIST.FIPS.180-4](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf)\\n *\\n * #### Precompile address\\n *\\n * `0x0100000000000000000000000000000000000101`\\n *\\n * #### Warning: SHA-512 vs SHA-512/256 Length-Extension Attacks\\n *\\n * [SHA-512](function.sha512.md#sha512) is vulnerable to [length-extension\\n * attacks](https://en.wikipedia.org/wiki/Length_extension_attack), which are\\n * relevant if you are computing the hash of a secret message. The\\n * [SHA-512/256](function.sha512_256.md#sha512_256) variant is **not**\\n * vulnerable to length-extension attacks.\\n *\\n * #### Gas Cost\\n *\\n * 115 gas, then 13 gas per word\\n *\\n * #### Example\\n *\\n * ```solidity\\n * bytes memory result = sha512(abi.encodePacked(\\\"input data\\\"));\\n * ```\\n *\\n * @param input Bytes to hash.\\n * @return output 64 byte digest.\\n * @custom:standard https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf\\n * @custom:see @oasisprotocol/oasis-sdk :: precompile/sha2.rs :: call_sha512\\n */\\nfunction sha512(bytes memory input) view returns (bytes memory output) {\\n    bool success;\\n\\n    (success, output) = Sapphire.SHA512.staticcall(input);\\n\\n    require(success, \\\"sha512\\\");\\n}\\n\\n/**\\n * @notice Hash the input data with SHA-384.\\n * @param input Bytes to hash.\\n * @return output 48 byte digest.\\n * @custom:standard https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf\\n * @custom:see @oasisprotocol/oasis-sdk :: precompile/sha2.rs :: call_sha384\\n */\\nfunction sha384(bytes memory input) view returns (bytes memory output) {\\n    bool success;\\n\\n    (success, output) = Sapphire.SHA384.staticcall(input);\\n\\n    require(success, \\\"sha384\\\");\\n}\\n\",\"keccak256\":\"0x87a43ed0f7c74b7da8ee58d349f466fb2947bf71f6fca10174ebad96d59e2c8a\",\"license\":\"Apache-2.0\"},\"@oasisprotocol/sapphire-contracts/contracts/SiweParser.sol\":{\"content\":\"// SPDX-License-Identifier: Apache-2.0\\npragma solidity ^0.8.0;\\n\\nimport {DateTime} from \\\"./DateTime.sol\\\";\\n\\nstruct ParsedSiweMessage {\\n    bytes schemeDomain;\\n    address addr;\\n    bytes statement;\\n    bytes uri;\\n    bytes version;\\n    uint256 chainId;\\n    bytes nonce;\\n    bytes issuedAt;\\n    bytes expirationTime;\\n    bytes notBefore;\\n    bytes requestId;\\n    bytes[] resources;\\n}\\n\\n/**\\n * @title On-chain parser for EIP-4361 SIWE message\\n * @notice Call parseSiweMsg() and provide the EIP-4361 SIWE message. The parser\\n * will generate the ParsedSiweMessage struct which you can then use to\\n * extract the authentication information in your on-chain contract.\\n */\\nlibrary SiweParser {\\n    /// Invalid length of the hex-encoded address\\n    error SiweParser_InvalidAddressLength();\\n    /// Invalid length of the nonce\\n    error SiweParser_InvalidNonce();\\n\\n    /**\\n     * @notice Convert string containing hex address without 0x prefix to solidity address object.\\n     */\\n    function _hexStringToAddress(bytes memory s)\\n        internal\\n        pure\\n        returns (address)\\n    {\\n        if (s.length != 40) {\\n            revert SiweParser_InvalidAddressLength();\\n        }\\n\\n        bytes memory r = new bytes(s.length / 2);\\n        for (uint256 i = 0; i < s.length / 2; ++i) {\\n            r[i] = bytes1(\\n                _fromHexChar(uint8(s[2 * i])) *\\n                    16 +\\n                    _fromHexChar(uint8(s[2 * i + 1]))\\n            );\\n        }\\n        return address(bytes20(r));\\n    }\\n\\n    function _fromHexChar(uint8 c) internal pure returns (uint8) {\\n        if (bytes1(c) >= bytes1(\\\"0\\\") && bytes1(c) <= bytes1(\\\"9\\\")) {\\n            return c - uint8(bytes1(\\\"0\\\"));\\n        }\\n        if (bytes1(c) >= bytes1(\\\"a\\\") && bytes1(c) <= bytes1(\\\"f\\\")) {\\n            return 10 + c - uint8(bytes1(\\\"a\\\"));\\n        }\\n        if (bytes1(c) >= bytes1(\\\"A\\\") && bytes1(c) <= bytes1(\\\"F\\\")) {\\n            return 10 + c - uint8(bytes1(\\\"A\\\"));\\n        }\\n        return 0;\\n    }\\n\\n    /**\\n     * @notice Substring.\\n     */\\n    function _substr(\\n        bytes memory str,\\n        uint256 startIndex,\\n        uint256 endIndex\\n    ) internal pure returns (bytes memory) {\\n        bytes memory result = new bytes(endIndex - startIndex);\\n        for (uint256 i = startIndex; i < endIndex && i < str.length; i++) {\\n            result[i - startIndex] = str[i];\\n        }\\n        return result;\\n    }\\n\\n    /**\\n     * @notice String to Uint using decimal format. No error handling.\\n     */\\n    function _parseUint(bytes memory b) internal pure returns (uint256) {\\n        uint256 result = 0;\\n        for (uint256 i = 0; i < b.length; i++) {\\n            result = result * 10 + (uint256(uint8(b[i])) - 0x30);\\n        }\\n        return (result);\\n    }\\n\\n    /**\\n     * @notice Parse \\\"NAME: VALUE\\\" in str starting at index i and ending at \\\\n or end of bytes.\\n     * @return VALUE and new i, if NAME matched; otherwise empty value and old i.\\n     */\\n    function _parseField(\\n        bytes calldata str,\\n        string memory name,\\n        uint256 i\\n    ) internal pure returns (bytes memory, uint256) {\\n        uint256 j = i;\\n        for (; j < str.length; j++) {\\n            if (str[j] == \\\":\\\") {\\n                // Delimiter found, check the name.\\n                if (keccak256(_substr(str, i, j)) != keccak256(bytes(name))) {\\n                    return (\\\"\\\", i);\\n                }\\n\\n                // Skip :\\n                j++;\\n                if (j < str.length && str[j] == \\\" \\\") {\\n                    // Skip blank\\n                    j++;\\n                }\\n\\n                i = j;\\n                break;\\n            }\\n        }\\n\\n        for (; j < str.length; j++) {\\n            if (str[j] == 0x0a) {\\n                return (_substr(str, i, j), j + 1);\\n            }\\n        }\\n        return (_substr(str, i, j), j);\\n    }\\n\\n    /**\\n     * @notice Parse bullets, one per line in str starting at i.\\n     * @return Array of parsed values and a new i.\\n     */\\n    function _parseArray(bytes calldata str, uint256 i)\\n        internal\\n        pure\\n        returns (bytes[] memory, uint256)\\n    {\\n        // First count the number of resources.\\n        uint256 j = i;\\n        uint256 count = 0;\\n        for (; j < str.length - 1; j++) {\\n            if (str[j] == \\\"-\\\" && str[j + 1] == \\\" \\\") {\\n                j += 2;\\n                count++;\\n            } else {\\n                break;\\n            }\\n            while (j < str.length && str[j] != 0x0a) {\\n                j++;\\n            }\\n        }\\n\\n        // Then build an array.\\n        bytes[] memory values = new bytes[](count);\\n        j = i;\\n        for (uint256 c = 0; j < str.length - 1 && c != count; j++) {\\n            if (str[j] == \\\"-\\\" && str[j + 1] == \\\" \\\") {\\n                i = j + 2;\\n            }\\n            while (j < str.length && str[j] != 0x0a) {\\n                j++;\\n            }\\n            values[c] = _substr(str, i, j);\\n            c++;\\n            if (j == str.length) {\\n                j--; // Subtract 1 because of the outer loop.\\n            }\\n        }\\n        return (values, j);\\n    }\\n\\n    /**\\n     * @notice Parse SIWE message.\\n     * @return ParsedSiweMessage struct with populated fields from the message.\\n     */\\n    function parseSiweMsg(bytes calldata siweMsg)\\n        internal\\n        pure\\n        returns (ParsedSiweMessage memory)\\n    {\\n        ParsedSiweMessage memory p;\\n        uint256 i = 0;\\n\\n        // dApp Domain.\\n        for (; i < siweMsg.length; i++) {\\n            if (siweMsg[i] == \\\" \\\") {\\n                p.schemeDomain = _substr(siweMsg, 0, i);\\n                break;\\n            }\\n        }\\n\\n        i += 50; // \\\" wants you to sign in with your Ethereum account:\\\\n\\\"\\n\\n        // Address.\\n        // TODO: Verify the mixed-case checksum.\\n        p.addr = _hexStringToAddress(_substr(siweMsg, i += 2, i += 40));\\n        i += 2; // End of address new line + New line.\\n\\n        // (Optional) statement.\\n        if (i < siweMsg.length && siweMsg[i] != \\\"\\\\n\\\") {\\n            for (uint256 j = i; j < siweMsg.length; j++) {\\n                if (siweMsg[j] == 0x0a) {\\n                    p.statement = _substr(siweMsg, i, j);\\n                    i = j + 1; // End of statement new line.\\n                    break;\\n                }\\n            }\\n        }\\n\\n        i++; // New line.\\n\\n        (p.uri, i) = _parseField(siweMsg, \\\"URI\\\", i);\\n        (p.version, i) = _parseField(siweMsg, \\\"Version\\\", i);\\n        bytes memory chainId;\\n        (chainId, i) = _parseField(siweMsg, \\\"Chain ID\\\", i);\\n        p.chainId = _parseUint(chainId);\\n        (p.nonce, i) = _parseField(siweMsg, \\\"Nonce\\\", i);\\n        if (p.nonce.length < 8) {\\n            revert SiweParser_InvalidNonce();\\n        }\\n        (p.issuedAt, i) = _parseField(siweMsg, \\\"Issued At\\\", i);\\n        (p.expirationTime, i) = _parseField(siweMsg, \\\"Expiration Time\\\", i);\\n        (p.notBefore, i) = _parseField(siweMsg, \\\"Not Before\\\", i);\\n        (p.requestId, i) = _parseField(siweMsg, \\\"Request ID\\\", i);\\n\\n        // Parse resources, if they exist.\\n        uint256 newI;\\n        (, newI) = _parseField(siweMsg, \\\"Resources\\\", i);\\n        if (newI != i) {\\n            (p.resources, i) = _parseArray(siweMsg, newI);\\n        }\\n\\n        return p;\\n    }\\n\\n    /**\\n     * @notice Parse RFC 3339 (ISO 8601) string to timestamp.\\n     */\\n    function timestampFromIso(bytes memory str)\\n        internal\\n        pure\\n        returns (uint256)\\n    {\\n        return\\n            DateTime.toTimestamp(\\n                uint16(_parseUint(_substr(str, 0, 4))),\\n                uint8(_parseUint(_substr(str, 5, 7))),\\n                uint8(_parseUint(_substr(str, 8, 10))),\\n                uint8(_parseUint(_substr(str, 11, 13))),\\n                uint8(_parseUint(_substr(str, 14, 16))),\\n                uint8(_parseUint(_substr(str, 17, 19)))\\n            );\\n    }\\n}\\n\",\"keccak256\":\"0x07529271c0beff34900dcd2d967635ddf0af86645a1c5fdcf7396b12bc3a9965\",\"license\":\"Apache-2.0\"},\"@oasisprotocol/sapphire-contracts/contracts/auth/A13e.sol\":{\"content\":\"// SPDX-License-Identifier: Apache-2.0\\npragma solidity ^0.8.0;\\n\\nimport {SignatureRSV} from \\\"../EthereumUtils.sol\\\";\\n\\n/**\\n * @title Interface for authenticatable contracts\\n * @notice This is the interface for universal authentication mechanism (e.g.\\n * SIWE):\\n * 1. The user-facing app calls `login()` which generates the authentication\\n *    token on-chain.\\n * 2. Any smart contract method that requires authentication can take this token\\n *    as an argument. Passing this token to `authMsgSender()` verifies it and\\n *    returns the **authenticated** user address. This verified address can then\\n *    serve as a user ID for authorization.\\n */\\nabstract contract A13e {\\n    /// A mapping of revoked authentication tokens. Access it directly or use the checkRevokedAuthToken modifier.\\n    mapping(bytes32 => bool) internal _revokedAuthTokens;\\n\\n    /// The authentication token was revoked\\n    error A13e_RevokedAuthToken();\\n\\n    /**\\n     * @notice Reverts if the given token was revoked\\n     */\\n    modifier checkRevokedAuthToken(bytes memory token) {\\n        if (_revokedAuthTokens[keccak256(token)]) {\\n            revert A13e_RevokedAuthToken();\\n        }\\n        _;\\n    }\\n\\n    /**\\n     * @notice Verify the login message and its signature and generate the\\n     * token.\\n     */\\n    function login(string calldata message, SignatureRSV calldata sig)\\n        external\\n        view\\n        virtual\\n        returns (bytes memory);\\n\\n    /**\\n     * @notice Validate the token and return authenticated msg.sender.\\n     */\\n    function authMsgSender(bytes memory token)\\n        internal\\n        view\\n        virtual\\n        returns (address);\\n\\n    /**\\n     * @notice Revoke the authentication token with the corresponding hash.\\n     * e.g. In case when the token is leaked or for extra-secure apps on\\n     * every logout.\\n     */\\n    function revokeAuthToken(bytes32 token) internal {\\n        _revokedAuthTokens[token] = true;\\n    }\\n}\\n\",\"keccak256\":\"0x0cf14dfe3264acfd5b67c0559d668dfbbdeea96879ade2c1144aac3931968fe2\",\"license\":\"Apache-2.0\"},\"@oasisprotocol/sapphire-contracts/contracts/auth/SiweAuth.sol\":{\"content\":\"// SPDX-License-Identifier: Apache-2.0\\npragma solidity ^0.8.0;\\n\\nimport {Strings} from \\\"@openzeppelin/contracts/utils/Strings.sol\\\";\\n\\nimport {SignatureRSV, A13e} from \\\"./A13e.sol\\\";\\nimport {ParsedSiweMessage, SiweParser} from \\\"../SiweParser.sol\\\";\\nimport {Sapphire} from \\\"../Sapphire.sol\\\";\\n\\n/// @title AuthToken structure for SIWE-based authentication\\nstruct AuthToken {\\n    string domain; // [ scheme \\\"://\\\" ] domain.\\n    address userAddr;\\n    uint256 validUntil; // in Unix timestamp.\\n    string statement; // Human-readable statement from the SIWE message.\\n    string[] resources; // Resources this token grants access to.\\n}\\n\\n/**\\n * @title Base contract for SIWE-based authentication\\n * @notice Inherit this contract if you wish to enable SIWE-based\\n * authentication in your contract functions that require authentication.\\n * The smart contract needs to be bound to a domain (passed in constructor).\\n *\\n * #### Example\\n *\\n * ```solidity\\n * contract MyContract is SiweAuth {\\n *   address private _owner;\\n *   string private _message;\\n *\\n *   modifier onlyOwner(bytes memory token) {\\n *     if (msg.sender != _owner && authMsgSender(token) != _owner) {\\n *       revert(\\\"not allowed\\\");\\n *     }\\n *     _;\\n *   }\\n *\\n *   constructor(string memory domain) SiweAuth(domain) {\\n *     _owner = msg.sender;\\n *   }\\n *\\n *   function getSecretMessage(bytes memory token) external view onlyOwner(token) returns (string memory) {\\n *     return _message;\\n *   }\\n *\\n *   function setSecretMessage(string calldata message) external onlyOwner(\\\"\\\") {\\n *     _message = message;\\n *   }\\n * }\\n * ```\\n */\\ncontract SiweAuth is A13e {\\n    /// Domain which the dApp is associated with\\n    string internal _domain;\\n    /// Encryption key which the authentication tokens are encrypted with\\n    bytes32 private _authTokenEncKey;\\n    /// Default authentication token validity, if no expiration-time provided\\n    uint256 private constant DEFAULT_VALIDITY = 24 hours;\\n\\n    /// Chain ID in the SIWE message does not match the actual chain ID\\n    error SiweAuth_ChainIdMismatch();\\n    /// Domain in the SIWE message does not match the domain of a dApp\\n    error SiweAuth_DomainMismatch();\\n    /// User address in the SIWE message does not match the message signer's address\\n    error SiweAuth_AddressMismatch();\\n    /// The Not before value in the SIWE message is still in the future\\n    error SiweAuth_NotBeforeInFuture();\\n    /// Validity of the authentication token or the Expires value in the SIWE message is in the past\\n    error SiweAuth_Expired();\\n\\n    /**\\n     * @notice Instantiate the contract which uses SIWE for authentication and\\n     * runs on the specified domain.\\n     * @param inDomain The domain this contract is associated with\\n     */\\n    constructor(string memory inDomain) {\\n        _authTokenEncKey = bytes32(Sapphire.randomBytes(32, \\\"\\\"));\\n        _domain = inDomain;\\n    }\\n\\n    /**\\n     * @notice Login using a SIWE message and signature\\n     * @param siweMsg The signed SIWE message\\n     * @param sig The signature of the SIWE message\\n     * @return The encrypted authentication token\\n     */\\n    function login(string calldata siweMsg, SignatureRSV calldata sig)\\n        external\\n        view\\n        override\\n        returns (bytes memory)\\n    {\\n        AuthToken memory b;\\n\\n        // Derive the user's address from the signature.\\n        bytes memory eip191msg = abi.encodePacked(\\n            \\\"\\\\x19Ethereum Signed Message:\\\\n\\\",\\n            Strings.toString(bytes(siweMsg).length),\\n            siweMsg\\n        );\\n        address addr = ecrecover(\\n            keccak256(eip191msg),\\n            uint8(sig.v),\\n            sig.r,\\n            sig.s\\n        );\\n        b.userAddr = addr;\\n\\n        ParsedSiweMessage memory p = SiweParser.parseSiweMsg(bytes(siweMsg));\\n\\n        if (p.chainId != block.chainid) {\\n            revert SiweAuth_ChainIdMismatch();\\n        }\\n\\n        if (keccak256(p.schemeDomain) != keccak256(bytes(_domain))) {\\n            revert SiweAuth_DomainMismatch();\\n        }\\n        b.domain = string(p.schemeDomain);\\n\\n        if (p.addr != addr) {\\n            revert SiweAuth_AddressMismatch();\\n        }\\n\\n        if (\\n            p.notBefore.length != 0 &&\\n            block.timestamp <= SiweParser.timestampFromIso(p.notBefore)\\n        ) {\\n            revert SiweAuth_NotBeforeInFuture();\\n        }\\n\\n        if (p.expirationTime.length != 0) {\\n            // Compute expected block number at expiration time.\\n            uint256 expirationTime = SiweParser.timestampFromIso(\\n                p.expirationTime\\n            );\\n            b.validUntil = expirationTime;\\n        } else {\\n            // Otherwise, just take the default validity.\\n            b.validUntil = block.timestamp + DEFAULT_VALIDITY;\\n        }\\n        if (block.timestamp >= b.validUntil) {\\n            revert SiweAuth_Expired();\\n        }\\n\\n        // Store statement from the SIWE message.\\n        b.statement = string(p.statement);\\n\\n        // Store resources from the SIWE message.\\n        b.resources = new string[](p.resources.length);\\n        for (uint256 i = 0; i < p.resources.length; i++) {\\n            b.resources[i] = string(p.resources[i]);\\n        }\\n\\n        bytes memory encB = Sapphire.encrypt(\\n            _authTokenEncKey,\\n            0,\\n            abi.encode(b),\\n            \\\"\\\"\\n        );\\n        return encB;\\n    }\\n\\n    /**\\n     * @notice Return the domain associated with the dApp.\\n     * @return The domain string\\n     */\\n    function domain() public view returns (string memory) {\\n        return _domain;\\n    }\\n\\n    /**\\n     * @notice Get the authenticated address from a token\\n     * @param token The authentication token\\n     * @return The authenticated user address or zero address if token is empty\\n     */\\n    function authMsgSender(bytes memory token)\\n        internal\\n        view\\n        override\\n        checkRevokedAuthToken(token)\\n        returns (address)\\n    {\\n        if (token.length == 0) {\\n            return address(0);\\n        }\\n\\n        AuthToken memory b = decodeAndValidateToken(token);\\n        return b.userAddr;\\n    }\\n\\n    /**\\n     * @notice Get the statement from the authentication token\\n     * @param token The authentication token\\n     * @return The statement string from the SIWE message\\n     */\\n    function getStatement(bytes memory token)\\n        internal\\n        view\\n        checkRevokedAuthToken(token)\\n        returns (string memory)\\n    {\\n        if (token.length == 0) {\\n            return \\\"\\\";\\n        }\\n\\n        AuthToken memory b = decodeAndValidateToken(token);\\n        return b.statement;\\n    }\\n\\n    /**\\n     * @notice Get all resources from the authentication token\\n     * @param token The authentication token\\n     * @return Array of resource URIs the token grants access to\\n     */\\n    function getResources(bytes memory token)\\n        internal\\n        view\\n        checkRevokedAuthToken(token)\\n        returns (string[] memory)\\n    {\\n        if (token.length == 0) {\\n            return new string[](0);\\n        }\\n\\n        AuthToken memory b = decodeAndValidateToken(token);\\n        return b.resources;\\n    }\\n\\n    /**\\n     * @notice Helper function to decrypt, decode and validate a token\\n     * @dev Performs token decoding as well as domain and validation\\n     * @param token The authentication token\\n     * @return The decoded and validated AuthToken struct\\n     */\\n    function decodeAndValidateToken(bytes memory token)\\n        internal\\n        view\\n        virtual\\n        returns (AuthToken memory)\\n    {\\n        bytes memory authTokenEncoded = Sapphire.decrypt(\\n            _authTokenEncKey,\\n            0,\\n            token,\\n            \\\"\\\"\\n        );\\n        AuthToken memory b = abi.decode(authTokenEncoded, (AuthToken));\\n\\n        // Validate domain\\n        if (keccak256(bytes(b.domain)) != keccak256(bytes(_domain))) {\\n            revert SiweAuth_DomainMismatch();\\n        }\\n\\n        // Validate expiry\\n        if (b.validUntil < block.timestamp) {\\n            revert SiweAuth_Expired();\\n        }\\n\\n        return b;\\n    }\\n}\\n\",\"keccak256\":\"0x99fe870c763ff9329f6bac4484ab0ec54fb90ca8bb665b44fd2e058fe739acda\",\"license\":\"Apache-2.0\"},\"@openzeppelin/contracts/utils/Strings.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (utils/Strings.sol)\\n\\npragma solidity ^0.8.20;\\n\\nimport {Math} from \\\"./math/Math.sol\\\";\\nimport {SignedMath} from \\\"./math/SignedMath.sol\\\";\\n\\n/**\\n * @dev String operations.\\n */\\nlibrary Strings {\\n    bytes16 private constant HEX_DIGITS = \\\"0123456789abcdef\\\";\\n    uint8 private constant ADDRESS_LENGTH = 20;\\n\\n    /**\\n     * @dev The `value` string doesn't fit in the specified `length`.\\n     */\\n    error StringsInsufficientHexLength(uint256 value, uint256 length);\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` decimal representation.\\n     */\\n    function toString(uint256 value) internal pure returns (string memory) {\\n        unchecked {\\n            uint256 length = Math.log10(value) + 1;\\n            string memory buffer = new string(length);\\n            uint256 ptr;\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                ptr := add(buffer, add(32, length))\\n            }\\n            while (true) {\\n                ptr--;\\n                /// @solidity memory-safe-assembly\\n                assembly {\\n                    mstore8(ptr, byte(mod(value, 10), HEX_DIGITS))\\n                }\\n                value /= 10;\\n                if (value == 0) break;\\n            }\\n            return buffer;\\n        }\\n    }\\n\\n    /**\\n     * @dev Converts a `int256` to its ASCII `string` decimal representation.\\n     */\\n    function toStringSigned(int256 value) internal pure returns (string memory) {\\n        return string.concat(value < 0 ? \\\"-\\\" : \\\"\\\", toString(SignedMath.abs(value)));\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation.\\n     */\\n    function toHexString(uint256 value) internal pure returns (string memory) {\\n        unchecked {\\n            return toHexString(value, Math.log256(value) + 1);\\n        }\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.\\n     */\\n    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {\\n        uint256 localValue = value;\\n        bytes memory buffer = new bytes(2 * length + 2);\\n        buffer[0] = \\\"0\\\";\\n        buffer[1] = \\\"x\\\";\\n        for (uint256 i = 2 * length + 1; i > 1; --i) {\\n            buffer[i] = HEX_DIGITS[localValue & 0xf];\\n            localValue >>= 4;\\n        }\\n        if (localValue != 0) {\\n            revert StringsInsufficientHexLength(value, length);\\n        }\\n        return string(buffer);\\n    }\\n\\n    /**\\n     * @dev Converts an `address` with fixed length of 20 bytes to its not checksummed ASCII `string` hexadecimal\\n     * representation.\\n     */\\n    function toHexString(address addr) internal pure returns (string memory) {\\n        return toHexString(uint256(uint160(addr)), ADDRESS_LENGTH);\\n    }\\n\\n    /**\\n     * @dev Returns true if the two strings are equal.\\n     */\\n    function equal(string memory a, string memory b) internal pure returns (bool) {\\n        return bytes(a).length == bytes(b).length && keccak256(bytes(a)) == keccak256(bytes(b));\\n    }\\n}\\n\",\"keccak256\":\"0x55f102ea785d8399c0e58d1108e2d289506dde18abc6db1b7f68c1f9f9bc5792\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/math/Math.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (utils/math/Math.sol)\\n\\npragma solidity ^0.8.20;\\n\\n/**\\n * @dev Standard math utilities missing in the Solidity language.\\n */\\nlibrary Math {\\n    /**\\n     * @dev Muldiv operation overflow.\\n     */\\n    error MathOverflowedMulDiv();\\n\\n    enum Rounding {\\n        Floor, // Toward negative infinity\\n        Ceil, // Toward positive infinity\\n        Trunc, // Toward zero\\n        Expand // Away from zero\\n    }\\n\\n    /**\\n     * @dev Returns the addition of two unsigned integers, with an overflow flag.\\n     */\\n    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            uint256 c = a + b;\\n            if (c < a) return (false, 0);\\n            return (true, c);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the subtraction of two unsigned integers, with an overflow flag.\\n     */\\n    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            if (b > a) return (false, 0);\\n            return (true, a - b);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the multiplication of two unsigned integers, with an overflow flag.\\n     */\\n    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            // Gas optimization: this is cheaper than requiring 'a' not being zero, but the\\n            // benefit is lost if 'b' is also tested.\\n            // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522\\n            if (a == 0) return (true, 0);\\n            uint256 c = a * b;\\n            if (c / a != b) return (false, 0);\\n            return (true, c);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the division of two unsigned integers, with a division by zero flag.\\n     */\\n    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            if (b == 0) return (false, 0);\\n            return (true, a / b);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the remainder of dividing two unsigned integers, with a division by zero flag.\\n     */\\n    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        unchecked {\\n            if (b == 0) return (false, 0);\\n            return (true, a % b);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the largest of two numbers.\\n     */\\n    function max(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a > b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the smallest of two numbers.\\n     */\\n    function min(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a < b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the average of two numbers. The result is rounded towards\\n     * zero.\\n     */\\n    function average(uint256 a, uint256 b) internal pure returns (uint256) {\\n        // (a + b) / 2 can overflow.\\n        return (a & b) + (a ^ b) / 2;\\n    }\\n\\n    /**\\n     * @dev Returns the ceiling of the division of two numbers.\\n     *\\n     * This differs from standard division with `/` in that it rounds towards infinity instead\\n     * of rounding towards zero.\\n     */\\n    function ceilDiv(uint256 a, uint256 b) internal pure returns (uint256) {\\n        if (b == 0) {\\n            // Guarantee the same behavior as in a regular Solidity division.\\n            return a / b;\\n        }\\n\\n        // (a + b - 1) / b can overflow on addition, so we distribute.\\n        return a == 0 ? 0 : (a - 1) / b + 1;\\n    }\\n\\n    /**\\n     * @notice Calculates floor(x * y / denominator) with full precision. Throws if result overflows a uint256 or\\n     * denominator == 0.\\n     * @dev Original credit to Remco Bloemen under MIT license (https://xn--2-umb.com/21/muldiv) with further edits by\\n     * Uniswap Labs also under MIT license.\\n     */\\n    function mulDiv(uint256 x, uint256 y, uint256 denominator) internal pure returns (uint256 result) {\\n        unchecked {\\n            // 512-bit multiply [prod1 prod0] = x * y. Compute the product mod 2^256 and mod 2^256 - 1, then use\\n            // use the Chinese Remainder Theorem to reconstruct the 512 bit result. The result is stored in two 256\\n            // variables such that product = prod1 * 2^256 + prod0.\\n            uint256 prod0 = x * y; // Least significant 256 bits of the product\\n            uint256 prod1; // Most significant 256 bits of the product\\n            assembly {\\n                let mm := mulmod(x, y, not(0))\\n                prod1 := sub(sub(mm, prod0), lt(mm, prod0))\\n            }\\n\\n            // Handle non-overflow cases, 256 by 256 division.\\n            if (prod1 == 0) {\\n                // Solidity will revert if denominator == 0, unlike the div opcode on its own.\\n                // The surrounding unchecked block does not change this fact.\\n                // See https://docs.soliditylang.org/en/latest/control-structures.html#checked-or-unchecked-arithmetic.\\n                return prod0 / denominator;\\n            }\\n\\n            // Make sure the result is less than 2^256. Also prevents denominator == 0.\\n            if (denominator <= prod1) {\\n                revert MathOverflowedMulDiv();\\n            }\\n\\n            ///////////////////////////////////////////////\\n            // 512 by 256 division.\\n            ///////////////////////////////////////////////\\n\\n            // Make division exact by subtracting the remainder from [prod1 prod0].\\n            uint256 remainder;\\n            assembly {\\n                // Compute remainder using mulmod.\\n                remainder := mulmod(x, y, denominator)\\n\\n                // Subtract 256 bit number from 512 bit number.\\n                prod1 := sub(prod1, gt(remainder, prod0))\\n                prod0 := sub(prod0, remainder)\\n            }\\n\\n            // Factor powers of two out of denominator and compute largest power of two divisor of denominator.\\n            // Always >= 1. See https://cs.stackexchange.com/q/138556/92363.\\n\\n            uint256 twos = denominator & (0 - denominator);\\n            assembly {\\n                // Divide denominator by twos.\\n                denominator := div(denominator, twos)\\n\\n                // Divide [prod1 prod0] by twos.\\n                prod0 := div(prod0, twos)\\n\\n                // Flip twos such that it is 2^256 / twos. If twos is zero, then it becomes one.\\n                twos := add(div(sub(0, twos), twos), 1)\\n            }\\n\\n            // Shift in bits from prod1 into prod0.\\n            prod0 |= prod1 * twos;\\n\\n            // Invert denominator mod 2^256. Now that denominator is an odd number, it has an inverse modulo 2^256 such\\n            // that denominator * inv = 1 mod 2^256. Compute the inverse by starting with a seed that is correct for\\n            // four bits. That is, denominator * inv = 1 mod 2^4.\\n            uint256 inverse = (3 * denominator) ^ 2;\\n\\n            // Use the Newton-Raphson iteration to improve the precision. Thanks to Hensel's lifting lemma, this also\\n            // works in modular arithmetic, doubling the correct bits in each step.\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^8\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^16\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^32\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^64\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^128\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^256\\n\\n            // Because the division is now exact we can divide by multiplying with the modular inverse of denominator.\\n            // This will give us the correct result modulo 2^256. Since the preconditions guarantee that the outcome is\\n            // less than 2^256, this is the final result. We don't need to compute the high bits of the result and prod1\\n            // is no longer required.\\n            result = prod0 * inverse;\\n            return result;\\n        }\\n    }\\n\\n    /**\\n     * @notice Calculates x * y / denominator with full precision, following the selected rounding direction.\\n     */\\n    function mulDiv(uint256 x, uint256 y, uint256 denominator, Rounding rounding) internal pure returns (uint256) {\\n        uint256 result = mulDiv(x, y, denominator);\\n        if (unsignedRoundsUp(rounding) && mulmod(x, y, denominator) > 0) {\\n            result += 1;\\n        }\\n        return result;\\n    }\\n\\n    /**\\n     * @dev Returns the square root of a number. If the number is not a perfect square, the value is rounded\\n     * towards zero.\\n     *\\n     * Inspired by Henry S. Warren, Jr.'s \\\"Hacker's Delight\\\" (Chapter 11).\\n     */\\n    function sqrt(uint256 a) internal pure returns (uint256) {\\n        if (a == 0) {\\n            return 0;\\n        }\\n\\n        // For our first guess, we get the biggest power of 2 which is smaller than the square root of the target.\\n        //\\n        // We know that the \\\"msb\\\" (most significant bit) of our target number `a` is a power of 2 such that we have\\n        // `msb(a) <= a < 2*msb(a)`. This value can be written `msb(a)=2**k` with `k=log2(a)`.\\n        //\\n        // This can be rewritten `2**log2(a) <= a < 2**(log2(a) + 1)`\\n        // \\u2192 `sqrt(2**k) <= sqrt(a) < sqrt(2**(k+1))`\\n        // \\u2192 `2**(k/2) <= sqrt(a) < 2**((k+1)/2) <= 2**(k/2 + 1)`\\n        //\\n        // Consequently, `2**(log2(a) / 2)` is a good first approximation of `sqrt(a)` with at least 1 correct bit.\\n        uint256 result = 1 << (log2(a) >> 1);\\n\\n        // At this point `result` is an estimation with one bit of precision. We know the true value is a uint128,\\n        // since it is the square root of a uint256. Newton's method converges quadratically (precision doubles at\\n        // every iteration). We thus need at most 7 iteration to turn our partial result with one bit of precision\\n        // into the expected uint128 result.\\n        unchecked {\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            return min(result, a / result);\\n        }\\n    }\\n\\n    /**\\n     * @notice Calculates sqrt(a), following the selected rounding direction.\\n     */\\n    function sqrt(uint256 a, Rounding rounding) internal pure returns (uint256) {\\n        unchecked {\\n            uint256 result = sqrt(a);\\n            return result + (unsignedRoundsUp(rounding) && result * result < a ? 1 : 0);\\n        }\\n    }\\n\\n    /**\\n     * @dev Return the log in base 2 of a positive value rounded towards zero.\\n     * Returns 0 if given 0.\\n     */\\n    function log2(uint256 value) internal pure returns (uint256) {\\n        uint256 result = 0;\\n        unchecked {\\n            if (value >> 128 > 0) {\\n                value >>= 128;\\n                result += 128;\\n            }\\n            if (value >> 64 > 0) {\\n                value >>= 64;\\n                result += 64;\\n            }\\n            if (value >> 32 > 0) {\\n                value >>= 32;\\n                result += 32;\\n            }\\n            if (value >> 16 > 0) {\\n                value >>= 16;\\n                result += 16;\\n            }\\n            if (value >> 8 > 0) {\\n                value >>= 8;\\n                result += 8;\\n            }\\n            if (value >> 4 > 0) {\\n                value >>= 4;\\n                result += 4;\\n            }\\n            if (value >> 2 > 0) {\\n                value >>= 2;\\n                result += 2;\\n            }\\n            if (value >> 1 > 0) {\\n                result += 1;\\n            }\\n        }\\n        return result;\\n    }\\n\\n    /**\\n     * @dev Return the log in base 2, following the selected rounding direction, of a positive value.\\n     * Returns 0 if given 0.\\n     */\\n    function log2(uint256 value, Rounding rounding) internal pure returns (uint256) {\\n        unchecked {\\n            uint256 result = log2(value);\\n            return result + (unsignedRoundsUp(rounding) && 1 << result < value ? 1 : 0);\\n        }\\n    }\\n\\n    /**\\n     * @dev Return the log in base 10 of a positive value rounded towards zero.\\n     * Returns 0 if given 0.\\n     */\\n    function log10(uint256 value) internal pure returns (uint256) {\\n        uint256 result = 0;\\n        unchecked {\\n            if (value >= 10 ** 64) {\\n                value /= 10 ** 64;\\n                result += 64;\\n            }\\n            if (value >= 10 ** 32) {\\n                value /= 10 ** 32;\\n                result += 32;\\n            }\\n            if (value >= 10 ** 16) {\\n                value /= 10 ** 16;\\n                result += 16;\\n            }\\n            if (value >= 10 ** 8) {\\n                value /= 10 ** 8;\\n                result += 8;\\n            }\\n            if (value >= 10 ** 4) {\\n                value /= 10 ** 4;\\n                result += 4;\\n            }\\n            if (value >= 10 ** 2) {\\n                value /= 10 ** 2;\\n                result += 2;\\n            }\\n            if (value >= 10 ** 1) {\\n                result += 1;\\n            }\\n        }\\n        return result;\\n    }\\n\\n    /**\\n     * @dev Return the log in base 10, following the selected rounding direction, of a positive value.\\n     * Returns 0 if given 0.\\n     */\\n    function log10(uint256 value, Rounding rounding) internal pure returns (uint256) {\\n        unchecked {\\n            uint256 result = log10(value);\\n            return result + (unsignedRoundsUp(rounding) && 10 ** result < value ? 1 : 0);\\n        }\\n    }\\n\\n    /**\\n     * @dev Return the log in base 256 of a positive value rounded towards zero.\\n     * Returns 0 if given 0.\\n     *\\n     * Adding one to the result gives the number of pairs of hex symbols needed to represent `value` as a hex string.\\n     */\\n    function log256(uint256 value) internal pure returns (uint256) {\\n        uint256 result = 0;\\n        unchecked {\\n            if (value >> 128 > 0) {\\n                value >>= 128;\\n                result += 16;\\n            }\\n            if (value >> 64 > 0) {\\n                value >>= 64;\\n                result += 8;\\n            }\\n            if (value >> 32 > 0) {\\n                value >>= 32;\\n                result += 4;\\n            }\\n            if (value >> 16 > 0) {\\n                value >>= 16;\\n                result += 2;\\n            }\\n            if (value >> 8 > 0) {\\n                result += 1;\\n            }\\n        }\\n        return result;\\n    }\\n\\n    /**\\n     * @dev Return the log in base 256, following the selected rounding direction, of a positive value.\\n     * Returns 0 if given 0.\\n     */\\n    function log256(uint256 value, Rounding rounding) internal pure returns (uint256) {\\n        unchecked {\\n            uint256 result = log256(value);\\n            return result + (unsignedRoundsUp(rounding) && 1 << (result << 3) < value ? 1 : 0);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns whether a provided rounding mode is considered rounding up for unsigned integers.\\n     */\\n    function unsignedRoundsUp(Rounding rounding) internal pure returns (bool) {\\n        return uint8(rounding) % 2 == 1;\\n    }\\n}\\n\",\"keccak256\":\"0x005ec64c6313f0555d59e278f9a7a5ab2db5bdc72a027f255a37c327af1ec02d\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/math/SignedMath.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (utils/math/SignedMath.sol)\\n\\npragma solidity ^0.8.20;\\n\\n/**\\n * @dev Standard signed math utilities missing in the Solidity language.\\n */\\nlibrary SignedMath {\\n    /**\\n     * @dev Returns the largest of two signed numbers.\\n     */\\n    function max(int256 a, int256 b) internal pure returns (int256) {\\n        return a > b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the smallest of two signed numbers.\\n     */\\n    function min(int256 a, int256 b) internal pure returns (int256) {\\n        return a < b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the average of two signed numbers without overflow.\\n     * The result is rounded towards zero.\\n     */\\n    function average(int256 a, int256 b) internal pure returns (int256) {\\n        // Formula from the book \\\"Hacker's Delight\\\"\\n        int256 x = (a & b) + ((a ^ b) >> 1);\\n        return x + (int256(uint256(x) >> 255) & (a ^ b));\\n    }\\n\\n    /**\\n     * @dev Returns the absolute unsigned value of a signed value.\\n     */\\n    function abs(int256 n) internal pure returns (uint256) {\\n        unchecked {\\n            // must be unchecked in order to support `n = type(int256).min`\\n            return uint256(n >= 0 ? n : -n);\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x5f7e4076e175393767754387c962926577f1660dd9b810187b9002407656be72\",\"license\":\"MIT\"},\"contracts/SimpleBet.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.20;\\n\\nimport \\\"@oasisprotocol/sapphire-contracts/contracts/auth/SiweAuth.sol\\\";\\n\\n/**\\n * @title SimpleBet\\n * @dev A simple betting smart contract with SiweAuth integration for Oasis Sapphire\\n * Users can place bets, contract acts as escrow, and owner can manage funds\\n */\\ncontract SimpleBet is SiweAuth {\\n    address private _owner;\\n    uint256 private _nextBetId = 1;\\n    \\n    enum BetOutcome {\\n        YES,\\n        NO\\n    }\\n    \\n    enum BetStatus {\\n        Active,\\n        Won,\\n        Lost,\\n        Cancelled\\n    }\\n    \\n    struct Bet {\\n        uint256 id;\\n        address user;\\n        uint256 amount;\\n        BetOutcome outcome;\\n        BetStatus status;\\n        uint256 createdAt;\\n        string description;\\n    }\\n    \\n    // Public metadata (encrypted but accessible via getter)\\n    Bet[] public _betMetas;\\n    \\n    // Private secret data (truly secret)\\n    bytes[] private _betSecrets;\\n    \\n    mapping(address => uint256[]) private _userBets;\\n    mapping(address => uint256) public userBalances;\\n    \\n    event BetPlaced(\\n        uint256 indexed betId,\\n        address indexed user,\\n        uint256 amount,\\n        BetOutcome outcome,\\n        uint256 index\\n    );\\n    \\n    event BetResolved(\\n        uint256 indexed betId,\\n        BetStatus status,\\n        uint256 payout\\n    );\\n    \\n    event FundsWithdrawn(\\n        address indexed user,\\n        uint256 amount\\n    );\\n    \\n    modifier onlyOwner(bytes memory token) {\\n        if (msg.sender != _owner && authMsgSender(token) != _owner) {\\n            revert(\\\"not allowed\\\");\\n        }\\n        _;\\n    }\\n    \\n    modifier onlyBetOwner(uint256 betId, bytes memory token) {\\n        require(betId < _betMetas.length, \\\"Bet does not exist\\\");\\n        address betOwner = _betMetas[betId].user;\\n        if (msg.sender != betOwner && authMsgSender(token) != betOwner) {\\n            revert(\\\"not bet owner\\\");\\n        }\\n        _;\\n    }\\n    \\n    constructor(string memory domain) SiweAuth(domain) {\\n        _owner = msg.sender;\\n    }\\n    \\n    /**\\n     * @dev Place a bet with amount and outcome\\n     * @param outcome The outcome to bet on (YES/NO)\\n     * @param description Public description of the bet\\n     * @param secretData Private data associated with the bet\\n     */\\n    function placeBet(\\n        BetOutcome outcome,\\n        string calldata description,\\n        bytes calldata secretData\\n    ) external payable {\\n        require(msg.value > 0, \\\"Bet amount must be greater than 0\\\");\\n        \\n        uint256 betId = _nextBetId++;\\n        \\n        Bet memory newBet = Bet({\\n            id: betId,\\n            user: msg.sender,\\n            amount: msg.value,\\n            outcome: outcome,\\n            status: BetStatus.Active,\\n            createdAt: block.timestamp,\\n            description: description\\n        });\\n        \\n        _betMetas.push(newBet);\\n        _betSecrets.push(secretData);\\n        _userBets[msg.sender].push(_betMetas.length - 1);\\n        \\n        emit BetPlaced(betId, msg.sender, msg.value, outcome, _betMetas.length - 1);\\n    }\\n    \\n    /**\\n     * @dev Get user's bets using SIWE authentication\\n     * @param token SIWE authentication token\\n     * @param offset Pagination offset\\n     * @param count Number of bets to return\\n     */\\n    function getUserBets(\\n        bytes memory token,\\n        uint256 offset,\\n        uint256 count\\n    ) external view returns (Bet[] memory) {\\n        address user = authMsgSender(token);\\n        require(user != address(0), \\\"Invalid authentication token\\\");\\n        \\n        uint256[] memory userBetIndices = _userBets[user];\\n        \\n        if (offset >= userBetIndices.length) {\\n            return new Bet[](0);\\n        }\\n        \\n        uint256 end = offset + count;\\n        if (end > userBetIndices.length) {\\n            end = userBetIndices.length;\\n        }\\n        \\n        Bet[] memory result = new Bet[](end - offset);\\n        for (uint256 i = offset; i < end; i++) {\\n            result[i - offset] = _betMetas[userBetIndices[i]];\\n        }\\n        \\n        return result;\\n    }\\n    \\n    /**\\n     * @dev Get secret data for a specific bet (only bet owner can access)\\n     * @param betIndex Index of the bet in the _betMetas array\\n     * @param token SIWE authentication token\\n     */\\n    function getBetSecret(\\n        uint256 betIndex,\\n        bytes memory token\\n    ) external view onlyBetOwner(_betMetas[betIndex].id, token) returns (bytes memory) {\\n        require(betIndex < _betSecrets.length, \\\"Bet secret does not exist\\\");\\n        return _betSecrets[betIndex];\\n    }\\n    \\n    /**\\n     * @dev Resolve a bet (only owner)\\n     * @param betId The bet ID to resolve\\n     * @param won Whether the bet won or lost\\n     * @param token SIWE authentication token for owner\\n     */\\n    function resolveBet(\\n        uint256 betId,\\n        bool won,\\n        bytes memory token\\n    ) external onlyOwner(token) {\\n        require(betId > 0 && betId < _nextBetId, \\\"Invalid bet ID\\\");\\n        \\n        // Find the bet in the array\\n        uint256 betIndex = 0;\\n        bool found = false;\\n        for (uint256 i = 0; i < _betMetas.length; i++) {\\n            if (_betMetas[i].id == betId) {\\n                betIndex = i;\\n                found = true;\\n                break;\\n            }\\n        }\\n        \\n        require(found, \\\"Bet not found\\\");\\n        require(_betMetas[betIndex].status == BetStatus.Active, \\\"Bet already resolved\\\");\\n        \\n        Bet storage bet = _betMetas[betIndex];\\n        uint256 payout = 0;\\n        \\n        if (won) {\\n            bet.status = BetStatus.Won;\\n            // Simple 2x payout for winning bets\\n            payout = bet.amount * 2;\\n            userBalances[bet.user] += payout;\\n        } else {\\n            bet.status = BetStatus.Lost;\\n            // No payout for losing bets\\n        }\\n        \\n        emit BetResolved(betId, bet.status, payout);\\n    }\\n    \\n    /**\\n     * @dev Cancel a bet and refund (only owner)\\n     * @param betId The bet ID to cancel\\n     * @param token SIWE authentication token for owner\\n     */\\n    function cancelBet(\\n        uint256 betId,\\n        bytes memory token\\n    ) external onlyOwner(token) {\\n        require(betId > 0 && betId < _nextBetId, \\\"Invalid bet ID\\\");\\n        \\n        // Find the bet in the array\\n        uint256 betIndex = 0;\\n        bool found = false;\\n        for (uint256 i = 0; i < _betMetas.length; i++) {\\n            if (_betMetas[i].id == betId) {\\n                betIndex = i;\\n                found = true;\\n                break;\\n            }\\n        }\\n        \\n        require(found, \\\"Bet not found\\\");\\n        require(_betMetas[betIndex].status == BetStatus.Active, \\\"Bet already resolved\\\");\\n        \\n        Bet storage bet = _betMetas[betIndex];\\n        bet.status = BetStatus.Cancelled;\\n        \\n        // Refund the bet amount\\n        userBalances[bet.user] += bet.amount;\\n        \\n        emit BetResolved(betId, bet.status, bet.amount);\\n    }\\n    \\n    /**\\n     * @dev Withdraw user balance\\n     */\\n    function withdrawBalance() external {\\n        uint256 balance = userBalances[msg.sender];\\n        require(balance > 0, \\\"No balance to withdraw\\\");\\n        \\n        userBalances[msg.sender] = 0;\\n        \\n        (bool success, ) = payable(msg.sender).call{value: balance}(\\\"\\\");\\n        require(success, \\\"Withdrawal failed\\\");\\n        \\n        emit FundsWithdrawn(msg.sender, balance);\\n    }\\n    \\n    /**\\n     * @dev Owner withdraws contract funds (only owner)\\n     * @param amount Amount to withdraw\\n     * @param token SIWE authentication token for owner\\n     */\\n    function ownerWithdraw(\\n        uint256 amount,\\n        bytes memory token\\n    ) external onlyOwner(token) {\\n        require(amount <= address(this).balance, \\\"Insufficient contract balance\\\");\\n        \\n        (bool success, ) = payable(_owner).call{value: amount}(\\\"\\\");\\n        require(success, \\\"Owner withdrawal failed\\\");\\n        \\n        emit FundsWithdrawn(_owner, amount);\\n    }\\n    \\n    /**\\n     * @dev Get all bet metadata (paginated)\\n     * @param offset Pagination offset\\n     * @param count Number of bets to return\\n     */\\n    function getAllBets(\\n        uint256 offset,\\n        uint256 count\\n    ) external view returns (Bet[] memory) {\\n        if (offset >= _betMetas.length) {\\n            return new Bet[](0);\\n        }\\n        \\n        uint256 end = offset + count;\\n        if (end > _betMetas.length) {\\n            end = _betMetas.length;\\n        }\\n        \\n        Bet[] memory result = new Bet[](end - offset);\\n        for (uint256 i = offset; i < end; i++) {\\n            result[i - offset] = _betMetas[offset + i];\\n        }\\n        \\n        return result;\\n    }\\n    \\n    /**\\n     * @dev Get contract balance\\n     */\\n    function getContractBalance() external view returns (uint256) {\\n        return address(this).balance;\\n    }\\n    \\n    /**\\n     * @dev Get total number of bets\\n     */\\n    function getTotalBets() external view returns (uint256) {\\n        return _betMetas.length;\\n    }\\n    \\n    /**\\n     * @dev Get user's total bet count\\n     * @param user User address\\n     */\\n    function getUserBetCount(address user) external view returns (uint256) {\\n        return _userBets[user].length;\\n    }\\n    \\n    /**\\n     * @dev Get owner address\\n     */\\n    function getOwner() external view returns (address) {\\n        return _owner;\\n    }\\n}\",\"keccak256\":\"0xacfa331cc474771bf0edfb270309673e734dfec9772d8e2ee96bb55a8bf73e1f\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x608060405260016004553480156200001657600080fd5b50604051620040ed380380620040ed8339810160408190526200003991620001c4565b806200005c6020604051806020016040528060008152506200009360201b60201c565b62000067906200027c565b60025560016200007882826200032d565b5050600380546001600160a01b031916331790555062000453565b60606000807301000000000000000000000000000000000000016001600160a01b03168585604051602001620000cb929190620003f9565b60408051601f1981840301815290829052620000e79162000435565b600060405180830381855afa9150503d806000811462000124576040519150601f19603f3d011682016040523d82523d6000602084013e62000129565b606091505b509150915081620001805760405162461bcd60e51b815260206004820152601360248201527f72616e646f6d42797465733a206661696c656400000000000000000000000000604482015260640160405180910390fd5b949350505050565b634e487b7160e01b600052604160045260246000fd5b60005b83811015620001bb578181015183820152602001620001a1565b50506000910152565b600060208284031215620001d757600080fd5b81516001600160401b0380821115620001ef57600080fd5b818401915084601f8301126200020457600080fd5b81518181111562000219576200021962000188565b604051601f8201601f19908116603f0116810190838211818310171562000244576200024462000188565b816040528281528760208487010111156200025e57600080fd5b620002718360208301602088016200019e565b979650505050505050565b805160208083015191908110156200029e576000198160200360031b1b821691505b50919050565b600181811c90821680620002b957607f821691505b6020821081036200029e57634e487b7160e01b600052602260045260246000fd5b601f8211156200032857600081815260208120601f850160051c81016020861015620003035750805b601f850160051c820191505b8181101562000324578281556001016200030f565b5050505b505050565b81516001600160401b0381111562000349576200034962000188565b62000361816200035a8454620002a4565b84620002da565b602080601f831160018114620003995760008415620003805750858301515b600019600386901b1c1916600185901b17855562000324565b600085815260208120601f198616915b82811015620003ca57888601518255948401946001909101908401620003a9565b5085821015620003e95787850151600019600388901b60f8161c191681555b5050505050600190811b01905550565b8281526040602082015260008251806040840152620004208160608501602087016200019e565b601f01601f1916919091016060019392505050565b60008251620004498184602087016200019e565b9190910192915050565b613c8a80620004636000396000f3fe6080604052600436106100f35760003560e01c8063a3cb679d1161008a578063c6d87da911610059578063c6d87da91461028a578063c908bea6146102aa578063cc2942e9146102d7578063e67a2299146102f757600080fd5b8063a3cb679d14610217578063a9a902e41461022c578063b624010a1461023f578063c2fb26a61461027557600080fd5b80635fd8c710116100c65780635fd8c710146101a75780636f9fb98a146101bc5780637f476b6f146101cf578063893d20e8146101ef57600080fd5b806326224c64146100f85780634bb30b75146101385780634dae0d5a1461015a57806350d6756c14610187575b600080fd5b34801561010457600080fd5b50610125610113366004612f48565b60086020526000908152604090205481565b6040519081526020015b60405180910390f35b34801561014457600080fd5b50610158610153366004613050565b61032a565b005b34801561016657600080fd5b5061017a610175366004613050565b6104c4565b60405161012f91906130e6565b34801561019357600080fd5b506101586101a23660046130f9565b6106cf565b3480156101b357600080fd5b50610158610980565b3480156101c857600080fd5b5047610125565b3480156101db57600080fd5b5061017a6101ea36600461319e565b610aaa565b3480156101fb57600080fd5b506003546040516001600160a01b03909116815260200161012f565b34801561022357600080fd5b50600554610125565b61015861023a3660046131fc565b610db7565b34801561024b57600080fd5b5061012561025a366004612f48565b6001600160a01b031660009081526007602052604090205490565b34801561028157600080fd5b5061017a6110c0565b34801561029657600080fd5b506101586102a5366004613050565b611152565b3480156102b657600080fd5b506102ca6102c5366004613282565b6113d9565b60405161012f9190613309565b3480156102e357600080fd5b506102ca6102f23660046133d0565b611749565b34801561030357600080fd5b506103176103123660046133f2565b6119e1565b60405161012f979695949392919061340b565b60035481906001600160a01b0316331480159061036357506003546001600160a01b031661035782611acb565b6001600160a01b031614155b156103895760405162461bcd60e51b81526004016103809061345a565b60405180910390fd5b478311156103d95760405162461bcd60e51b815260206004820152601d60248201527f496e73756666696369656e7420636f6e74726163742062616c616e63650000006044820152606401610380565b6003546040516000916001600160a01b03169085908381818185875af1925050503d8060008114610426576040519150601f19603f3d011682016040523d82523d6000602084013e61042b565b606091505b505090508061047c5760405162461bcd60e51b815260206004820152601760248201527f4f776e6572207769746864726177616c206661696c65640000000000000000006044820152606401610380565b6003546040518581526001600160a01b03909116907feaff4b37086828766ad3268786972c0cd24259d4c87a80f9d3963a3c3d999b0d9060200160405180910390a250505050565b6060600583815481106104d9576104d961347f565b6000918252602090912060069091020154600554839082106105325760405162461bcd60e51b815260206004820152601260248201527110995d08191bd95cc81b9bdd08195e1a5cdd60721b6044820152606401610380565b6000600583815481106105475761054761347f565b60009182526020909120600160069092020101546001600160a01b031690503381148015906105905750806001600160a01b031661058483611acb565b6001600160a01b031614155b156105cd5760405162461bcd60e51b815260206004820152600d60248201526c3737ba103132ba1037bbb732b960991b6044820152606401610380565b600654861061061e5760405162461bcd60e51b815260206004820152601960248201527f4265742073656372657420646f6573206e6f74206578697374000000000000006044820152606401610380565b600686815481106106315761063161347f565b90600052602060002001805461064690613495565b80601f016020809104026020016040519081016040528092919081815260200182805461067290613495565b80156106bf5780601f10610694576101008083540402835291602001916106bf565b820191906000526020600020905b8154815290600101906020018083116106a257829003601f168201915b5050505050935050505092915050565b60035481906001600160a01b0316331480159061070857506003546001600160a01b03166106fc82611acb565b6001600160a01b031614155b156107255760405162461bcd60e51b81526004016103809061345a565b600084118015610736575060045484105b6107735760405162461bcd60e51b815260206004820152600e60248201526d125b9d985b1a590818995d08125160921b6044820152606401610380565b60008060005b6005548110156107cc5786600582815481106107975761079761347f565b906000526020600020906006020160000154036107ba57809250600191506107cc565b806107c4816134df565b915050610779565b508061080a5760405162461bcd60e51b815260206004820152600d60248201526c10995d081b9bdd08199bdd5b99609a1b6044820152606401610380565b60006005838154811061081f5761081f61347f565b906000526020600020906006020160030160019054906101000a900460ff16600381111561084f5761084f6132cf565b146108935760405162461bcd60e51b815260206004820152601460248201527310995d08185b1c9958591e481c995cdbdb1d995960621b6044820152606401610380565b6000600583815481106108a8576108a861347f565b906000526020600020906006020190506000861561091c5760038201805461ff0019166101001790556002808301546108e0916134f8565b60018301546001600160a01b031660009081526008602052604081208054929350839290919061091190849061350f565b9091555061092e9050565b60038201805461ff0019166102001790555b600382015460405189917fb4810c14f5f90d64272bdaaa79adbcd7a5593b0be3da5c9073f83a6e05169a169161096e91610100900460ff16908590613522565b60405180910390a25050505050505050565b33600090815260086020526040902054806109d65760405162461bcd60e51b81526020600482015260166024820152754e6f2062616c616e636520746f20776974686472617760501b6044820152606401610380565b336000818152600860205260408082208290555190919083908381818185875af1925050503d8060008114610a27576040519150601f19603f3d011682016040523d82523d6000602084013e610a2c565b606091505b5050905080610a715760405162461bcd60e51b815260206004820152601160248201527015da5d1a191c985dd85b0819985a5b1959607a1b6044820152606401610380565b60405182815233907feaff4b37086828766ad3268786972c0cd24259d4c87a80f9d3963a3c3d999b0d9060200160405180910390a25050565b6060610ab4612e32565b6000610abf85611b32565b8686604051602001610ad39392919061353d565b60408051601f19818403018152828252805160208083019190912060008086528583018086529190915260ff89850135169385019390935287356060850152870135608084015292509060019060a0016020604051602081039080840390855afa158015610b45573d6000803e3d6000fd5b5050604051601f1901516001600160a01b0381166020860152915060009050610b6e8888611bc4565b9050468160a0015114610b945760405163362c833760e01b815260040160405180910390fd5b6001604051610ba39190613591565b604051809103902081600001518051906020012014610bd55760405163283d62bd60e01b815260040160405180910390fd5b8051845260208101516001600160a01b03838116911614610c09576040516305cc02e160e01b815260040160405180910390fd5b6101208101515115801590610c2b5750610c2781610120015161202b565b4211155b15610c495760405163299d02f160e01b815260040160405180910390fd5b6101008101515115610c70576000610c6582610100015161202b565b604086015250610c83565b610c7d620151804261350f565b60408501525b83604001514210610ca757604051630b17115560e41b815260040160405180910390fd5b60408101516060850152610160810151516001600160401b03811115610ccf57610ccf612f65565b604051908082528060200260200182016040528015610d0257816020015b6060815260200190600190039081610ced5790505b50608085015260005b81610160015151811015610d6c578161016001518181518110610d3057610d3061347f565b602002602001015185608001518281518110610d4e57610d4e61347f565b60200260200101819052508080610d64906134df565b915050610d0b565b506000610da86002546000801b87604051602001610d8a9190613607565b60408051601f1981840301815260208301909152600082529061209a565b955050505050505b9392505050565b60003411610e115760405162461bcd60e51b815260206004820152602160248201527f42657420616d6f756e74206d7573742062652067726561746572207468616e206044820152600360fc1b6064820152608401610380565b6004805460009182610e22836134df565b91905055905060006040518060e00160405280838152602001336001600160a01b03168152602001348152602001886001811115610e6257610e626132cf565b81526020016000815260200142815260200187878080601f016020809104026020016040519081016040528093929190818152602001838380828437600092018290525093909452505060058054600180820183559190925283517f036b6384b5eca791c62761152d0c79bb0604c104a5fb6f4eb0703f3154bb3db0600690930292830190815560208501517f036b6384b5eca791c62761152d0c79bb0604c104a5fb6f4eb0703f3154bb3db1840180546001600160a01b0319166001600160a01b0390921691909117905560408501517f036b6384b5eca791c62761152d0c79bb0604c104a5fb6f4eb0703f3154bb3db284015560608501517f036b6384b5eca791c62761152d0c79bb0604c104a5fb6f4eb0703f3154bb3db3909301805495965086959194509160ff19909116908381811115610fa357610fa36132cf565b021790555060808201518160030160016101000a81548160ff02191690836003811115610fd257610fd26132cf565b021790555060a0820151600482015560c08201516005820190610ff59082613710565b5050600680546001810182556000919091527ff652222313e28459528d920b65115c16c04f3efc82aaedc97be59f3f377c0d3f0190506110368486836137cf565b503360009081526007602052604090206005546110559060019061388f565b815460018181018455600093845260209093200155600554339184917f7cdde6d299ea8fdc0aceb52128ad2948a1db7494031bd05ca26c6ae74b6e33b49134918c916110a09161388f565b6040516110af939291906138a2565b60405180910390a350505050505050565b6060600180546110cf90613495565b80601f01602080910402602001604051908101604052809291908181526020018280546110fb90613495565b80156111485780601f1061111d57610100808354040283529160200191611148565b820191906000526020600020905b81548152906001019060200180831161112b57829003601f168201915b5050505050905090565b60035481906001600160a01b0316331480159061118b57506003546001600160a01b031661117f82611acb565b6001600160a01b031614155b156111a85760405162461bcd60e51b81526004016103809061345a565b6000831180156111b9575060045483105b6111f65760405162461bcd60e51b815260206004820152600e60248201526d125b9d985b1a590818995d08125160921b6044820152606401610380565b60008060005b60055481101561124f57856005828154811061121a5761121a61347f565b9060005260206000209060060201600001540361123d578092506001915061124f565b80611247816134df565b9150506111fc565b508061128d5760405162461bcd60e51b815260206004820152600d60248201526c10995d081b9bdd08199bdd5b99609a1b6044820152606401610380565b6000600583815481106112a2576112a261347f565b906000526020600020906006020160030160019054906101000a900460ff1660038111156112d2576112d26132cf565b146113165760405162461bcd60e51b815260206004820152601460248201527310995d08185b1c9958591e481c995cdbdb1d995960621b6044820152606401610380565b60006005838154811061132b5761132b61347f565b60009182526020808320600360069390930201918201805461ff001916610300179055600282015460018301546001600160a01b0316845260089091526040832080549294509092909161138090849061350f565b90915550506003810154600282015460405188927fb4810c14f5f90d64272bdaaa79adbcd7a5593b0be3da5c9073f83a6e05169a16926113c99261010090920460ff1691613522565b60405180910390a2505050505050565b606060006113e685611acb565b90506001600160a01b03811661143e5760405162461bcd60e51b815260206004820152601c60248201527f496e76616c69642061757468656e7469636174696f6e20746f6b656e000000006044820152606401610380565b6001600160a01b03811660009081526007602090815260408083208054825181850281018501909352808352919290919083018282801561149e57602002820191906000526020600020905b81548152602001906001019080831161148a575b50505050509050805185106114e85760408051600080825260208201909252906114de565b6114cb612e6a565b8152602001906001900390816114c35790505b5092505050610db0565b60006114f4858761350f565b90508151811115611503575080515b600061150f878361388f565b6001600160401b0381111561152657611526612f65565b60405190808252806020026020018201604052801561155f57816020015b61154c612e6a565b8152602001906001900390816115445790505b509050865b8281101561173d5760058482815181106115805761158061347f565b6020026020010151815481106115985761159861347f565b90600052602060002090600602016040518060e0016040529081600082015481526020016001820160009054906101000a90046001600160a01b03166001600160a01b03166001600160a01b03168152602001600282015481526020016003820160009054906101000a900460ff166001811115611618576116186132cf565b6001811115611629576116296132cf565b81526020016003820160019054906101000a900460ff166003811115611651576116516132cf565b6003811115611662576116626132cf565b81526020016004820154815260200160058201805461168090613495565b80601f01602080910402602001604051908101604052809291908181526020018280546116ac90613495565b80156116f95780601f106116ce576101008083540402835291602001916116f9565b820191906000526020600020905b8154815290600101906020018083116116dc57829003601f168201915b50505050508152505082898361170f919061388f565b8151811061171f5761171f61347f565b60200260200101819052508080611735906134df565b915050611564565b50979650505050505050565b600554606090831061178e576040805160008082526020820190925290611786565b611773612e6a565b81526020019060019003908161176b5790505b5090506119db565b600061179a838561350f565b6005549091508111156117ac57506005545b60006117b8858361388f565b6001600160401b038111156117cf576117cf612f65565b60405190808252806020026020018201604052801561180857816020015b6117f5612e6a565b8152602001906001900390816117ed5790505b509050845b828110156119d6576005611821828861350f565b815481106118315761183161347f565b90600052602060002090600602016040518060e0016040529081600082015481526020016001820160009054906101000a90046001600160a01b03166001600160a01b03166001600160a01b03168152602001600282015481526020016003820160009054906101000a900460ff1660018111156118b1576118b16132cf565b60018111156118c2576118c26132cf565b81526020016003820160019054906101000a900460ff1660038111156118ea576118ea6132cf565b60038111156118fb576118fb6132cf565b81526020016004820154815260200160058201805461191990613495565b80601f016020809104026020016040519081016040528092919081815260200182805461194590613495565b80156119925780601f1061196757610100808354040283529160200191611992565b820191906000526020600020905b81548152906001019060200180831161197557829003601f168201915b5050505050815250508287836119a8919061388f565b815181106119b8576119b861347f565b602002602001018190525080806119ce906134df565b91505061180d565b509150505b92915050565b600581815481106119f157600080fd5b60009182526020909120600690910201805460018201546002830154600384015460048501546005860180549597506001600160a01b0390941695929460ff808416956101009094041693919290611a4890613495565b80601f0160208091040260200160405190810160405280929190818152602001828054611a7490613495565b8015611ac15780601f10611a9657610100808354040283529160200191611ac1565b820191906000526020600020905b815481529060010190602001808311611aa457829003601f168201915b5050505050905087565b80516020808301919091206000908152908190526040812054829060ff1615611b07576040516313d4cf0960e31b815260040160405180910390fd5b8251600003611b195760009150611b2c565b6000611b248461216f565b602001519250505b50919050565b60606000611b3f83612219565b60010190506000816001600160401b03811115611b5e57611b5e612f65565b6040519080825280601f01601f191660200182016040528015611b88576020820181803683370190505b5090508181016020015b600019016f181899199a1a9b1b9c1cb0b131b232b360811b600a86061a8153600a8504945084611b9257509392505050565b611bcc612ea7565b611bd4612ea7565b60005b83811015611c6557848482818110611bf157611bf161347f565b909101356001600160f81b031916600160fd1b039050611c5357611c4c85858080601f016020809104026020016040519081016040528093929190818152602001838380828437600092018290525092508591506122f19050565b8252611c65565b80611c5d816134df565b915050611bd7565b611c7060328261350f565b9050611cd7611cd286868080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250611cbc92506002915086905061350f565b935083611cca60288261350f565b9450846122f1565b6123c7565b6001600160a01b03166020830152611cf060028261350f565b90508381108015611d2a5750848482818110611d0e57611d0e61347f565b9050013560f81c60f81b6001600160f81b031916600560f91b14155b15611dd357805b84811015611dd157858582818110611d4b57611d4b61347f565b909101356001600160f81b031916600560f91b039050611dbf57611da886868080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508692508591506122f19050565b6040840152611db881600161350f565b9150611dd1565b80611dc9816134df565b915050611d31565b505b80611ddd816134df565b915050611e0785856040518060400160405280600381526020016255524960e81b81525084612502565b836060018193508290525050611e3e8585604051806040016040528060078152602001662b32b939b4b7b760c91b81525084612502565b8360800181935082905250506060611e7886866040518060400160405280600881526020016710da185a5b88125160c21b81525085612502565b92509050611e858161270c565b60a08401526040805180820190915260058152644e6f6e636560d81b6020820152611eb4908790879085612502565b60c08501829052905190925060081115611ee157604051632d2f00c360e21b815260040160405180910390fd5b611f0e868660405180604001604052806009815260200168125cdcdd595908105d60ba1b81525085612502565b8460e0018194508290525050611f4d86866040518060400160405280600f81526020016e45787069726174696f6e2054696d6560881b81525085612502565b84610100018194508290525050611f8886866040518060400160405280600a8152602001694e6f74204265666f726560b01b81525085612502565b84610120018194508290525050611fc386866040518060400160405280600a81526020016914995c5d595cdd08125160b21b81525085612502565b846101400181945082905250506000611fff8787604051806040016040528060098152602001685265736f757263657360b81b81525086612502565b91505082811461202057612014878783612770565b61016086019190915292505b509195945050505050565b60006119db61204561204084600060046122f1565b61270c565b61205561204085600560076122f1565b612065612040866008600a6122f1565b61207561204087600b600d6122f1565b61208561204088600e60106122f1565b61209561204089601160136122f1565b612a60565b60606000806003600160981b016001600160a01b0316878787876040516020016120c794939291906138da565b60408051601f19818403018152908290526120e191613916565b600060405180830381855afa9150503d806000811461211c576040519150601f19603f3d011682016040523d82523d6000602084013e612121565b606091505b5091509150816121655760405162461bcd60e51b815260206004820152600f60248201526e195b98dc9e5c1d0e8819985a5b1959608a1b6044820152606401610380565b9695505050505050565b612177612e32565b60006121996002546000801b8560405180602001604052806000815250612c24565b90506000818060200190518101906121b19190613a2d565b905060016040516121c29190613591565b6040518091039020816000015180519060200120146121f45760405163283d62bd60e01b815260040160405180910390fd5b4281604001511015610db057604051630b17115560e41b815260040160405180910390fd5b60008072184f03e93ff9f4daa797ed6e38ed64bf6a1f0160401b83106122585772184f03e93ff9f4daa797ed6e38ed64bf6a1f0160401b830492506040015b6d04ee2d6d415b85acef81000000008310612284576d04ee2d6d415b85acef8100000000830492506020015b662386f26fc1000083106122a257662386f26fc10000830492506010015b6305f5e10083106122ba576305f5e100830492506008015b61271083106122ce57612710830492506004015b606483106122e0576064830492506002015b600a83106119db5760010192915050565b606060006122ff848461388f565b6001600160401b0381111561231657612316612f65565b6040519080825280601f01601f191660200182016040528015612340576020820181803683370190505b509050835b83811080156123545750855181105b156123be5785818151811061236b5761236b61347f565b01602001516001600160f81b03191682612385878461388f565b815181106123955761239561347f565b60200101906001600160f81b031916908160001a905350806123b6816134df565b915050612345565b50949350505050565b600081516028146123eb5760405163acf8696960e01b815260040160405180910390fd5b6000600283516123fb9190613afc565b6001600160401b0381111561241257612412612f65565b6040519080825280601f01601f19166020018201604052801561243c576020820181803683370190505b50905060005b600284516124509190613afc565b8110156124ee5761248e846124668360026134f8565b61247190600161350f565b815181106124815761248161347f565b016020015160f81c612cef565b61249d856124718460026134f8565b6124a8906010613b10565b6124b29190613b2c565b60f81b8282815181106124c7576124c761347f565b60200101906001600160f81b031916908160001a9053506124e7816134df565b9050612442565b506124f881613b45565b60601c9392505050565b60606000825b8581101561261d578686828181106125225761252261347f565b909101356001600160f81b031916601d60f91b03905061260b57848051906020012061258788888080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508992508691506122f19050565b80519060200120146125ac575050604080516020810190915260008152905081612703565b806125b6816134df565b91505085811080156125f057508686828181106125d5576125d561347f565b9050013560f81c60f81b6001600160f81b031916600160fd1b145b1561260357806125ff816134df565b9150505b80935061261d565b80612615816134df565b915050612508565b858110156126bb578686828181106126375761263761347f565b909101356001600160f81b031916600560f91b0390506126a95761269487878080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508892508591506122f19050565b61269f82600161350f565b9250925050612703565b806126b3816134df565b91505061261d565b6126fe87878080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508892508591506122f19050565b925090505b94509492505050565b600080805b835181101561276957603084828151811061272e5761272e61347f565b0160200151612740919060f81c61388f565b61274b83600a6134f8565b612755919061350f565b915080612761816134df565b915050612711565b5092915050565b6060600082815b61278260018761388f565b82101561287d5786868381811061279b5761279b61347f565b9050013560f81c60f81b6001600160f81b031916602d60f81b1480156127f3575086866127c984600161350f565b8181106127d8576127d861347f565b9050013560f81c60f81b6001600160f81b031916600160fd1b145b156128175761280360028361350f565b91508061280f816134df565b91505061281c565b61287d565b858210801561285457508686838181106128385761283861347f565b9050013560f81c60f81b6001600160f81b031916600a60f81b14155b1561286b5781612863816134df565b92505061281c565b81612875816134df565b925050612777565b6000816001600160401b0381111561289757612897612f65565b6040519080825280602002602001820160405280156128ca57816020015b60608152602001906001900390816128b55790505b50905085925060005b6128de60018961388f565b841080156128ec5750828114155b15612a52578888858181106129035761290361347f565b9050013560f81c60f81b6001600160f81b031916602d60f81b14801561295b5750888861293186600161350f565b8181106129405761294061347f565b9050013560f81c60f81b6001600160f81b031916600160fd1b145b1561296e5761296b84600261350f565b96505b87841080156129a6575088888581811061298a5761298a61347f565b9050013560f81c60f81b6001600160f81b031916600a60f81b14155b156129bd57836129b5816134df565b94505061296e565b612a0089898080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508b92508891506122f19050565b828281518110612a1257612a1261347f565b60200260200101819052508080612a28906134df565b915050878403612a405783612a3c81613b81565b9450505b83612a4a816134df565b9450506128d3565b509791965090945050505050565b60006107b25b8761ffff168161ffff161015612abc57612a7f81612dd3565b15612a9957612a926301e285008361350f565b9150612aaa565b612aa76301e133808361350f565b91505b80612ab481613b98565b915050612a66565b612ac4612f11565b601f8152612ad189612dd3565b15612ae257601d6020820152612aea565b601c60208201525b601f60408201819052601e606083018190526080830182905260a0830181905260c0830182905260e0830182905261010083018190526101208301829052610140830152610160820152600191505b8760ff168261ffff161015612b9e5780612b54600184613bb9565b61ffff16600c8110612b6857612b6861347f565b6020020151612b7a9062015180613bd4565b612b8a9063ffffffff168461350f565b925081612b9681613b98565b925050612b39565b612ba9600188613bfc565b612bb99060ff1662015180613bd4565b612bc99063ffffffff168461350f565b9250612bda60ff8716610e10613bd4565b612bea9063ffffffff168461350f565b9250612bfa60ff8616603c613c15565b612c089061ffff168461350f565b9250612c1760ff85168461350f565b9998505050505050505050565b60606000806004600160981b016001600160a01b031687878787604051602001612c5194939291906138da565b60408051601f1981840301815290829052612c6b91613916565b600060405180830381855afa9150503d8060008114612ca6576040519150601f19603f3d011682016040523d82523d6000602084013e612cab565b606091505b5091509150816121655760405162461bcd60e51b815260206004820152600f60248201526e191958dc9e5c1d0e8819985a5b1959608a1b6044820152606401610380565b6000600360fc1b60f883901b6001600160f81b03191610801590612d255750603960f81b60f883901b6001600160f81b03191611155b15612d35576119db603083613bfc565b606160f81b60f883901b6001600160f81b03191610801590612d695750603360f91b60f883901b6001600160f81b03191611155b15612d85576061612d7b83600a613b2c565b6119db9190613bfc565b604160f81b60f883901b6001600160f81b03191610801590612db95750602360f91b60f883901b6001600160f81b03191611155b15612dcb576041612d7b83600a613b2c565b506000919050565b6000612de0600483613c33565b61ffff1615612df157506000919050565b612dfc606483613c33565b61ffff1615612e0d57506001919050565b612e1961019083613c33565b61ffff1615612e2a57506000919050565b506001919050565b6040518060a001604052806060815260200160006001600160a01b031681526020016000815260200160608152602001606081525090565b6040805160e08101825260008082526020820181905291810182905290606082019081526020016000815260200160008152602001606081525090565b6040518061018001604052806060815260200160006001600160a01b03168152602001606081526020016060815260200160608152602001600081526020016060815260200160608152602001606081526020016060815260200160608152602001606081525090565b604051806101800160405280600c906020820280368337509192915050565b6001600160a01b0381168114612f4557600080fd5b50565b600060208284031215612f5a57600080fd5b8135610db081612f30565b634e487b7160e01b600052604160045260246000fd5b60405160a081016001600160401b0381118282101715612f9d57612f9d612f65565b60405290565b604051601f8201601f191681016001600160401b0381118282101715612fcb57612fcb612f65565b604052919050565b60006001600160401b03821115612fec57612fec612f65565b50601f01601f191660200190565b600082601f83011261300b57600080fd5b813561301e61301982612fd3565b612fa3565b81815284602083860101111561303357600080fd5b816020850160208301376000918101602001919091529392505050565b6000806040838503121561306357600080fd5b8235915060208301356001600160401b0381111561308057600080fd5b61308c85828601612ffa565b9150509250929050565b60005b838110156130b1578181015183820152602001613099565b50506000910152565b600081518084526130d2816020860160208601613096565b601f01601f19169290920160200192915050565b602081526000610db060208301846130ba565b60008060006060848603121561310e57600080fd5b833592506020840135801515811461312557600080fd5b915060408401356001600160401b0381111561314057600080fd5b61314c86828701612ffa565b9150509250925092565b60008083601f84011261316857600080fd5b5081356001600160401b0381111561317f57600080fd5b60208301915083602082850101111561319757600080fd5b9250929050565b600080600083850360808112156131b457600080fd5b84356001600160401b038111156131ca57600080fd5b6131d687828801613156565b9095509350506060601f19820112156131ee57600080fd5b506020840190509250925092565b60008060008060006060868803121561321457600080fd5b85356002811061322357600080fd5b945060208601356001600160401b038082111561323f57600080fd5b61324b89838a01613156565b9096509450604088013591508082111561326457600080fd5b5061327188828901613156565b969995985093965092949392505050565b60008060006060848603121561329757600080fd5b83356001600160401b038111156132ad57600080fd5b6132b986828701612ffa565b9660208601359650604090950135949350505050565b634e487b7160e01b600052602160045260246000fd5b600281106132f5576132f56132cf565b9052565b600481106132f5576132f56132cf565b60006020808301818452808551808352604092508286019150828160051b87010184880160005b838110156133c257888303603f19018552815180518452878101516001600160a01b031688850152868101518785015260608082015160e09190613376828801826132e5565b505060808083015161338a828801826132f9565b505060a0828101519086015260c0918201519185018190526133ae818601836130ba565b968901969450505090860190600101613330565b509098975050505050505050565b600080604083850312156133e357600080fd5b50508035926020909101359150565b60006020828403121561340457600080fd5b5035919050565b8781526001600160a01b03871660208201526040810186905261343160608201866132e5565b61343e60808201856132f9565b8260a082015260e060c08201526000612c1760e08301846130ba565b6020808252600b908201526a1b9bdd08185b1b1bddd95960aa1b604082015260600190565b634e487b7160e01b600052603260045260246000fd5b600181811c908216806134a957607f821691505b602082108103611b2c57634e487b7160e01b600052602260045260246000fd5b634e487b7160e01b600052601160045260246000fd5b6000600182016134f1576134f16134c9565b5060010190565b80820281158282048414176119db576119db6134c9565b808201808211156119db576119db6134c9565b6040810161353082856132f9565b8260208301529392505050565b7f19457468657265756d205369676e6564204d6573736167653a0a00000000000081526000845161357581601a850160208901613096565b82018385601a83013760009301601a0192835250909392505050565b600080835461359f81613495565b600182811680156135b757600181146135cc576135fb565b60ff19841687528215158302870194506135fb565b8760005260208060002060005b858110156135f25781548a8201529084019082016135d9565b50505082870194505b50929695505050505050565b60006020808352835160a08285015261362360c08501826130ba565b905060018060a01b0382860151166040850152604085015160608501526060850151601f198086840301608087015261365c83836130ba565b6080880151878203830160a089015280518083529194508501925084840190600581901b8501860160005b828110156136b357848783030184526136a18287516130ba565b95880195938801939150600101613687565b509998505050505050505050565b601f82111561370b57600081815260208120601f850160051c810160208610156136e85750805b601f850160051c820191505b81811015613707578281556001016136f4565b5050505b505050565b81516001600160401b0381111561372957613729612f65565b61373d816137378454613495565b846136c1565b602080601f831160018114613772576000841561375a5750858301515b600019600386901b1c1916600185901b178555613707565b600085815260208120601f198616915b828110156137a157888601518255948401946001909101908401613782565b50858210156137bf5787850151600019600388901b60f8161c191681555b5050505050600190811b01905550565b6001600160401b038311156137e6576137e6612f65565b6137fa836137f48354613495565b836136c1565b6000601f84116001811461382e57600085156138165750838201355b600019600387901b1c1916600186901b178355613888565b600083815260209020601f19861690835b8281101561385f578685013582556020948501946001909201910161383f565b508682101561387c5760001960f88860031b161c19848701351681555b505060018560011b0183555b5050505050565b818103818111156119db576119db6134c9565b838152606081016138b660208301856132e5565b826040830152949350505050565b634e487b7160e01b600052601260045260246000fd5b8481528360208201526080604082015260006138f960808301856130ba565b828103606084015261390b81856130ba565b979650505050505050565b60008251613928818460208701613096565b9190910192915050565b600082601f83011261394357600080fd5b815161395161301982612fd3565b81815284602083860101111561396657600080fd5b613977826020830160208701613096565b949350505050565b805161398a81612f30565b919050565b600082601f8301126139a057600080fd5b815160206001600160401b03808311156139bc576139bc612f65565b8260051b6139cb838201612fa3565b93845285810183019383810190888611156139e557600080fd5b84880192505b85831015613a2157825184811115613a035760008081fd5b613a118a87838c0101613932565b83525091840191908401906139eb565b98975050505050505050565b600060208284031215613a3f57600080fd5b81516001600160401b0380821115613a5657600080fd5b9083019060a08286031215613a6a57600080fd5b613a72612f7b565b825182811115613a8157600080fd5b613a8d87828601613932565b825250613a9c6020840161397f565b602082015260408301516040820152606083015182811115613abd57600080fd5b613ac987828601613932565b606083015250608083015182811115613ae157600080fd5b613aed8782860161398f565b60808301525095945050505050565b600082613b0b57613b0b6138c4565b500490565b60ff8181168382160290811690818114612769576127696134c9565b60ff81811683821601908111156119db576119db6134c9565b805160208201516bffffffffffffffffffffffff198082169291906014831015613b795780818460140360031b1b83161693505b505050919050565b600081613b9057613b906134c9565b506000190190565b600061ffff808316818103613baf57613baf6134c9565b6001019392505050565b61ffff828116828216039080821115612769576127696134c9565b63ffffffff818116838216028082169190828114613bf457613bf46134c9565b505092915050565b60ff82811682821603908111156119db576119db6134c9565b61ffff818116838216028082169190828114613bf457613bf46134c9565b600061ffff80841680613c4857613c486138c4565b9216919091069291505056fea264697066735822122040e4fdc8b72e285821c49b2b064a2baf5874c1b4f8a7b9eb39e6b05b2001ef3e64736f6c63430008140033",
+  "deployedBytecode": "0x6080604052600436106100f35760003560e01c8063a3cb679d1161008a578063c6d87da911610059578063c6d87da91461028a578063c908bea6146102aa578063cc2942e9146102d7578063e67a2299146102f757600080fd5b8063a3cb679d14610217578063a9a902e41461022c578063b624010a1461023f578063c2fb26a61461027557600080fd5b80635fd8c710116100c65780635fd8c710146101a75780636f9fb98a146101bc5780637f476b6f146101cf578063893d20e8146101ef57600080fd5b806326224c64146100f85780634bb30b75146101385780634dae0d5a1461015a57806350d6756c14610187575b600080fd5b34801561010457600080fd5b50610125610113366004612f48565b60086020526000908152604090205481565b6040519081526020015b60405180910390f35b34801561014457600080fd5b50610158610153366004613050565b61032a565b005b34801561016657600080fd5b5061017a610175366004613050565b6104c4565b60405161012f91906130e6565b34801561019357600080fd5b506101586101a23660046130f9565b6106cf565b3480156101b357600080fd5b50610158610980565b3480156101c857600080fd5b5047610125565b3480156101db57600080fd5b5061017a6101ea36600461319e565b610aaa565b3480156101fb57600080fd5b506003546040516001600160a01b03909116815260200161012f565b34801561022357600080fd5b50600554610125565b61015861023a3660046131fc565b610db7565b34801561024b57600080fd5b5061012561025a366004612f48565b6001600160a01b031660009081526007602052604090205490565b34801561028157600080fd5b5061017a6110c0565b34801561029657600080fd5b506101586102a5366004613050565b611152565b3480156102b657600080fd5b506102ca6102c5366004613282565b6113d9565b60405161012f9190613309565b3480156102e357600080fd5b506102ca6102f23660046133d0565b611749565b34801561030357600080fd5b506103176103123660046133f2565b6119e1565b60405161012f979695949392919061340b565b60035481906001600160a01b0316331480159061036357506003546001600160a01b031661035782611acb565b6001600160a01b031614155b156103895760405162461bcd60e51b81526004016103809061345a565b60405180910390fd5b478311156103d95760405162461bcd60e51b815260206004820152601d60248201527f496e73756666696369656e7420636f6e74726163742062616c616e63650000006044820152606401610380565b6003546040516000916001600160a01b03169085908381818185875af1925050503d8060008114610426576040519150601f19603f3d011682016040523d82523d6000602084013e61042b565b606091505b505090508061047c5760405162461bcd60e51b815260206004820152601760248201527f4f776e6572207769746864726177616c206661696c65640000000000000000006044820152606401610380565b6003546040518581526001600160a01b03909116907feaff4b37086828766ad3268786972c0cd24259d4c87a80f9d3963a3c3d999b0d9060200160405180910390a250505050565b6060600583815481106104d9576104d961347f565b6000918252602090912060069091020154600554839082106105325760405162461bcd60e51b815260206004820152601260248201527110995d08191bd95cc81b9bdd08195e1a5cdd60721b6044820152606401610380565b6000600583815481106105475761054761347f565b60009182526020909120600160069092020101546001600160a01b031690503381148015906105905750806001600160a01b031661058483611acb565b6001600160a01b031614155b156105cd5760405162461bcd60e51b815260206004820152600d60248201526c3737ba103132ba1037bbb732b960991b6044820152606401610380565b600654861061061e5760405162461bcd60e51b815260206004820152601960248201527f4265742073656372657420646f6573206e6f74206578697374000000000000006044820152606401610380565b600686815481106106315761063161347f565b90600052602060002001805461064690613495565b80601f016020809104026020016040519081016040528092919081815260200182805461067290613495565b80156106bf5780601f10610694576101008083540402835291602001916106bf565b820191906000526020600020905b8154815290600101906020018083116106a257829003601f168201915b5050505050935050505092915050565b60035481906001600160a01b0316331480159061070857506003546001600160a01b03166106fc82611acb565b6001600160a01b031614155b156107255760405162461bcd60e51b81526004016103809061345a565b600084118015610736575060045484105b6107735760405162461bcd60e51b815260206004820152600e60248201526d125b9d985b1a590818995d08125160921b6044820152606401610380565b60008060005b6005548110156107cc5786600582815481106107975761079761347f565b906000526020600020906006020160000154036107ba57809250600191506107cc565b806107c4816134df565b915050610779565b508061080a5760405162461bcd60e51b815260206004820152600d60248201526c10995d081b9bdd08199bdd5b99609a1b6044820152606401610380565b60006005838154811061081f5761081f61347f565b906000526020600020906006020160030160019054906101000a900460ff16600381111561084f5761084f6132cf565b146108935760405162461bcd60e51b815260206004820152601460248201527310995d08185b1c9958591e481c995cdbdb1d995960621b6044820152606401610380565b6000600583815481106108a8576108a861347f565b906000526020600020906006020190506000861561091c5760038201805461ff0019166101001790556002808301546108e0916134f8565b60018301546001600160a01b031660009081526008602052604081208054929350839290919061091190849061350f565b9091555061092e9050565b60038201805461ff0019166102001790555b600382015460405189917fb4810c14f5f90d64272bdaaa79adbcd7a5593b0be3da5c9073f83a6e05169a169161096e91610100900460ff16908590613522565b60405180910390a25050505050505050565b33600090815260086020526040902054806109d65760405162461bcd60e51b81526020600482015260166024820152754e6f2062616c616e636520746f20776974686472617760501b6044820152606401610380565b336000818152600860205260408082208290555190919083908381818185875af1925050503d8060008114610a27576040519150601f19603f3d011682016040523d82523d6000602084013e610a2c565b606091505b5050905080610a715760405162461bcd60e51b815260206004820152601160248201527015da5d1a191c985dd85b0819985a5b1959607a1b6044820152606401610380565b60405182815233907feaff4b37086828766ad3268786972c0cd24259d4c87a80f9d3963a3c3d999b0d9060200160405180910390a25050565b6060610ab4612e32565b6000610abf85611b32565b8686604051602001610ad39392919061353d565b60408051601f19818403018152828252805160208083019190912060008086528583018086529190915260ff89850135169385019390935287356060850152870135608084015292509060019060a0016020604051602081039080840390855afa158015610b45573d6000803e3d6000fd5b5050604051601f1901516001600160a01b0381166020860152915060009050610b6e8888611bc4565b9050468160a0015114610b945760405163362c833760e01b815260040160405180910390fd5b6001604051610ba39190613591565b604051809103902081600001518051906020012014610bd55760405163283d62bd60e01b815260040160405180910390fd5b8051845260208101516001600160a01b03838116911614610c09576040516305cc02e160e01b815260040160405180910390fd5b6101208101515115801590610c2b5750610c2781610120015161202b565b4211155b15610c495760405163299d02f160e01b815260040160405180910390fd5b6101008101515115610c70576000610c6582610100015161202b565b604086015250610c83565b610c7d620151804261350f565b60408501525b83604001514210610ca757604051630b17115560e41b815260040160405180910390fd5b60408101516060850152610160810151516001600160401b03811115610ccf57610ccf612f65565b604051908082528060200260200182016040528015610d0257816020015b6060815260200190600190039081610ced5790505b50608085015260005b81610160015151811015610d6c578161016001518181518110610d3057610d3061347f565b602002602001015185608001518281518110610d4e57610d4e61347f565b60200260200101819052508080610d64906134df565b915050610d0b565b506000610da86002546000801b87604051602001610d8a9190613607565b60408051601f1981840301815260208301909152600082529061209a565b955050505050505b9392505050565b60003411610e115760405162461bcd60e51b815260206004820152602160248201527f42657420616d6f756e74206d7573742062652067726561746572207468616e206044820152600360fc1b6064820152608401610380565b6004805460009182610e22836134df565b91905055905060006040518060e00160405280838152602001336001600160a01b03168152602001348152602001886001811115610e6257610e626132cf565b81526020016000815260200142815260200187878080601f016020809104026020016040519081016040528093929190818152602001838380828437600092018290525093909452505060058054600180820183559190925283517f036b6384b5eca791c62761152d0c79bb0604c104a5fb6f4eb0703f3154bb3db0600690930292830190815560208501517f036b6384b5eca791c62761152d0c79bb0604c104a5fb6f4eb0703f3154bb3db1840180546001600160a01b0319166001600160a01b0390921691909117905560408501517f036b6384b5eca791c62761152d0c79bb0604c104a5fb6f4eb0703f3154bb3db284015560608501517f036b6384b5eca791c62761152d0c79bb0604c104a5fb6f4eb0703f3154bb3db3909301805495965086959194509160ff19909116908381811115610fa357610fa36132cf565b021790555060808201518160030160016101000a81548160ff02191690836003811115610fd257610fd26132cf565b021790555060a0820151600482015560c08201516005820190610ff59082613710565b5050600680546001810182556000919091527ff652222313e28459528d920b65115c16c04f3efc82aaedc97be59f3f377c0d3f0190506110368486836137cf565b503360009081526007602052604090206005546110559060019061388f565b815460018181018455600093845260209093200155600554339184917f7cdde6d299ea8fdc0aceb52128ad2948a1db7494031bd05ca26c6ae74b6e33b49134918c916110a09161388f565b6040516110af939291906138a2565b60405180910390a350505050505050565b6060600180546110cf90613495565b80601f01602080910402602001604051908101604052809291908181526020018280546110fb90613495565b80156111485780601f1061111d57610100808354040283529160200191611148565b820191906000526020600020905b81548152906001019060200180831161112b57829003601f168201915b5050505050905090565b60035481906001600160a01b0316331480159061118b57506003546001600160a01b031661117f82611acb565b6001600160a01b031614155b156111a85760405162461bcd60e51b81526004016103809061345a565b6000831180156111b9575060045483105b6111f65760405162461bcd60e51b815260206004820152600e60248201526d125b9d985b1a590818995d08125160921b6044820152606401610380565b60008060005b60055481101561124f57856005828154811061121a5761121a61347f565b9060005260206000209060060201600001540361123d578092506001915061124f565b80611247816134df565b9150506111fc565b508061128d5760405162461bcd60e51b815260206004820152600d60248201526c10995d081b9bdd08199bdd5b99609a1b6044820152606401610380565b6000600583815481106112a2576112a261347f565b906000526020600020906006020160030160019054906101000a900460ff1660038111156112d2576112d26132cf565b146113165760405162461bcd60e51b815260206004820152601460248201527310995d08185b1c9958591e481c995cdbdb1d995960621b6044820152606401610380565b60006005838154811061132b5761132b61347f565b60009182526020808320600360069390930201918201805461ff001916610300179055600282015460018301546001600160a01b0316845260089091526040832080549294509092909161138090849061350f565b90915550506003810154600282015460405188927fb4810c14f5f90d64272bdaaa79adbcd7a5593b0be3da5c9073f83a6e05169a16926113c99261010090920460ff1691613522565b60405180910390a2505050505050565b606060006113e685611acb565b90506001600160a01b03811661143e5760405162461bcd60e51b815260206004820152601c60248201527f496e76616c69642061757468656e7469636174696f6e20746f6b656e000000006044820152606401610380565b6001600160a01b03811660009081526007602090815260408083208054825181850281018501909352808352919290919083018282801561149e57602002820191906000526020600020905b81548152602001906001019080831161148a575b50505050509050805185106114e85760408051600080825260208201909252906114de565b6114cb612e6a565b8152602001906001900390816114c35790505b5092505050610db0565b60006114f4858761350f565b90508151811115611503575080515b600061150f878361388f565b6001600160401b0381111561152657611526612f65565b60405190808252806020026020018201604052801561155f57816020015b61154c612e6a565b8152602001906001900390816115445790505b509050865b8281101561173d5760058482815181106115805761158061347f565b6020026020010151815481106115985761159861347f565b90600052602060002090600602016040518060e0016040529081600082015481526020016001820160009054906101000a90046001600160a01b03166001600160a01b03166001600160a01b03168152602001600282015481526020016003820160009054906101000a900460ff166001811115611618576116186132cf565b6001811115611629576116296132cf565b81526020016003820160019054906101000a900460ff166003811115611651576116516132cf565b6003811115611662576116626132cf565b81526020016004820154815260200160058201805461168090613495565b80601f01602080910402602001604051908101604052809291908181526020018280546116ac90613495565b80156116f95780601f106116ce576101008083540402835291602001916116f9565b820191906000526020600020905b8154815290600101906020018083116116dc57829003601f168201915b50505050508152505082898361170f919061388f565b8151811061171f5761171f61347f565b60200260200101819052508080611735906134df565b915050611564565b50979650505050505050565b600554606090831061178e576040805160008082526020820190925290611786565b611773612e6a565b81526020019060019003908161176b5790505b5090506119db565b600061179a838561350f565b6005549091508111156117ac57506005545b60006117b8858361388f565b6001600160401b038111156117cf576117cf612f65565b60405190808252806020026020018201604052801561180857816020015b6117f5612e6a565b8152602001906001900390816117ed5790505b509050845b828110156119d6576005611821828861350f565b815481106118315761183161347f565b90600052602060002090600602016040518060e0016040529081600082015481526020016001820160009054906101000a90046001600160a01b03166001600160a01b03166001600160a01b03168152602001600282015481526020016003820160009054906101000a900460ff1660018111156118b1576118b16132cf565b60018111156118c2576118c26132cf565b81526020016003820160019054906101000a900460ff1660038111156118ea576118ea6132cf565b60038111156118fb576118fb6132cf565b81526020016004820154815260200160058201805461191990613495565b80601f016020809104026020016040519081016040528092919081815260200182805461194590613495565b80156119925780601f1061196757610100808354040283529160200191611992565b820191906000526020600020905b81548152906001019060200180831161197557829003601f168201915b5050505050815250508287836119a8919061388f565b815181106119b8576119b861347f565b602002602001018190525080806119ce906134df565b91505061180d565b509150505b92915050565b600581815481106119f157600080fd5b60009182526020909120600690910201805460018201546002830154600384015460048501546005860180549597506001600160a01b0390941695929460ff808416956101009094041693919290611a4890613495565b80601f0160208091040260200160405190810160405280929190818152602001828054611a7490613495565b8015611ac15780601f10611a9657610100808354040283529160200191611ac1565b820191906000526020600020905b815481529060010190602001808311611aa457829003601f168201915b5050505050905087565b80516020808301919091206000908152908190526040812054829060ff1615611b07576040516313d4cf0960e31b815260040160405180910390fd5b8251600003611b195760009150611b2c565b6000611b248461216f565b602001519250505b50919050565b60606000611b3f83612219565b60010190506000816001600160401b03811115611b5e57611b5e612f65565b6040519080825280601f01601f191660200182016040528015611b88576020820181803683370190505b5090508181016020015b600019016f181899199a1a9b1b9c1cb0b131b232b360811b600a86061a8153600a8504945084611b9257509392505050565b611bcc612ea7565b611bd4612ea7565b60005b83811015611c6557848482818110611bf157611bf161347f565b909101356001600160f81b031916600160fd1b039050611c5357611c4c85858080601f016020809104026020016040519081016040528093929190818152602001838380828437600092018290525092508591506122f19050565b8252611c65565b80611c5d816134df565b915050611bd7565b611c7060328261350f565b9050611cd7611cd286868080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250611cbc92506002915086905061350f565b935083611cca60288261350f565b9450846122f1565b6123c7565b6001600160a01b03166020830152611cf060028261350f565b90508381108015611d2a5750848482818110611d0e57611d0e61347f565b9050013560f81c60f81b6001600160f81b031916600560f91b14155b15611dd357805b84811015611dd157858582818110611d4b57611d4b61347f565b909101356001600160f81b031916600560f91b039050611dbf57611da886868080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508692508591506122f19050565b6040840152611db881600161350f565b9150611dd1565b80611dc9816134df565b915050611d31565b505b80611ddd816134df565b915050611e0785856040518060400160405280600381526020016255524960e81b81525084612502565b836060018193508290525050611e3e8585604051806040016040528060078152602001662b32b939b4b7b760c91b81525084612502565b8360800181935082905250506060611e7886866040518060400160405280600881526020016710da185a5b88125160c21b81525085612502565b92509050611e858161270c565b60a08401526040805180820190915260058152644e6f6e636560d81b6020820152611eb4908790879085612502565b60c08501829052905190925060081115611ee157604051632d2f00c360e21b815260040160405180910390fd5b611f0e868660405180604001604052806009815260200168125cdcdd595908105d60ba1b81525085612502565b8460e0018194508290525050611f4d86866040518060400160405280600f81526020016e45787069726174696f6e2054696d6560881b81525085612502565b84610100018194508290525050611f8886866040518060400160405280600a8152602001694e6f74204265666f726560b01b81525085612502565b84610120018194508290525050611fc386866040518060400160405280600a81526020016914995c5d595cdd08125160b21b81525085612502565b846101400181945082905250506000611fff8787604051806040016040528060098152602001685265736f757263657360b81b81525086612502565b91505082811461202057612014878783612770565b61016086019190915292505b509195945050505050565b60006119db61204561204084600060046122f1565b61270c565b61205561204085600560076122f1565b612065612040866008600a6122f1565b61207561204087600b600d6122f1565b61208561204088600e60106122f1565b61209561204089601160136122f1565b612a60565b60606000806003600160981b016001600160a01b0316878787876040516020016120c794939291906138da565b60408051601f19818403018152908290526120e191613916565b600060405180830381855afa9150503d806000811461211c576040519150601f19603f3d011682016040523d82523d6000602084013e612121565b606091505b5091509150816121655760405162461bcd60e51b815260206004820152600f60248201526e195b98dc9e5c1d0e8819985a5b1959608a1b6044820152606401610380565b9695505050505050565b612177612e32565b60006121996002546000801b8560405180602001604052806000815250612c24565b90506000818060200190518101906121b19190613a2d565b905060016040516121c29190613591565b6040518091039020816000015180519060200120146121f45760405163283d62bd60e01b815260040160405180910390fd5b4281604001511015610db057604051630b17115560e41b815260040160405180910390fd5b60008072184f03e93ff9f4daa797ed6e38ed64bf6a1f0160401b83106122585772184f03e93ff9f4daa797ed6e38ed64bf6a1f0160401b830492506040015b6d04ee2d6d415b85acef81000000008310612284576d04ee2d6d415b85acef8100000000830492506020015b662386f26fc1000083106122a257662386f26fc10000830492506010015b6305f5e10083106122ba576305f5e100830492506008015b61271083106122ce57612710830492506004015b606483106122e0576064830492506002015b600a83106119db5760010192915050565b606060006122ff848461388f565b6001600160401b0381111561231657612316612f65565b6040519080825280601f01601f191660200182016040528015612340576020820181803683370190505b509050835b83811080156123545750855181105b156123be5785818151811061236b5761236b61347f565b01602001516001600160f81b03191682612385878461388f565b815181106123955761239561347f565b60200101906001600160f81b031916908160001a905350806123b6816134df565b915050612345565b50949350505050565b600081516028146123eb5760405163acf8696960e01b815260040160405180910390fd5b6000600283516123fb9190613afc565b6001600160401b0381111561241257612412612f65565b6040519080825280601f01601f19166020018201604052801561243c576020820181803683370190505b50905060005b600284516124509190613afc565b8110156124ee5761248e846124668360026134f8565b61247190600161350f565b815181106124815761248161347f565b016020015160f81c612cef565b61249d856124718460026134f8565b6124a8906010613b10565b6124b29190613b2c565b60f81b8282815181106124c7576124c761347f565b60200101906001600160f81b031916908160001a9053506124e7816134df565b9050612442565b506124f881613b45565b60601c9392505050565b60606000825b8581101561261d578686828181106125225761252261347f565b909101356001600160f81b031916601d60f91b03905061260b57848051906020012061258788888080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508992508691506122f19050565b80519060200120146125ac575050604080516020810190915260008152905081612703565b806125b6816134df565b91505085811080156125f057508686828181106125d5576125d561347f565b9050013560f81c60f81b6001600160f81b031916600160fd1b145b1561260357806125ff816134df565b9150505b80935061261d565b80612615816134df565b915050612508565b858110156126bb578686828181106126375761263761347f565b909101356001600160f81b031916600560f91b0390506126a95761269487878080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508892508591506122f19050565b61269f82600161350f565b9250925050612703565b806126b3816134df565b91505061261d565b6126fe87878080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508892508591506122f19050565b925090505b94509492505050565b600080805b835181101561276957603084828151811061272e5761272e61347f565b0160200151612740919060f81c61388f565b61274b83600a6134f8565b612755919061350f565b915080612761816134df565b915050612711565b5092915050565b6060600082815b61278260018761388f565b82101561287d5786868381811061279b5761279b61347f565b9050013560f81c60f81b6001600160f81b031916602d60f81b1480156127f3575086866127c984600161350f565b8181106127d8576127d861347f565b9050013560f81c60f81b6001600160f81b031916600160fd1b145b156128175761280360028361350f565b91508061280f816134df565b91505061281c565b61287d565b858210801561285457508686838181106128385761283861347f565b9050013560f81c60f81b6001600160f81b031916600a60f81b14155b1561286b5781612863816134df565b92505061281c565b81612875816134df565b925050612777565b6000816001600160401b0381111561289757612897612f65565b6040519080825280602002602001820160405280156128ca57816020015b60608152602001906001900390816128b55790505b50905085925060005b6128de60018961388f565b841080156128ec5750828114155b15612a52578888858181106129035761290361347f565b9050013560f81c60f81b6001600160f81b031916602d60f81b14801561295b5750888861293186600161350f565b8181106129405761294061347f565b9050013560f81c60f81b6001600160f81b031916600160fd1b145b1561296e5761296b84600261350f565b96505b87841080156129a6575088888581811061298a5761298a61347f565b9050013560f81c60f81b6001600160f81b031916600a60f81b14155b156129bd57836129b5816134df565b94505061296e565b612a0089898080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508b92508891506122f19050565b828281518110612a1257612a1261347f565b60200260200101819052508080612a28906134df565b915050878403612a405783612a3c81613b81565b9450505b83612a4a816134df565b9450506128d3565b509791965090945050505050565b60006107b25b8761ffff168161ffff161015612abc57612a7f81612dd3565b15612a9957612a926301e285008361350f565b9150612aaa565b612aa76301e133808361350f565b91505b80612ab481613b98565b915050612a66565b612ac4612f11565b601f8152612ad189612dd3565b15612ae257601d6020820152612aea565b601c60208201525b601f60408201819052601e606083018190526080830182905260a0830181905260c0830182905260e0830182905261010083018190526101208301829052610140830152610160820152600191505b8760ff168261ffff161015612b9e5780612b54600184613bb9565b61ffff16600c8110612b6857612b6861347f565b6020020151612b7a9062015180613bd4565b612b8a9063ffffffff168461350f565b925081612b9681613b98565b925050612b39565b612ba9600188613bfc565b612bb99060ff1662015180613bd4565b612bc99063ffffffff168461350f565b9250612bda60ff8716610e10613bd4565b612bea9063ffffffff168461350f565b9250612bfa60ff8616603c613c15565b612c089061ffff168461350f565b9250612c1760ff85168461350f565b9998505050505050505050565b60606000806004600160981b016001600160a01b031687878787604051602001612c5194939291906138da565b60408051601f1981840301815290829052612c6b91613916565b600060405180830381855afa9150503d8060008114612ca6576040519150601f19603f3d011682016040523d82523d6000602084013e612cab565b606091505b5091509150816121655760405162461bcd60e51b815260206004820152600f60248201526e191958dc9e5c1d0e8819985a5b1959608a1b6044820152606401610380565b6000600360fc1b60f883901b6001600160f81b03191610801590612d255750603960f81b60f883901b6001600160f81b03191611155b15612d35576119db603083613bfc565b606160f81b60f883901b6001600160f81b03191610801590612d695750603360f91b60f883901b6001600160f81b03191611155b15612d85576061612d7b83600a613b2c565b6119db9190613bfc565b604160f81b60f883901b6001600160f81b03191610801590612db95750602360f91b60f883901b6001600160f81b03191611155b15612dcb576041612d7b83600a613b2c565b506000919050565b6000612de0600483613c33565b61ffff1615612df157506000919050565b612dfc606483613c33565b61ffff1615612e0d57506001919050565b612e1961019083613c33565b61ffff1615612e2a57506000919050565b506001919050565b6040518060a001604052806060815260200160006001600160a01b031681526020016000815260200160608152602001606081525090565b6040805160e08101825260008082526020820181905291810182905290606082019081526020016000815260200160008152602001606081525090565b6040518061018001604052806060815260200160006001600160a01b03168152602001606081526020016060815260200160608152602001600081526020016060815260200160608152602001606081526020016060815260200160608152602001606081525090565b604051806101800160405280600c906020820280368337509192915050565b6001600160a01b0381168114612f4557600080fd5b50565b600060208284031215612f5a57600080fd5b8135610db081612f30565b634e487b7160e01b600052604160045260246000fd5b60405160a081016001600160401b0381118282101715612f9d57612f9d612f65565b60405290565b604051601f8201601f191681016001600160401b0381118282101715612fcb57612fcb612f65565b604052919050565b60006001600160401b03821115612fec57612fec612f65565b50601f01601f191660200190565b600082601f83011261300b57600080fd5b813561301e61301982612fd3565b612fa3565b81815284602083860101111561303357600080fd5b816020850160208301376000918101602001919091529392505050565b6000806040838503121561306357600080fd5b8235915060208301356001600160401b0381111561308057600080fd5b61308c85828601612ffa565b9150509250929050565b60005b838110156130b1578181015183820152602001613099565b50506000910152565b600081518084526130d2816020860160208601613096565b601f01601f19169290920160200192915050565b602081526000610db060208301846130ba565b60008060006060848603121561310e57600080fd5b833592506020840135801515811461312557600080fd5b915060408401356001600160401b0381111561314057600080fd5b61314c86828701612ffa565b9150509250925092565b60008083601f84011261316857600080fd5b5081356001600160401b0381111561317f57600080fd5b60208301915083602082850101111561319757600080fd5b9250929050565b600080600083850360808112156131b457600080fd5b84356001600160401b038111156131ca57600080fd5b6131d687828801613156565b9095509350506060601f19820112156131ee57600080fd5b506020840190509250925092565b60008060008060006060868803121561321457600080fd5b85356002811061322357600080fd5b945060208601356001600160401b038082111561323f57600080fd5b61324b89838a01613156565b9096509450604088013591508082111561326457600080fd5b5061327188828901613156565b969995985093965092949392505050565b60008060006060848603121561329757600080fd5b83356001600160401b038111156132ad57600080fd5b6132b986828701612ffa565b9660208601359650604090950135949350505050565b634e487b7160e01b600052602160045260246000fd5b600281106132f5576132f56132cf565b9052565b600481106132f5576132f56132cf565b60006020808301818452808551808352604092508286019150828160051b87010184880160005b838110156133c257888303603f19018552815180518452878101516001600160a01b031688850152868101518785015260608082015160e09190613376828801826132e5565b505060808083015161338a828801826132f9565b505060a0828101519086015260c0918201519185018190526133ae818601836130ba565b968901969450505090860190600101613330565b509098975050505050505050565b600080604083850312156133e357600080fd5b50508035926020909101359150565b60006020828403121561340457600080fd5b5035919050565b8781526001600160a01b03871660208201526040810186905261343160608201866132e5565b61343e60808201856132f9565b8260a082015260e060c08201526000612c1760e08301846130ba565b6020808252600b908201526a1b9bdd08185b1b1bddd95960aa1b604082015260600190565b634e487b7160e01b600052603260045260246000fd5b600181811c908216806134a957607f821691505b602082108103611b2c57634e487b7160e01b600052602260045260246000fd5b634e487b7160e01b600052601160045260246000fd5b6000600182016134f1576134f16134c9565b5060010190565b80820281158282048414176119db576119db6134c9565b808201808211156119db576119db6134c9565b6040810161353082856132f9565b8260208301529392505050565b7f19457468657265756d205369676e6564204d6573736167653a0a00000000000081526000845161357581601a850160208901613096565b82018385601a83013760009301601a0192835250909392505050565b600080835461359f81613495565b600182811680156135b757600181146135cc576135fb565b60ff19841687528215158302870194506135fb565b8760005260208060002060005b858110156135f25781548a8201529084019082016135d9565b50505082870194505b50929695505050505050565b60006020808352835160a08285015261362360c08501826130ba565b905060018060a01b0382860151166040850152604085015160608501526060850151601f198086840301608087015261365c83836130ba565b6080880151878203830160a089015280518083529194508501925084840190600581901b8501860160005b828110156136b357848783030184526136a18287516130ba565b95880195938801939150600101613687565b509998505050505050505050565b601f82111561370b57600081815260208120601f850160051c810160208610156136e85750805b601f850160051c820191505b81811015613707578281556001016136f4565b5050505b505050565b81516001600160401b0381111561372957613729612f65565b61373d816137378454613495565b846136c1565b602080601f831160018114613772576000841561375a5750858301515b600019600386901b1c1916600185901b178555613707565b600085815260208120601f198616915b828110156137a157888601518255948401946001909101908401613782565b50858210156137bf5787850151600019600388901b60f8161c191681555b5050505050600190811b01905550565b6001600160401b038311156137e6576137e6612f65565b6137fa836137f48354613495565b836136c1565b6000601f84116001811461382e57600085156138165750838201355b600019600387901b1c1916600186901b178355613888565b600083815260209020601f19861690835b8281101561385f578685013582556020948501946001909201910161383f565b508682101561387c5760001960f88860031b161c19848701351681555b505060018560011b0183555b5050505050565b818103818111156119db576119db6134c9565b838152606081016138b660208301856132e5565b826040830152949350505050565b634e487b7160e01b600052601260045260246000fd5b8481528360208201526080604082015260006138f960808301856130ba565b828103606084015261390b81856130ba565b979650505050505050565b60008251613928818460208701613096565b9190910192915050565b600082601f83011261394357600080fd5b815161395161301982612fd3565b81815284602083860101111561396657600080fd5b613977826020830160208701613096565b949350505050565b805161398a81612f30565b919050565b600082601f8301126139a057600080fd5b815160206001600160401b03808311156139bc576139bc612f65565b8260051b6139cb838201612fa3565b93845285810183019383810190888611156139e557600080fd5b84880192505b85831015613a2157825184811115613a035760008081fd5b613a118a87838c0101613932565b83525091840191908401906139eb565b98975050505050505050565b600060208284031215613a3f57600080fd5b81516001600160401b0380821115613a5657600080fd5b9083019060a08286031215613a6a57600080fd5b613a72612f7b565b825182811115613a8157600080fd5b613a8d87828601613932565b825250613a9c6020840161397f565b602082015260408301516040820152606083015182811115613abd57600080fd5b613ac987828601613932565b606083015250608083015182811115613ae157600080fd5b613aed8782860161398f565b60808301525095945050505050565b600082613b0b57613b0b6138c4565b500490565b60ff8181168382160290811690818114612769576127696134c9565b60ff81811683821601908111156119db576119db6134c9565b805160208201516bffffffffffffffffffffffff198082169291906014831015613b795780818460140360031b1b83161693505b505050919050565b600081613b9057613b906134c9565b506000190190565b600061ffff808316818103613baf57613baf6134c9565b6001019392505050565b61ffff828116828216039080821115612769576127696134c9565b63ffffffff818116838216028082169190828114613bf457613bf46134c9565b505092915050565b60ff82811682821603908111156119db576119db6134c9565b61ffff818116838216028082169190828114613bf457613bf46134c9565b600061ffff80841680613c4857613c486138c4565b9216919091069291505056fea264697066735822122040e4fdc8b72e285821c49b2b064a2baf5874c1b4f8a7b9eb39e6b05b2001ef3e64736f6c63430008140033",
+  "devdoc": {
+    "details": "A simple betting smart contract with SiweAuth integration for Oasis Sapphire Users can place bets, contract acts as escrow, and owner can manage funds",
+    "kind": "dev",
+    "methods": {
+      "cancelBet(uint256,bytes)": {
+        "details": "Cancel a bet and refund (only owner)",
+        "params": {
+          "betId": "The bet ID to cancel",
+          "token": "SIWE authentication token for owner"
+        }
+      },
+      "domain()": {
+        "returns": {
+          "_0": "The domain string"
+        }
+      },
+      "getAllBets(uint256,uint256)": {
+        "details": "Get all bet metadata (paginated)",
+        "params": {
+          "count": "Number of bets to return",
+          "offset": "Pagination offset"
+        }
+      },
+      "getBetSecret(uint256,bytes)": {
+        "details": "Get secret data for a specific bet (only bet owner can access)",
+        "params": {
+          "betIndex": "Index of the bet in the _betMetas array",
+          "token": "SIWE authentication token"
+        }
+      },
+      "getContractBalance()": {
+        "details": "Get contract balance"
+      },
+      "getOwner()": {
+        "details": "Get owner address"
+      },
+      "getTotalBets()": {
+        "details": "Get total number of bets"
+      },
+      "getUserBetCount(address)": {
+        "details": "Get user's total bet count",
+        "params": {
+          "user": "User address"
+        }
+      },
+      "getUserBets(bytes,uint256,uint256)": {
+        "details": "Get user's bets using SIWE authentication",
+        "params": {
+          "count": "Number of bets to return",
+          "offset": "Pagination offset",
+          "token": "SIWE authentication token"
+        }
+      },
+      "login(string,(bytes32,bytes32,uint256))": {
+        "params": {
+          "sig": "The signature of the SIWE message",
+          "siweMsg": "The signed SIWE message"
+        },
+        "returns": {
+          "_0": "The encrypted authentication token"
+        }
+      },
+      "ownerWithdraw(uint256,bytes)": {
+        "details": "Owner withdraws contract funds (only owner)",
+        "params": {
+          "amount": "Amount to withdraw",
+          "token": "SIWE authentication token for owner"
+        }
+      },
+      "placeBet(uint8,string,bytes)": {
+        "details": "Place a bet with amount and outcome",
+        "params": {
+          "description": "Public description of the bet",
+          "outcome": "The outcome to bet on (YES/NO)",
+          "secretData": "Private data associated with the bet"
+        }
+      },
+      "resolveBet(uint256,bool,bytes)": {
+        "details": "Resolve a bet (only owner)",
+        "params": {
+          "betId": "The bet ID to resolve",
+          "token": "SIWE authentication token for owner",
+          "won": "Whether the bet won or lost"
+        }
+      },
+      "withdrawBalance()": {
+        "details": "Withdraw user balance"
+      }
+    },
+    "title": "SimpleBet",
+    "version": 1
+  },
+  "userdoc": {
+    "errors": {
+      "A13e_RevokedAuthToken()": [
+        {
+          "notice": "The authentication token was revoked"
+        }
+      ],
+      "SiweAuth_AddressMismatch()": [
+        {
+          "notice": "User address in the SIWE message does not match the message signer's address"
+        }
+      ],
+      "SiweAuth_ChainIdMismatch()": [
+        {
+          "notice": "Chain ID in the SIWE message does not match the actual chain ID"
+        }
+      ],
+      "SiweAuth_DomainMismatch()": [
+        {
+          "notice": "Domain in the SIWE message does not match the domain of a dApp"
+        }
+      ],
+      "SiweAuth_Expired()": [
+        {
+          "notice": "Validity of the authentication token or the Expires value in the SIWE message is in the past"
+        }
+      ],
+      "SiweAuth_NotBeforeInFuture()": [
+        {
+          "notice": "The Not before value in the SIWE message is still in the future"
+        }
+      ],
+      "SiweParser_InvalidAddressLength()": [
+        {
+          "notice": "Invalid length of the hex-encoded address"
+        }
+      ],
+      "SiweParser_InvalidNonce()": [
+        {
+          "notice": "Invalid length of the nonce"
+        }
+      ]
+    },
+    "kind": "user",
+    "methods": {
+      "domain()": {
+        "notice": "Return the domain associated with the dApp."
+      },
+      "login(string,(bytes32,bytes32,uint256))": {
+        "notice": "Login using a SIWE message and signature"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 2352,
+        "contract": "contracts/SimpleBet.sol:SimpleBet",
+        "label": "_revokedAuthTokens",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_bytes32,t_bool)"
+      },
+      {
+        "astId": 2436,
+        "contract": "contracts/SimpleBet.sol:SimpleBet",
+        "label": "_domain",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_string_storage"
+      },
+      {
+        "astId": 2439,
+        "contract": "contracts/SimpleBet.sol:SimpleBet",
+        "label": "_authTokenEncKey",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_bytes32"
+      },
+      {
+        "astId": 4309,
+        "contract": "contracts/SimpleBet.sol:SimpleBet",
+        "label": "_owner",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_address"
+      },
+      {
+        "astId": 4312,
+        "contract": "contracts/SimpleBet.sol:SimpleBet",
+        "label": "_nextBetId",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 4341,
+        "contract": "contracts/SimpleBet.sol:SimpleBet",
+        "label": "_betMetas",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_array(t_struct(Bet)4337_storage)dyn_storage"
+      },
+      {
+        "astId": 4344,
+        "contract": "contracts/SimpleBet.sol:SimpleBet",
+        "label": "_betSecrets",
+        "offset": 0,
+        "slot": "6",
+        "type": "t_array(t_bytes_storage)dyn_storage"
+      },
+      {
+        "astId": 4349,
+        "contract": "contracts/SimpleBet.sol:SimpleBet",
+        "label": "_userBets",
+        "offset": 0,
+        "slot": "7",
+        "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)"
+      },
+      {
+        "astId": 4353,
+        "contract": "contracts/SimpleBet.sol:SimpleBet",
+        "label": "userBalances",
+        "offset": 0,
+        "slot": "8",
+        "type": "t_mapping(t_address,t_uint256)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_bytes_storage)dyn_storage": {
+        "base": "t_bytes_storage",
+        "encoding": "dynamic_array",
+        "label": "bytes[]",
+        "numberOfBytes": "32"
+      },
+      "t_array(t_struct(Bet)4337_storage)dyn_storage": {
+        "base": "t_struct(Bet)4337_storage",
+        "encoding": "dynamic_array",
+        "label": "struct SimpleBet.Bet[]",
+        "numberOfBytes": "32"
+      },
+      "t_array(t_uint256)dyn_storage": {
+        "base": "t_uint256",
+        "encoding": "dynamic_array",
+        "label": "uint256[]",
+        "numberOfBytes": "32"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_bytes_storage": {
+        "encoding": "bytes",
+        "label": "bytes",
+        "numberOfBytes": "32"
+      },
+      "t_enum(BetOutcome)4315": {
+        "encoding": "inplace",
+        "label": "enum SimpleBet.BetOutcome",
+        "numberOfBytes": "1"
+      },
+      "t_enum(BetStatus)4320": {
+        "encoding": "inplace",
+        "label": "enum SimpleBet.BetStatus",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256[])",
+        "numberOfBytes": "32",
+        "value": "t_array(t_uint256)dyn_storage"
+      },
+      "t_mapping(t_address,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_bytes32,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_string_storage": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      },
+      "t_struct(Bet)4337_storage": {
+        "encoding": "inplace",
+        "label": "struct SimpleBet.Bet",
+        "members": [
+          {
+            "astId": 4322,
+            "contract": "contracts/SimpleBet.sol:SimpleBet",
+            "label": "id",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 4324,
+            "contract": "contracts/SimpleBet.sol:SimpleBet",
+            "label": "user",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address"
+          },
+          {
+            "astId": 4326,
+            "contract": "contracts/SimpleBet.sol:SimpleBet",
+            "label": "amount",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 4329,
+            "contract": "contracts/SimpleBet.sol:SimpleBet",
+            "label": "outcome",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_enum(BetOutcome)4315"
+          },
+          {
+            "astId": 4332,
+            "contract": "contracts/SimpleBet.sol:SimpleBet",
+            "label": "status",
+            "offset": 1,
+            "slot": "3",
+            "type": "t_enum(BetStatus)4320"
+          },
+          {
+            "astId": 4334,
+            "contract": "contracts/SimpleBet.sol:SimpleBet",
+            "label": "createdAt",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 4336,
+            "contract": "contracts/SimpleBet.sol:SimpleBet",
+            "label": "description",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_string_storage"
+          }
+        ],
+        "numberOfBytes": "192"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}
