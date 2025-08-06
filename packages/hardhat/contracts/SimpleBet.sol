@@ -37,6 +37,7 @@ contract SimpleBet is SiweAuth {
         uint256 id;
         address user;
         uint256 totalAmount;    // Total amount across all subbets
+        BetOutcome outcome;     // Overall outcome for all subbets
         BetStatus status;       // Overall bet status
         uint256 createdAt;
         string description;
@@ -100,24 +101,23 @@ contract SimpleBet is SiweAuth {
     /**
      * @dev Place a bet with subbets across multiple platforms
      * @param description Description of the bet (private)
+     * @param outcome Overall outcome for all subbets (YES/NO)
      * @param platforms Array of platform names
      * @param amounts Array of amounts for each platform
      * @param marketIds Array of market IDs for each platform
-     * @param outcomes Array of outcomes for each platform
      */
     function placeBet(
         string calldata description,
+        BetOutcome outcome,
         string[] calldata platforms,
         uint256[] calldata amounts,
-        string[] calldata marketIds,
-        BetOutcome[] calldata outcomes
+        string[] calldata marketIds
     ) external payable {
         require(msg.value > 0, "Bet amount must be greater than 0");
         require(platforms.length > 0, "At least one subbet required");
         require(
             platforms.length == amounts.length && 
-            amounts.length == marketIds.length && 
-            marketIds.length == outcomes.length,
+            amounts.length == marketIds.length,
             "Array lengths must match"
         );
         
@@ -132,27 +132,29 @@ contract SimpleBet is SiweAuth {
         uint256 betId = _nextBetId++;
         
         // Create the main bet
-        Bet storage newBet = _betMetas.push();
+        _betMetas.push();
+        Bet storage newBet = _betMetas[_betMetas.length - 1];
         newBet.id = betId;
         newBet.user = msg.sender;
         newBet.totalAmount = msg.value;
+        newBet.outcome = outcome;
         newBet.status = BetStatus.Active;
         newBet.createdAt = block.timestamp;
         newBet.description = description;
         newBet.totalPayout = 0;
         
-        // Add subbets
+        // Add subbets (all with the same outcome)
         for (uint256 i = 0; i < platforms.length; i++) {
             newBet.subBets.push(SubBet({
                 platform: platforms[i],
                 amount: amounts[i],
                 marketId: marketIds[i],
-                outcome: outcomes[i],
+                outcome: outcome,
                 status: BetStatus.Active,
                 payout: 0
             }));
             
-            emit SubBetPlaced(betId, platforms[i], amounts[i], marketIds[i], outcomes[i]);
+            emit SubBetPlaced(betId, platforms[i], amounts[i], marketIds[i], outcome);
         }
         
         _userBets[msg.sender].push(_betMetas.length - 1);
@@ -198,18 +200,14 @@ contract SimpleBet is SiweAuth {
     
     
     /**
-     * @dev Resolve a specific subbet (only owner)
-     * @param betId The bet ID containing the subbet
-     * @param subBetIndex Index of the subbet to resolve
-     * @param won Whether the subbet won or lost
-     * @param payout Payout amount from the platform
+     * @dev Resolve a bet and all its subbets (only owner)
+     * @param betId The bet ID to resolve
+     * @param won Whether the bet won or lost
      * @param token SIWE authentication token for owner
      */
-    function resolveSubBet(
+    function resolveBet(
         uint256 betId,
-        uint256 subBetIndex,
         bool won,
-        uint256 payout,
         bytes memory token
     ) external onlyOwner(token) {
         require(betId > 0 && betId < _nextBetId, "Invalid bet ID");
@@ -226,57 +224,34 @@ contract SimpleBet is SiweAuth {
         }
         
         require(found, "Bet not found");
+        require(_betMetas[betIndex].status == BetStatus.Active, "Bet already resolved");
+        
         Bet storage bet = _betMetas[betIndex];
-        require(subBetIndex < bet.subBets.length, "Invalid subbet index");
-        require(bet.subBets[subBetIndex].status == BetStatus.Active, "SubBet already resolved");
+        uint256 totalPayout = 0;
         
-        SubBet storage subBet = bet.subBets[subBetIndex];
-        
-        if (won) {
-            subBet.status = BetStatus.Won;
-            subBet.payout = payout;
-            bet.totalPayout += payout;
-            // Add winnings to user balance (original amount already there)
-            userBalances[bet.user] += payout - subBet.amount;
-        } else {
-            subBet.status = BetStatus.Lost;
-            subBet.payout = 0;
-            // Remove the subbet amount from user's balance since they lost
-            userBalances[bet.user] -= subBet.amount;
-        }
-        
-        // Check if all subbets are resolved to update main bet status
-        _updateBetStatus(betIndex);
-        
-        emit BetResolved(betId, subBet.status, subBet.payout);
-    }
-    
-    /**
-     * @dev Internal function to update overall bet status based on subbets
-     * @param betIndex Index of the bet to update
-     */
-    function _updateBetStatus(uint256 betIndex) internal {
-        Bet storage bet = _betMetas[betIndex];
-        
-        bool allResolved = true;
-        bool hasWon = false;
-        
+        // Resolve all subbets with 2x multiplier
         for (uint256 i = 0; i < bet.subBets.length; i++) {
-            if (bet.subBets[i].status == BetStatus.Active) {
-                allResolved = false;
-                break;
-            } else if (bet.subBets[i].status == BetStatus.Won) {
-                hasWon = true;
+            SubBet storage subBet = bet.subBets[i];
+            
+            if (won) {
+                subBet.status = BetStatus.Won;
+                subBet.payout = subBet.amount * 2; // 2x multiplier
+                totalPayout += subBet.payout;
+                // Add winnings to user balance (original amount already there)
+                userBalances[bet.user] += subBet.amount; // Add only the winnings (1x the original amount)
+            } else {
+                subBet.status = BetStatus.Lost;
+                subBet.payout = 0;
+                // Remove the subbet amount from user's balance since they lost
+                userBalances[bet.user] -= subBet.amount;
             }
         }
         
-        if (allResolved) {
-            if (hasWon) {
-                bet.status = BetStatus.Won;
-            } else {
-                bet.status = BetStatus.Lost;
-            }
-        }
+        // Update main bet
+        bet.status = won ? BetStatus.Won : BetStatus.Lost;
+        bet.totalPayout = totalPayout;
+        
+        emit BetResolved(betId, bet.status, totalPayout);
     }
     
     /**

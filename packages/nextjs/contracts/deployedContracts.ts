@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   23295: {
     SimpleBet: {
-      address: "0xB427045A44230615e08A9C2ad00233425F206C74",
+      address: "0xb13F46B7489B4D602DC2fe08C80FBb06C250dC4D",
       abi: [
         {
           inputs: [
@@ -247,6 +247,11 @@ const deployedContracts = {
                   type: "uint256",
                 },
                 {
+                  internalType: "enum SimpleBet.BetOutcome",
+                  name: "outcome",
+                  type: "uint8",
+                },
+                {
                   internalType: "enum SimpleBet.BetStatus",
                   name: "status",
                   type: "uint8",
@@ -343,6 +348,11 @@ const deployedContracts = {
                   internalType: "uint256",
                   name: "totalAmount",
                   type: "uint256",
+                },
+                {
+                  internalType: "enum SimpleBet.BetOutcome",
+                  name: "outcome",
+                  type: "uint8",
                 },
                 {
                   internalType: "enum SimpleBet.BetStatus",
@@ -621,6 +631,11 @@ const deployedContracts = {
                   type: "uint256",
                 },
                 {
+                  internalType: "enum SimpleBet.BetOutcome",
+                  name: "outcome",
+                  type: "uint8",
+                },
+                {
                   internalType: "enum SimpleBet.BetStatus",
                   name: "status",
                   type: "uint8",
@@ -753,6 +768,11 @@ const deployedContracts = {
               type: "string",
             },
             {
+              internalType: "enum SimpleBet.BetOutcome",
+              name: "outcome",
+              type: "uint8",
+            },
+            {
               internalType: "string[]",
               name: "platforms",
               type: "string[]",
@@ -766,11 +786,6 @@ const deployedContracts = {
               internalType: "string[]",
               name: "marketIds",
               type: "string[]",
-            },
-            {
-              internalType: "enum SimpleBet.BetOutcome[]",
-              name: "outcomes",
-              type: "uint8[]",
             },
           ],
           name: "placeBet",
@@ -786,19 +801,9 @@ const deployedContracts = {
               type: "uint256",
             },
             {
-              internalType: "uint256",
-              name: "subBetIndex",
-              type: "uint256",
-            },
-            {
               internalType: "bool",
               name: "won",
               type: "bool",
-            },
-            {
-              internalType: "uint256",
-              name: "payout",
-              type: "uint256",
             },
             {
               internalType: "bytes",
@@ -806,7 +811,7 @@ const deployedContracts = {
               type: "bytes",
             },
           ],
-          name: "resolveSubBet",
+          name: "resolveBet",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -842,7 +847,7 @@ const deployedContracts = {
         domain: "@oasisprotocol/sapphire-contracts/contracts/auth/SiweAuth.sol",
         login: "@oasisprotocol/sapphire-contracts/contracts/auth/SiweAuth.sol",
       },
-      deployedOnBlock: 12902439,
+      deployedOnBlock: 12903447,
     },
   },
   31337: {
