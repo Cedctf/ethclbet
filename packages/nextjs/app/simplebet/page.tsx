@@ -288,12 +288,12 @@ export default function SimpleBetPage() {
       if (result && Array.isArray(result)) {
         const formattedBets = result.map((bet: any) => ({
           id: bet.id,
-          amount: bet.amount,
-          outcome: bet.outcome,
+          amount: bet.totalAmount || bet.amount, // Use totalAmount from new contract structure
           status: bet.status,
           description: bet.description,
           createdAt: bet.createdAt ? Number(bet.createdAt) : 0,
           bettor: bet.user,
+          totalPayout: bet.totalPayout || 0,
         }));
 
         setUserBets(formattedBets);
@@ -713,8 +713,8 @@ export default function SimpleBetPage() {
                       <span>{formatEther(bet.amount)} ETH</span>
                     </div>
                     <div className="text-sm text-gray-500">
-                      Outcome: {bet.outcome === 0 ? "YES" : "NO"} | Status:{" "}
-                      {["Active", "Won", "Lost", "Cancelled"][bet.status]}
+                      Status: {["Active", "Won", "Lost", "Cancelled"][bet.status]}
+                      {bet.totalPayout > 0 && <span> | Payout: {formatEther(bet.totalPayout)} ETH</span>}
                     </div>
                     <div className="text-xs text-gray-400">
                       Bettor: {bet.bettor} | ID: {bet.id?.toString()}
