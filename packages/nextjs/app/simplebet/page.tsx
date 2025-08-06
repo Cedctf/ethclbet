@@ -37,12 +37,25 @@ export default function SimpleBetPage() {
   const [singleBet, setSingleBet] = useState<any>(null);
   const [loadingSingleBet, setLoadingSingleBet] = useState(false);
 
+  // Bet resolution (owner only)
+  const [resolveBetId, setResolveBetId] = useState("");
+  const [betWon, setBetWon] = useState(true);
+  const [loadingResolve, setLoadingResolve] = useState(false);
+
+  // Cancel bet (owner only)
+  const [cancelBetId, setCancelBetId] = useState("");
+  const [loadingCancel, setLoadingCancel] = useState(false);
+
   // Contract interactions
   const { writeContractAsync: placeBet, isMining: isPlacingBet } = useScaffoldWriteContract({
     contractName: "SimpleBet",
   });
 
   const { writeContractAsync: withdrawBalance, isMining: isWithdrawing } = useScaffoldWriteContract({
+    contractName: "SimpleBet",
+  });
+
+  const { writeContractAsync } = useScaffoldWriteContract({
     contractName: "SimpleBet",
   });
 
@@ -306,6 +319,82 @@ export default function SimpleBetPage() {
     }
   };
 
+  // Resolve Bet (owner only)
+  const handleResolveBet = async () => {
+    if (!resolveBetId || isNaN(parseInt(resolveBetId))) {
+      notification.error("Please enter a valid bet ID");
+      return;
+    }
+
+    if (!isTokenValid()) {
+      notification.error("Please authenticate with SIWE first");
+      return;
+    }
+
+    if (!publicClient || !deployedContractData) {
+      notification.error("Contract not found or client not ready");
+      return;
+    }
+
+    setLoadingResolve(true);
+    try {
+      const tokenBytes = siweToken as `0x${string}`;
+      const betId = BigInt(parseInt(resolveBetId));
+
+      // Call the contract's resolveBet function
+      await writeContractAsync({
+        functionName: "resolveBet",
+        args: [betId, betWon, tokenBytes],
+      });
+
+      notification.success(`Bet ${resolveBetId} resolved as ${betWon ? "Won" : "Lost"}!`);
+      setResolveBetId("");
+    } catch (error) {
+      console.error("Error resolving bet:", error);
+      notification.error("Failed to resolve bet. Make sure you're the owner and the bet exists.");
+    } finally {
+      setLoadingResolve(false);
+    }
+  };
+
+  // Cancel Bet (owner only)
+  const handleCancelBet = async () => {
+    if (!cancelBetId || isNaN(parseInt(cancelBetId))) {
+      notification.error("Please enter a valid bet ID");
+      return;
+    }
+
+    if (!isTokenValid()) {
+      notification.error("Please authenticate with SIWE first");
+      return;
+    }
+
+    if (!publicClient || !deployedContractData) {
+      notification.error("Contract not found or client not ready");
+      return;
+    }
+
+    setLoadingCancel(true);
+    try {
+      const tokenBytes = siweToken as `0x${string}`;
+      const betId = BigInt(parseInt(cancelBetId));
+
+      // Call the contract's cancelBet function
+      await writeContractAsync({
+        functionName: "cancelBet",
+        args: [betId, tokenBytes],
+      });
+
+      notification.success(`Bet ${cancelBetId} cancelled successfully!`);
+      setCancelBetId("");
+    } catch (error) {
+      console.error("Error cancelling bet:", error);
+      notification.error("Failed to cancel bet. Make sure you're the owner and the bet exists.");
+    } finally {
+      setLoadingCancel(false);
+    }
+  };
+
   // Withdraw Balance
   const handleWithdraw = async () => {
     if (!userBalance || userBalance === 0n) {
@@ -527,6 +616,80 @@ export default function SimpleBetPage() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Owner Functions */}
+          <div className="bg-base-100 p-6 rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Owner Functions</h2>
+
+            {/* Resolve Bet */}
+            <div className="space-y-4 mb-6">
+              <h3 className="text-lg font-medium">Resolve Bet</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="label">Bet ID</label>
+                  <input
+                    type="number"
+                    value={resolveBetId}
+                    onChange={e => setResolveBetId(e.target.value)}
+                    className="input input-bordered w-full"
+                    placeholder="Enter bet ID"
+                  />
+                </div>
+                <div>
+                  <label className="label">Outcome</label>
+                  <select
+                    value={betWon ? "won" : "lost"}
+                    onChange={e => setBetWon(e.target.value === "won")}
+                    className="select select-bordered w-full"
+                  >
+                    <option value="won">Won</option>
+                    <option value="lost">Lost</option>
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <button
+                    onClick={handleResolveBet}
+                    disabled={loadingResolve || !isAuthenticated}
+                    className="btn btn-success w-full"
+                  >
+                    {loadingResolve ? "Resolving..." : "Resolve Bet"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Cancel Bet */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Cancel Bet</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="label">Bet ID</label>
+                  <input
+                    type="number"
+                    value={cancelBetId}
+                    onChange={e => setCancelBetId(e.target.value)}
+                    className="input input-bordered w-full"
+                    placeholder="Enter bet ID to cancel"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <button
+                    onClick={handleCancelBet}
+                    disabled={loadingCancel || !isAuthenticated}
+                    className="btn btn-warning w-full"
+                  >
+                    {loadingCancel ? "Cancelling..." : "Cancel Bet"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {!isAuthenticated && (
+              <div className="mt-4">
+                <p className="text-sm text-gray-500">Please authenticate with SIWE to use owner functions</p>
+              </div>
+            )}
           </div>
 
           {/* Withdraw Balance */}
