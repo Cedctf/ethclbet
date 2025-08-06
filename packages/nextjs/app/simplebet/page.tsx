@@ -209,8 +209,8 @@ export default function SimpleBetPage() {
     }
   };
 
-  // Get All Bets (requires SIWE authentication)
-  const handleGetAllBets = async () => {
+  // Get User Bets (requires SIWE authentication)
+  const handleGetUserBets = async () => {
     if (!isTokenValid()) {
       notification.error("Please authenticate with SIWE first");
       return;
@@ -227,16 +227,16 @@ export default function SimpleBetPage() {
       // The token is already in the correct format for Sapphire's SiweAuth
       const tokenBytes = siweToken as `0x${string}`;
 
-      // Call the contract's getAllBets function with SIWE authentication
+      // Call the contract's getUserBets function with SIWE authentication
       // Parameters: token, offset, count
       const result = await publicClient.readContract({
         address: deployedContractData.address,
         abi: deployedContractData.abi,
-        functionName: "getAllBets",
-        args: [tokenBytes, 0n, 50n], // Get first 50 bets
+        functionName: "getUserBets",
+        args: [tokenBytes, 0n, 50n], // Get first 50 user bets
       });
 
-      // The result should be an array of all bets
+      // The result should be an array of user's bets
       if (result && Array.isArray(result)) {
         const formattedBets = result.map((bet: any) => ({
           id: bet.id,
@@ -244,15 +244,15 @@ export default function SimpleBetPage() {
           outcome: bet.outcome,
           status: bet.status,
           description: bet.description,
-          createdAt: bet.timestamp ? Number(bet.timestamp) : 0,
-          bettor: bet.bettor,
+          createdAt: bet.createdAt ? Number(bet.createdAt) : 0,
+          bettor: bet.user,
         }));
 
         setUserBets(formattedBets);
-        notification.success(`Loaded ${formattedBets.length} bets`);
+        notification.success(`Loaded ${formattedBets.length} of your bets`);
       } else {
         setUserBets([]);
-        notification.info("No bets found");
+        notification.info("No bets found for your account");
       }
     } catch (error) {
       console.error("Error getting all bets:", error);
@@ -523,19 +523,19 @@ export default function SimpleBetPage() {
 
         {/* User Actions */}
         <div className="space-y-6">
-          {/* Get All Bets */}
+          {/* Get User Bets */}
           <div className="bg-base-100 p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">All Bets (Private)</h2>
+            <h2 className="text-xl font-semibold mb-4">Your Bets (Private)</h2>
             <button
-              onClick={handleGetAllBets}
+              onClick={handleGetUserBets}
               disabled={loadingBets || !isAuthenticated}
               className="btn btn-secondary w-full mb-4"
             >
-              {loadingBets ? "Loading..." : "Get All Bets"}
+              {loadingBets ? "Loading..." : "Get My Bets"}
             </button>
 
             {!isAuthenticated && (
-              <p className="text-sm text-gray-500 mb-4">Please authenticate with SIWE to view bets</p>
+              <p className="text-sm text-gray-500 mb-4">Please authenticate with SIWE to view your bets</p>
             )}
 
             {userBets.length > 0 && (
