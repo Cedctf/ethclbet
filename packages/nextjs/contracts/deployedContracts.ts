@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   23295: {
     SimpleBet: {
-      address: "0x6E005eDE5f15b8df8c2d4dD191b27DE42dE0b0e2",
+      address: "0x39861297E8DC38A3155165B4b0Fe903A7e479da7",
       abi: [
         {
           inputs: [
@@ -566,12 +566,12 @@ const deployedContracts = {
         domain: "@oasisprotocol/sapphire-contracts/contracts/auth/SiweAuth.sol",
         login: "@oasisprotocol/sapphire-contracts/contracts/auth/SiweAuth.sol",
       },
-      deployedOnBlock: 12891276,
+      deployedOnBlock: 12900280,
     },
   },
   31337: {
     SimpleBet: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
       abi: [
         {
           inputs: [
@@ -1130,7 +1130,7 @@ const deployedContracts = {
         domain: "@oasisprotocol/sapphire-contracts/contracts/auth/SiweAuth.sol",
         login: "@oasisprotocol/sapphire-contracts/contracts/auth/SiweAuth.sol",
       },
-      deployedOnBlock: 1,
+      deployedOnBlock: 3,
     },
   },
 } as const;

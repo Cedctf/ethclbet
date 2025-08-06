@@ -1,30 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ethers } from "ethers";
+import { SiweMessage } from "siwe";
 import { formatEther, parseEther } from "viem";
 import { useAccount, useSignMessage } from "wagmi";
 import { usePublicClient } from "wagmi";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
-
-// SIWE message generation
-const generateSiweMessage = (address: string, domain: string, nonce: string) => {
-  const now = new Date();
-  const expirationTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
-
-  return `${domain} wants you to sign in with your Ethereum account:
-${address}
-
-I accept the Terms of Service: https://service.invalid/
-
-URI: https://${domain}/
-Version: 1
-Chain ID: 23295
-Nonce: ${nonce}
-Issued At: ${now.toISOString()}
-Expiration Time: ${expirationTime.toISOString()}`;
-};
 
 // Generate random nonce
 const generateNonce = () => Math.random().toString(36).substring(2, 15);
@@ -74,6 +58,12 @@ export default function SimpleBetPage() {
     functionName: "getTotalBets",
   });
 
+  // Get domain from contract
+  const { data: contractDomain } = useScaffoldReadContract({
+    contractName: "SimpleBet",
+    functionName: "domain",
+  });
+
   // Load SIWE token from localStorage on mount
   useEffect(() => {
     const storedToken = localStorage.getItem("siwe-token");
@@ -88,33 +78,62 @@ export default function SimpleBetPage() {
         // Token expired
         localStorage.removeItem("siwe-token");
         localStorage.removeItem("siwe-token-expiry");
+        setIsAuthenticated(false);
       }
     }
   }, []);
 
+  // Update authentication state when token changes
+  useEffect(() => {
+    setIsAuthenticated(isTokenValid());
+  }, [siweToken]);
+
   // SIWE Login
   const handleSiweLogin = async () => {
-    if (!address) {
-      notification.error("Please connect your wallet first");
+    if (!address || !deployedContractData || !publicClient || !contractDomain) {
+      notification.error("Please connect your wallet and ensure contract is deployed");
       return;
     }
 
     try {
-      const domain = "testnet.sapphire.oasis.io";
-      const nonce = generateNonce();
-      const message = generateSiweMessage(address, domain, nonce);
+      // Get chain ID from the public client
+      const chainId = await publicClient.getChainId();
 
+      // Create SIWE message using the siwe library - matching Sapphire docs exactly
+      const siweMessage = new SiweMessage({
+        domain: contractDomain,
+        address: address,
+        uri: `http://${contractDomain}`, // Use http:// as shown in docs
+        version: "1",
+        chainId: chainId,
+        nonce: generateNonce(),
+        // Remove issuedAt and expirationTime as they're not in the docs example
+        statement: "I accept the Terms of Service: https://service.invalid/", // Add statement as shown in docs
+      });
+
+      const message = siweMessage.toMessage();
       const signature = await signMessageAsync({ message });
 
-      // Create SIWE token (in a real app, you'd verify this on the backend)
-      const siweData = {
-        message,
-        signature,
-        address,
-        timestamp: new Date().getTime(),
+      // Parse signature using ethers.Signature.from as shown in Sapphire docs
+      const sig = ethers.Signature.from(signature);
+
+      // Convert to SignatureRSV format expected by the contract
+      const signatureRSV = {
+        r: sig.r,
+        s: sig.s,
+        v: BigInt(sig.v),
       };
 
-      const token = btoa(JSON.stringify(siweData));
+      // Call the contract's login method to get the proper SIWE token
+      const loginResult = await publicClient.readContract({
+        address: deployedContractData.address,
+        abi: deployedContractData.abi,
+        functionName: "login",
+        args: [message, signatureRSV], // Pass signatureRSV as expected by contract
+      });
+
+      // The login method returns a bytes token that we can use for authenticated calls
+      const token = loginResult as string;
       const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours
 
       // Store in localStorage
@@ -172,9 +191,18 @@ export default function SimpleBetPage() {
     }
   };
 
+  // Check if token is valid (similar to docs pattern)
+  const isTokenValid = () => {
+    if (!siweToken) return false;
+    const storedExpiry = localStorage.getItem("siwe-token-expiry");
+    if (!storedExpiry) return false;
+    const now = new Date().getTime();
+    return now < parseInt(storedExpiry);
+  };
+
   // Get User Bets (requires SIWE authentication)
   const handleGetUserBets = async () => {
-    if (!isAuthenticated || !siweToken) {
+    if (!isTokenValid()) {
       notification.error("Please authenticate with SIWE first");
       return;
     }
@@ -186,16 +214,9 @@ export default function SimpleBetPage() {
 
     setLoadingBets(true);
     try {
-      // Parse the SIWE token to get the signature and message
-      const siweData = JSON.parse(atob(siweToken));
-      const { message, signature } = siweData;
-
-      // Convert the SIWE message and signature to a token format that the contract expects
-      // The contract expects a bytes token that contains the SIWE message and signature
-      const tokenData = JSON.stringify({ message, signature });
-      const tokenBytes = `0x${Array.from(new TextEncoder().encode(tokenData))
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("")}` as `0x${string}`;
+      // Use the token directly from the login method
+      // The token is already in the correct format for Sapphire's SiweAuth
+      const tokenBytes = siweToken as `0x${string}`;
 
       // Call the contract's getUserBets function with SIWE authentication
       // Parameters: token, offset, count
