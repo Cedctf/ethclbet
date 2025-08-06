@@ -24,14 +24,24 @@ contract SimpleBet is SiweAuth {
         Cancelled
     }
     
+    struct SubBet {
+        string platform;        // e.g., "Polymarket", "Augur", "Gnosis"
+        uint256 amount;         // Amount allocated to this platform
+        string marketId;        // Platform-specific market identifier
+        BetOutcome outcome;     // Outcome bet on this platform
+        BetStatus status;       // Status of this specific subbet
+        uint256 payout;         // Payout received from this platform
+    }
+    
     struct Bet {
         uint256 id;
         address user;
-        uint256 amount;
-        BetOutcome outcome;
-        BetStatus status;
+        uint256 totalAmount;    // Total amount across all subbets
+        BetStatus status;       // Overall bet status
         uint256 createdAt;
         string description;
+        SubBet[] subBets;       // Array of subbets across different platforms
+        uint256 totalPayout;    // Total payout across all subbets
     }
     
     // Private bet details (secret, accessible only with SIWE auth)
@@ -43,9 +53,17 @@ contract SimpleBet is SiweAuth {
     event BetPlaced(
         uint256 indexed betId,
         address indexed user,
-        uint256 amount,
-        BetOutcome outcome,
+        uint256 totalAmount,
+        uint256 subBetCount,
         uint256 index
+    );
+    
+    event SubBetPlaced(
+        uint256 indexed betId,
+        string platform,
+        uint256 amount,
+        string marketId,
+        BetOutcome outcome
     );
     
     event BetResolved(
@@ -80,35 +98,69 @@ contract SimpleBet is SiweAuth {
     }
     
     /**
-     * @dev Place a bet with amount and outcome
-     * @param outcome The outcome to bet on (YES/NO)
-     * @param description Description of the bet (now private)
+     * @dev Place a bet with subbets across multiple platforms
+     * @param description Description of the bet (private)
+     * @param platforms Array of platform names
+     * @param amounts Array of amounts for each platform
+     * @param marketIds Array of market IDs for each platform
+     * @param outcomes Array of outcomes for each platform
      */
     function placeBet(
-        BetOutcome outcome,
-        string calldata description
+        string calldata description,
+        string[] calldata platforms,
+        uint256[] calldata amounts,
+        string[] calldata marketIds,
+        BetOutcome[] calldata outcomes
     ) external payable {
         require(msg.value > 0, "Bet amount must be greater than 0");
+        require(platforms.length > 0, "At least one subbet required");
+        require(
+            platforms.length == amounts.length && 
+            amounts.length == marketIds.length && 
+            marketIds.length == outcomes.length,
+            "Array lengths must match"
+        );
+        
+        // Verify total amounts match sent value
+        uint256 totalAmount = 0;
+        for (uint256 i = 0; i < amounts.length; i++) {
+            require(amounts[i] > 0, "Each subbet amount must be greater than 0");
+            totalAmount += amounts[i];
+        }
+        require(totalAmount == msg.value, "Total subbet amounts must equal sent value");
         
         uint256 betId = _nextBetId++;
         
-        Bet memory newBet = Bet({
-            id: betId,
-            user: msg.sender,
-            amount: msg.value,
-            outcome: outcome,
-            status: BetStatus.Active,
-            createdAt: block.timestamp,
-            description: description
-        });
+        // Create the main bet
+        Bet storage newBet = _betMetas.push();
+        newBet.id = betId;
+        newBet.user = msg.sender;
+        newBet.totalAmount = msg.value;
+        newBet.status = BetStatus.Active;
+        newBet.createdAt = block.timestamp;
+        newBet.description = description;
+        newBet.totalPayout = 0;
         
-        _betMetas.push(newBet);
+        // Add subbets
+        for (uint256 i = 0; i < platforms.length; i++) {
+            newBet.subBets.push(SubBet({
+                platform: platforms[i],
+                amount: amounts[i],
+                marketId: marketIds[i],
+                outcome: outcomes[i],
+                status: BetStatus.Active,
+                payout: 0
+            }));
+            
+            emit SubBetPlaced(betId, platforms[i], amounts[i], marketIds[i], outcomes[i]);
+        }
+        
         _userBets[msg.sender].push(_betMetas.length - 1);
         
         // Add bet amount to user's withdrawable balance
         userBalances[msg.sender] += msg.value;
         
-        emit BetPlaced(betId, msg.sender, msg.value, outcome, _betMetas.length - 1);
+        emit BetPlaced(betId, msg.sender, msg.value, platforms.length, _betMetas.length - 1);
     }
     
     /**
@@ -146,14 +198,18 @@ contract SimpleBet is SiweAuth {
     
     
     /**
-     * @dev Resolve a bet (only owner)
-     * @param betId The bet ID to resolve
-     * @param won Whether the bet won or lost
+     * @dev Resolve a specific subbet (only owner)
+     * @param betId The bet ID containing the subbet
+     * @param subBetIndex Index of the subbet to resolve
+     * @param won Whether the subbet won or lost
+     * @param payout Payout amount from the platform
      * @param token SIWE authentication token for owner
      */
-    function resolveBet(
+    function resolveSubBet(
         uint256 betId,
+        uint256 subBetIndex,
         bool won,
+        uint256 payout,
         bytes memory token
     ) external onlyOwner(token) {
         require(betId > 0 && betId < _nextBetId, "Invalid bet ID");
@@ -170,23 +226,57 @@ contract SimpleBet is SiweAuth {
         }
         
         require(found, "Bet not found");
-        require(_betMetas[betIndex].status == BetStatus.Active, "Bet already resolved");
-        
         Bet storage bet = _betMetas[betIndex];
-        uint256 payout = 0;
+        require(subBetIndex < bet.subBets.length, "Invalid subbet index");
+        require(bet.subBets[subBetIndex].status == BetStatus.Active, "SubBet already resolved");
+        
+        SubBet storage subBet = bet.subBets[subBetIndex];
         
         if (won) {
-            bet.status = BetStatus.Won;
-            // Simple 2x payout for winning bets (user already has their bet amount, so add only the winnings)
-            payout = bet.amount * 2;
-            userBalances[bet.user] += bet.amount; // Add the winnings (original bet amount already in balance)
+            subBet.status = BetStatus.Won;
+            subBet.payout = payout;
+            bet.totalPayout += payout;
+            // Add winnings to user balance (original amount already there)
+            userBalances[bet.user] += payout - subBet.amount;
         } else {
-            bet.status = BetStatus.Lost;
-            // Remove the bet amount from user's balance since they lost
-            userBalances[bet.user] -= bet.amount;
+            subBet.status = BetStatus.Lost;
+            subBet.payout = 0;
+            // Remove the subbet amount from user's balance since they lost
+            userBalances[bet.user] -= subBet.amount;
         }
         
-        emit BetResolved(betId, bet.status, payout);
+        // Check if all subbets are resolved to update main bet status
+        _updateBetStatus(betIndex);
+        
+        emit BetResolved(betId, subBet.status, subBet.payout);
+    }
+    
+    /**
+     * @dev Internal function to update overall bet status based on subbets
+     * @param betIndex Index of the bet to update
+     */
+    function _updateBetStatus(uint256 betIndex) internal {
+        Bet storage bet = _betMetas[betIndex];
+        
+        bool allResolved = true;
+        bool hasWon = false;
+        
+        for (uint256 i = 0; i < bet.subBets.length; i++) {
+            if (bet.subBets[i].status == BetStatus.Active) {
+                allResolved = false;
+                break;
+            } else if (bet.subBets[i].status == BetStatus.Won) {
+                hasWon = true;
+            }
+        }
+        
+        if (allResolved) {
+            if (hasWon) {
+                bet.status = BetStatus.Won;
+            } else {
+                bet.status = BetStatus.Lost;
+            }
+        }
     }
     
     /**
@@ -217,9 +307,81 @@ contract SimpleBet is SiweAuth {
         Bet storage bet = _betMetas[betIndex];
         bet.status = BetStatus.Cancelled;
         
+        // Cancel all active subbets
+        for (uint256 i = 0; i < bet.subBets.length; i++) {
+            if (bet.subBets[i].status == BetStatus.Active) {
+                bet.subBets[i].status = BetStatus.Cancelled;
+            }
+        }
+        
         // User already has their bet amount in balance, no need to add again
         
-        emit BetResolved(betId, bet.status, bet.amount);
+        emit BetResolved(betId, bet.status, bet.totalAmount);
+    }
+    
+    /**
+     * @dev Get subbets for a specific bet (requires SIWE authentication)
+     * @param token SIWE authentication token
+     * @param betId The bet ID to get subbets for
+     */
+    function getSubBets(
+        bytes memory token,
+        uint256 betId
+    ) external view returns (SubBet[] memory) {
+        address user = authMsgSender(token);
+        require(user != address(0), "Invalid authentication token");
+        require(betId > 0 && betId < _nextBetId, "Invalid bet ID");
+        
+        // Find the bet in the array
+        for (uint256 i = 0; i < _betMetas.length; i++) {
+            if (_betMetas[i].id == betId) {
+                return _betMetas[i].subBets;
+            }
+        }
+        
+        revert("Bet not found");
+    }
+    
+    /**
+     * @dev Get bet summary with subbet count (requires SIWE authentication)
+     * @param token SIWE authentication token
+     * @param betId The bet ID to get summary for
+     */
+    function getBetSummary(
+        bytes memory token,
+        uint256 betId
+    ) external view returns (
+        uint256 id,
+        address user,
+        uint256 totalAmount,
+        BetStatus status,
+        uint256 createdAt,
+        string memory description,
+        uint256 subBetCount,
+        uint256 totalPayout
+    ) {
+        address caller = authMsgSender(token);
+        require(caller != address(0), "Invalid authentication token");
+        require(betId > 0 && betId < _nextBetId, "Invalid bet ID");
+        
+        // Find the bet in the array
+        for (uint256 i = 0; i < _betMetas.length; i++) {
+            if (_betMetas[i].id == betId) {
+                Bet storage bet = _betMetas[i];
+                return (
+                    bet.id,
+                    bet.user,
+                    bet.totalAmount,
+                    bet.status,
+                    bet.createdAt,
+                    bet.description,
+                    bet.subBets.length,
+                    bet.totalPayout
+                );
+            }
+        }
+        
+        revert("Bet not found");
     }
     
     /**

@@ -24,9 +24,8 @@ export default function SimpleBetPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Form states
-  const [betAmount, setBetAmount] = useState("");
-  const [betOutcome, setBetOutcome] = useState(0); // 0 = YES, 1 = NO
   const [betDescription, setBetDescription] = useState("");
+  const [subBets, setSubBets] = useState([{ platform: "", amount: "", marketId: "", outcome: 0 }]);
 
   // User bets state
   const [userBets, setUserBets] = useState<any[]>([]);
@@ -37,14 +36,21 @@ export default function SimpleBetPage() {
   const [singleBet, setSingleBet] = useState<any>(null);
   const [loadingSingleBet, setLoadingSingleBet] = useState(false);
 
-  // Bet resolution (owner only)
-  const [resolveBetId, setResolveBetId] = useState("");
-  const [betWon, setBetWon] = useState(true);
-  const [loadingResolve, setLoadingResolve] = useState(false);
+  // SubBet resolution (owner only)
+  const [resolveSubBetId, setResolveSubBetId] = useState("");
+  const [resolveSubBetIndex, setResolveSubBetIndex] = useState("");
+  const [subBetWon, setSubBetWon] = useState(true);
+  const [subBetPayout, setSubBetPayout] = useState("");
+  const [loadingResolveSubBet, setLoadingResolveSubBet] = useState(false);
 
   // Cancel bet (owner only)
   const [cancelBetId, setCancelBetId] = useState("");
   const [loadingCancel, setLoadingCancel] = useState(false);
+
+  // SubBet details
+  const [subBetDetailsId, setSubBetDetailsId] = useState("");
+  const [subBetDetails, setSubBetDetails] = useState<any[]>([]);
+  const [loadingSubBetDetails, setLoadingSubBetDetails] = useState(false);
 
   // Contract interactions
   const { writeContractAsync: placeBet, isMining: isPlacingBet } = useScaffoldWriteContract({
@@ -186,23 +192,65 @@ export default function SimpleBetPage() {
     notification.success("Logged out successfully");
   };
 
-  // Place Bet
+  // SubBet management functions
+  const addSubBet = () => {
+    setSubBets([...subBets, { platform: "", amount: "", marketId: "", outcome: 0 }]);
+  };
+
+  const removeSubBet = (index: number) => {
+    if (subBets.length > 1) {
+      setSubBets(subBets.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateSubBet = (index: number, field: string, value: string | number) => {
+    const updated = [...subBets];
+    updated[index] = { ...updated[index], [field]: value };
+    setSubBets(updated);
+  };
+
+  const getTotalAmount = () => {
+    return subBets.reduce((total, subBet) => {
+      const amount = parseFloat(subBet.amount) || 0;
+      return total + amount;
+    }, 0);
+  };
+
+  // Place Bet with SubBets
   const handlePlaceBet = async () => {
-    if (!betAmount || !betDescription) {
-      notification.error("Please fill in all fields");
+    if (!betDescription) {
+      notification.error("Please enter a bet description");
+      return;
+    }
+
+    // Validate subbets
+    const validSubBets = subBets.filter(sb => sb.platform && sb.amount && sb.marketId);
+    if (validSubBets.length === 0) {
+      notification.error("Please add at least one valid subbet");
+      return;
+    }
+
+    const totalAmount = getTotalAmount();
+    if (totalAmount <= 0) {
+      notification.error("Total bet amount must be greater than 0");
       return;
     }
 
     try {
+      const platforms = validSubBets.map(sb => sb.platform);
+      const amounts = validSubBets.map(sb => parseEther(sb.amount));
+      const marketIds = validSubBets.map(sb => sb.marketId);
+      const outcomes = validSubBets.map(sb => sb.outcome);
+
       await placeBet({
         functionName: "placeBet",
-        args: [betOutcome, betDescription],
-        value: parseEther(betAmount),
+        args: [betDescription, platforms, amounts, marketIds, outcomes],
+        value: parseEther(totalAmount.toString()),
       });
 
-      notification.success("Bet placed successfully!");
-      setBetAmount("");
+      notification.success("Aggregated bet placed successfully!");
       setBetDescription("");
+      setSubBets([{ platform: "", amount: "", marketId: "", outcome: 0 }]);
     } catch (error) {
       console.error("Error placing bet:", error);
       notification.error("Failed to place bet");
@@ -319,9 +367,58 @@ export default function SimpleBetPage() {
     }
   };
 
-  // Resolve Bet (owner only)
-  const handleResolveBet = async () => {
-    if (!resolveBetId || isNaN(parseInt(resolveBetId))) {
+  // Resolve SubBet (owner only)
+  const handleResolveSubBet = async () => {
+    if (!resolveSubBetId || isNaN(parseInt(resolveSubBetId))) {
+      notification.error("Please enter a valid bet ID");
+      return;
+    }
+
+    if (!resolveSubBetIndex || isNaN(parseInt(resolveSubBetIndex))) {
+      notification.error("Please enter a valid subbet index");
+      return;
+    }
+
+    if (!subBetPayout || isNaN(parseFloat(subBetPayout))) {
+      notification.error("Please enter a valid payout amount");
+      return;
+    }
+
+    if (!isTokenValid()) {
+      notification.error("Please authenticate with SIWE first");
+      return;
+    }
+
+    setLoadingResolveSubBet(true);
+    try {
+      const tokenBytes = siweToken as `0x${string}`;
+      const betId = BigInt(parseInt(resolveSubBetId));
+      const subBetIndex = BigInt(parseInt(resolveSubBetIndex));
+      const payout = parseEther(subBetPayout);
+
+      // Call the contract's resolveSubBet function
+      await writeContractAsync({
+        functionName: "resolveSubBet",
+        args: [betId, subBetIndex, subBetWon, payout, tokenBytes],
+      });
+
+      notification.success(
+        `SubBet ${resolveSubBetIndex} of Bet ${resolveSubBetId} resolved as ${subBetWon ? "Won" : "Lost"}!`,
+      );
+      setResolveSubBetId("");
+      setResolveSubBetIndex("");
+      setSubBetPayout("");
+    } catch (error) {
+      console.error("Error resolving subbet:", error);
+      notification.error("Failed to resolve subbet. Make sure you're the owner and the bet/subbet exists.");
+    } finally {
+      setLoadingResolveSubBet(false);
+    }
+  };
+
+  // Get SubBet Details
+  const handleGetSubBetDetails = async () => {
+    if (!subBetDetailsId || isNaN(parseInt(subBetDetailsId))) {
       notification.error("Please enter a valid bet ID");
       return;
     }
@@ -336,24 +433,42 @@ export default function SimpleBetPage() {
       return;
     }
 
-    setLoadingResolve(true);
+    setLoadingSubBetDetails(true);
     try {
       const tokenBytes = siweToken as `0x${string}`;
-      const betId = BigInt(parseInt(resolveBetId));
+      const betId = BigInt(parseInt(subBetDetailsId));
 
-      // Call the contract's resolveBet function
-      await writeContractAsync({
-        functionName: "resolveBet",
-        args: [betId, betWon, tokenBytes],
+      // Call the contract's getSubBets function
+      const result = await publicClient.readContract({
+        address: deployedContractData.address,
+        abi: deployedContractData.abi,
+        functionName: "getSubBets",
+        args: [tokenBytes, betId],
       });
 
-      notification.success(`Bet ${resolveBetId} resolved as ${betWon ? "Won" : "Lost"}!`);
-      setResolveBetId("");
+      if (result && Array.isArray(result)) {
+        const formattedSubBets = result.map((subBet: any, index: number) => ({
+          index,
+          platform: subBet.platform,
+          amount: subBet.amount,
+          marketId: subBet.marketId,
+          outcome: subBet.outcome,
+          status: subBet.status,
+          payout: subBet.payout,
+        }));
+
+        setSubBetDetails(formattedSubBets);
+        notification.success(`Loaded ${formattedSubBets.length} subbets for bet ${subBetDetailsId}`);
+      } else {
+        setSubBetDetails([]);
+        notification.info("No subbets found for this bet");
+      }
     } catch (error) {
-      console.error("Error resolving bet:", error);
-      notification.error("Failed to resolve bet. Make sure you're the owner and the bet exists.");
+      console.error("Error getting subbet details:", error);
+      notification.error("Failed to get subbet details. Make sure the bet ID is valid and you're authenticated.");
+      setSubBetDetails([]);
     } finally {
-      setLoadingResolve(false);
+      setLoadingSubBetDetails(false);
     }
   };
 
@@ -471,34 +586,10 @@ export default function SimpleBetPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Place Bet */}
+        {/* Place Aggregated Bet */}
         <div className="bg-base-100 p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Place Bet</h2>
+          <h2 className="text-xl font-semibold mb-4">Place Aggregated Bet</h2>
           <div className="space-y-4">
-            <div>
-              <label className="label">Bet Amount (ETH)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={betAmount}
-                onChange={e => setBetAmount(e.target.value)}
-                className="input input-bordered w-full"
-                placeholder="0.1"
-              />
-            </div>
-
-            <div>
-              <label className="label">Outcome</label>
-              <select
-                value={betOutcome}
-                onChange={e => setBetOutcome(parseInt(e.target.value))}
-                className="select select-bordered w-full"
-              >
-                <option value={0}>YES</option>
-                <option value={1}>NO</option>
-              </select>
-            </div>
-
             <div>
               <label className="label">Description (Private)</label>
               <input
@@ -510,13 +601,88 @@ export default function SimpleBetPage() {
               />
               <div className="label">
                 <span className="label-text-alt text-info">
-                  ℹ️ Description is now private and requires SIWE authentication to view
+                  ℹ️ Description is private and requires SIWE authentication to view
                 </span>
               </div>
             </div>
 
+            {/* SubBets */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="label">SubBets (Platforms)</label>
+                <button onClick={addSubBet} className="btn btn-sm btn-outline">
+                  + Add Platform
+                </button>
+              </div>
+
+              {subBets.map((subBet, index) => (
+                <div key={index} className="border p-4 rounded-lg mb-3 bg-base-200">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium">Platform {index + 1}</span>
+                    {subBets.length > 1 && (
+                      <button onClick={() => removeSubBet(index)} className="btn btn-xs btn-error">
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div>
+                      <label className="label label-text-sm">Platform</label>
+                      <input
+                        type="text"
+                        value={subBet.platform}
+                        onChange={e => updateSubBet(index, "platform", e.target.value)}
+                        className="input input-bordered input-sm w-full"
+                        placeholder="e.g., Polymarket"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="label label-text-sm">Amount (ETH)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={subBet.amount}
+                        onChange={e => updateSubBet(index, "amount", e.target.value)}
+                        className="input input-bordered input-sm w-full"
+                        placeholder="0.1"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="label label-text-sm">Market ID</label>
+                      <input
+                        type="text"
+                        value={subBet.marketId}
+                        onChange={e => updateSubBet(index, "marketId", e.target.value)}
+                        className="input input-bordered input-sm w-full"
+                        placeholder="market123"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="label label-text-sm">Outcome</label>
+                      <select
+                        value={subBet.outcome}
+                        onChange={e => updateSubBet(index, "outcome", parseInt(e.target.value))}
+                        className="select select-bordered select-sm w-full"
+                      >
+                        <option value={0}>YES</option>
+                        <option value={1}>NO</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <div className="text-right">
+                <span className="text-lg font-semibold">Total: {getTotalAmount().toFixed(4)} ETH</span>
+              </div>
+            </div>
+
             <button onClick={handlePlaceBet} disabled={isPlacingBet} className="btn btn-primary w-full">
-              {isPlacingBet ? "Placing Bet..." : "Place Bet"}
+              {isPlacingBet ? "Placing Aggregated Bet..." : "Place Aggregated Bet"}
             </button>
           </div>
         </div>
@@ -622,38 +788,59 @@ export default function SimpleBetPage() {
           <div className="bg-base-100 p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">Owner Functions</h2>
 
-            {/* Resolve Bet */}
+            {/* Resolve SubBet */}
             <div className="space-y-4 mb-6">
-              <h3 className="text-lg font-medium">Resolve Bet</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <h3 className="text-lg font-medium">Resolve SubBet</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div>
                   <label className="label">Bet ID</label>
                   <input
                     type="number"
-                    value={resolveBetId}
-                    onChange={e => setResolveBetId(e.target.value)}
+                    value={resolveSubBetId}
+                    onChange={e => setResolveSubBetId(e.target.value)}
                     className="input input-bordered w-full"
                     placeholder="Enter bet ID"
                   />
                 </div>
                 <div>
+                  <label className="label">SubBet Index</label>
+                  <input
+                    type="number"
+                    value={resolveSubBetIndex}
+                    onChange={e => setResolveSubBetIndex(e.target.value)}
+                    className="input input-bordered w-full"
+                    placeholder="0, 1, 2..."
+                  />
+                </div>
+                <div>
                   <label className="label">Outcome</label>
                   <select
-                    value={betWon ? "won" : "lost"}
-                    onChange={e => setBetWon(e.target.value === "won")}
+                    value={subBetWon ? "won" : "lost"}
+                    onChange={e => setSubBetWon(e.target.value === "won")}
                     className="select select-bordered w-full"
                   >
                     <option value="won">Won</option>
                     <option value="lost">Lost</option>
                   </select>
                 </div>
+                <div>
+                  <label className="label">Payout (ETH)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={subBetPayout}
+                    onChange={e => setSubBetPayout(e.target.value)}
+                    className="input input-bordered w-full"
+                    placeholder="0.2"
+                  />
+                </div>
                 <div className="flex items-end">
                   <button
-                    onClick={handleResolveBet}
-                    disabled={loadingResolve || !isAuthenticated}
+                    onClick={handleResolveSubBet}
+                    disabled={loadingResolveSubBet || !isAuthenticated}
                     className="btn btn-success w-full"
                   >
-                    {loadingResolve ? "Resolving..." : "Resolve Bet"}
+                    {loadingResolveSubBet ? "Resolving..." : "Resolve SubBet"}
                   </button>
                 </div>
               </div>
@@ -690,6 +877,69 @@ export default function SimpleBetPage() {
                 <p className="text-sm text-gray-500">Please authenticate with SIWE to use owner functions</p>
               </div>
             )}
+          </div>
+
+          {/* SubBet Details */}
+          <div className="bg-base-100 p-6 rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">SubBet Details</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="label">Bet ID</label>
+                <input
+                  type="number"
+                  value={subBetDetailsId}
+                  onChange={e => setSubBetDetailsId(e.target.value)}
+                  className="input input-bordered w-full"
+                  placeholder="Enter bet ID to view subbets"
+                />
+              </div>
+              <button
+                onClick={handleGetSubBetDetails}
+                disabled={loadingSubBetDetails || !isAuthenticated}
+                className="btn btn-info w-full"
+              >
+                {loadingSubBetDetails ? "Loading..." : "Get SubBet Details"}
+              </button>
+
+              {!isAuthenticated && (
+                <p className="text-sm text-gray-500">Please authenticate with SIWE to view subbet details</p>
+              )}
+
+              {subBetDetails.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="font-semibold">SubBets for Bet #{subBetDetailsId}</h3>
+                  {subBetDetails.map((subBet, index) => (
+                    <div key={index} className="border p-3 rounded bg-base-200">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                        <div>
+                          <strong>Index:</strong> {subBet.index}
+                        </div>
+                        <div>
+                          <strong>Platform:</strong> {subBet.platform}
+                        </div>
+                        <div>
+                          <strong>Market ID:</strong> {subBet.marketId}
+                        </div>
+                        <div>
+                          <strong>Amount:</strong> {formatEther(subBet.amount)} ETH
+                        </div>
+                        <div>
+                          <strong>Outcome:</strong> {subBet.outcome === 0 ? "YES" : "NO"}
+                        </div>
+                        <div>
+                          <strong>Status:</strong> {["Active", "Won", "Lost", "Cancelled"][subBet.status]}
+                        </div>
+                        {subBet.payout > 0 && (
+                          <div className="col-span-2 md:col-span-3">
+                            <strong>Payout:</strong> {formatEther(subBet.payout)} ETH
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Withdraw Balance */}
