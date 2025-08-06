@@ -34,11 +34,8 @@ contract SimpleBet is SiweAuth {
         string description;
     }
     
-    // Public metadata (encrypted but accessible via getter)
-    Bet[] public _betMetas;
-    
-    // Private secret data (truly secret)
-    bytes[] private _betSecrets;
+    // Private bet details (secret, accessible only with SIWE auth)
+    Bet[] private _betMetas;
     
     mapping(address => uint256[]) private _userBets;
     mapping(address => uint256) public userBalances;
@@ -85,13 +82,11 @@ contract SimpleBet is SiweAuth {
     /**
      * @dev Place a bet with amount and outcome
      * @param outcome The outcome to bet on (YES/NO)
-     * @param description Public description of the bet
-     * @param secretData Private data associated with the bet
+     * @param description Description of the bet (now private)
      */
     function placeBet(
         BetOutcome outcome,
-        string calldata description,
-        bytes calldata secretData
+        string calldata description
     ) external payable {
         require(msg.value > 0, "Bet amount must be greater than 0");
         
@@ -108,7 +103,6 @@ contract SimpleBet is SiweAuth {
         });
         
         _betMetas.push(newBet);
-        _betSecrets.push(secretData);
         _userBets[msg.sender].push(_betMetas.length - 1);
         
         // Add bet amount to user's withdrawable balance
@@ -150,18 +144,6 @@ contract SimpleBet is SiweAuth {
         return result;
     }
     
-    /**
-     * @dev Get secret data for a specific bet (only bet owner can access)
-     * @param betIndex Index of the bet in the _betMetas array
-     * @param token SIWE authentication token
-     */
-    function getBetSecret(
-        uint256 betIndex,
-        bytes memory token
-    ) external view onlyBetOwner(_betMetas[betIndex].id, token) returns (bytes memory) {
-        require(betIndex < _betSecrets.length, "Bet secret does not exist");
-        return _betSecrets[betIndex];
-    }
     
     /**
      * @dev Resolve a bet (only owner)
@@ -273,14 +255,18 @@ contract SimpleBet is SiweAuth {
     }
     
     /**
-     * @dev Get all bet metadata (paginated)
+     * @dev Get all bet metadata (paginated) - requires SIWE authentication
+     * @param token SIWE authentication token
      * @param offset Pagination offset
      * @param count Number of bets to return
      */
     function getAllBets(
+        bytes memory token,
         uint256 offset,
         uint256 count
     ) external view returns (Bet[] memory) {
+        address user = authMsgSender(token);
+        require(user != address(0), "Invalid authentication token");
         if (offset >= _betMetas.length) {
             return new Bet[](0);
         }
@@ -296,6 +282,22 @@ contract SimpleBet is SiweAuth {
         }
         
         return result;
+    }
+    
+    /**
+     * @dev Get a specific bet by index - requires SIWE authentication
+     * @param token SIWE authentication token
+     * @param betIndex Index of the bet in the _betMetas array
+     */
+    function getBet(
+        bytes memory token,
+        uint256 betIndex
+    ) external view returns (Bet memory) {
+        address user = authMsgSender(token);
+        require(user != address(0), "Invalid authentication token");
+        require(betIndex < _betMetas.length, "Bet does not exist");
+        
+        return _betMetas[betIndex];
     }
     
     /**

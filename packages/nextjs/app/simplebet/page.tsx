@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { SiweMessage } from "siwe";
 import { formatEther, parseEther } from "viem";
@@ -27,11 +27,15 @@ export default function SimpleBetPage() {
   const [betAmount, setBetAmount] = useState("");
   const [betOutcome, setBetOutcome] = useState(0); // 0 = YES, 1 = NO
   const [betDescription, setBetDescription] = useState("");
-  const [secretData, setSecretData] = useState("");
 
   // User bets state
   const [userBets, setUserBets] = useState<any[]>([]);
   const [loadingBets, setLoadingBets] = useState(false);
+
+  // Single bet lookup
+  const [betIndex, setBetIndex] = useState("");
+  const [singleBet, setSingleBet] = useState<any>(null);
+  const [loadingSingleBet, setLoadingSingleBet] = useState(false);
 
   // Contract interactions
   const { writeContractAsync: placeBet, isMining: isPlacingBet } = useScaffoldWriteContract({
@@ -64,6 +68,15 @@ export default function SimpleBetPage() {
     functionName: "domain",
   });
 
+  // Check if token is valid (similar to docs pattern)
+  const isTokenValid = useCallback(() => {
+    if (!siweToken) return false;
+    const storedExpiry = localStorage.getItem("siwe-token-expiry");
+    if (!storedExpiry) return false;
+    const now = new Date().getTime();
+    return now < parseInt(storedExpiry);
+  }, [siweToken]);
+
   // Load SIWE token from localStorage on mount
   useEffect(() => {
     const storedToken = localStorage.getItem("siwe-token");
@@ -86,7 +99,7 @@ export default function SimpleBetPage() {
   // Update authentication state when token changes
   useEffect(() => {
     setIsAuthenticated(isTokenValid());
-  }, [siweToken]);
+  }, [siweToken, isTokenValid]);
 
   // SIWE Login
   const handleSiweLogin = async () => {
@@ -168,40 +181,23 @@ export default function SimpleBetPage() {
     }
 
     try {
-      // Convert secret data to hex string format
-      const secretDataBytes = secretData
-        ? (`0x${Array.from(new TextEncoder().encode(secretData))
-            .map(b => b.toString(16).padStart(2, "0"))
-            .join("")}` as `0x${string}`)
-        : ("0x" as `0x${string}`);
-
       await placeBet({
         functionName: "placeBet",
-        args: [betOutcome, betDescription, secretDataBytes],
+        args: [betOutcome, betDescription],
         value: parseEther(betAmount),
       });
 
       notification.success("Bet placed successfully!");
       setBetAmount("");
       setBetDescription("");
-      setSecretData("");
     } catch (error) {
       console.error("Error placing bet:", error);
       notification.error("Failed to place bet");
     }
   };
 
-  // Check if token is valid (similar to docs pattern)
-  const isTokenValid = () => {
-    if (!siweToken) return false;
-    const storedExpiry = localStorage.getItem("siwe-token-expiry");
-    if (!storedExpiry) return false;
-    const now = new Date().getTime();
-    return now < parseInt(storedExpiry);
-  };
-
-  // Get User Bets (requires SIWE authentication)
-  const handleGetUserBets = async () => {
+  // Get All Bets (requires SIWE authentication)
+  const handleGetAllBets = async () => {
     if (!isTokenValid()) {
       notification.error("Please authenticate with SIWE first");
       return;
@@ -218,38 +214,95 @@ export default function SimpleBetPage() {
       // The token is already in the correct format for Sapphire's SiweAuth
       const tokenBytes = siweToken as `0x${string}`;
 
-      // Call the contract's getUserBets function with SIWE authentication
+      // Call the contract's getAllBets function with SIWE authentication
       // Parameters: token, offset, count
       const result = await publicClient.readContract({
         address: deployedContractData.address,
         abi: deployedContractData.abi,
-        functionName: "getUserBets",
+        functionName: "getAllBets",
         args: [tokenBytes, 0n, 50n], // Get first 50 bets
       });
 
-      // The result should be an array of user bets
+      // The result should be an array of all bets
       if (result && Array.isArray(result)) {
-        const formattedBets = result.map((bet: any, index: number) => ({
-          id: index,
+        const formattedBets = result.map((bet: any) => ({
+          id: bet.id,
           amount: bet.amount,
           outcome: bet.outcome,
           status: bet.status,
           description: bet.description,
           createdAt: bet.timestamp ? Number(bet.timestamp) : 0,
-          secretData: bet.secretData,
+          bettor: bet.bettor,
         }));
 
         setUserBets(formattedBets);
         notification.success(`Loaded ${formattedBets.length} bets`);
       } else {
         setUserBets([]);
-        notification.info("No bets found for this user");
+        notification.info("No bets found");
       }
     } catch (error) {
-      console.error("Error getting user bets:", error);
-      notification.error("Failed to get user bets. Make sure you're authenticated and have placed bets.");
+      console.error("Error getting all bets:", error);
+      notification.error("Failed to get bets. Make sure you're authenticated.");
     } finally {
       setLoadingBets(false);
+    }
+  };
+
+  // Get Single Bet (requires SIWE authentication)
+  const handleGetSingleBet = async () => {
+    if (!betIndex || isNaN(parseInt(betIndex))) {
+      notification.error("Please enter a valid bet index");
+      return;
+    }
+
+    if (!isTokenValid()) {
+      notification.error("Please authenticate with SIWE first");
+      return;
+    }
+
+    if (!publicClient || !deployedContractData) {
+      notification.error("Contract not found or client not ready");
+      return;
+    }
+
+    setLoadingSingleBet(true);
+    try {
+      const tokenBytes = siweToken as `0x${string}`;
+      const index = BigInt(parseInt(betIndex));
+
+      // Call the contract's getBet function with SIWE authentication
+      const result = await publicClient.readContract({
+        address: deployedContractData.address,
+        abi: deployedContractData.abi,
+        functionName: "getBet",
+        args: [tokenBytes, index],
+      });
+
+      if (result) {
+        const bet = result as any;
+        const formattedBet = {
+          id: bet.id,
+          amount: bet.amount,
+          outcome: bet.outcome,
+          status: bet.status,
+          description: bet.description,
+          createdAt: bet.timestamp ? Number(bet.timestamp) : 0,
+          bettor: bet.bettor,
+        };
+
+        setSingleBet(formattedBet);
+        notification.success("Bet loaded successfully!");
+      } else {
+        setSingleBet(null);
+        notification.error("Bet not found");
+      }
+    } catch (error) {
+      console.error("Error getting single bet:", error);
+      notification.error("Failed to get bet. Make sure the index is valid and you're authenticated.");
+      setSingleBet(null);
+    } finally {
+      setLoadingSingleBet(false);
     }
   };
 
@@ -358,24 +411,19 @@ export default function SimpleBetPage() {
             </div>
 
             <div>
-              <label className="label">Description</label>
+              <label className="label">Description (Private)</label>
               <input
                 type="text"
                 value={betDescription}
                 onChange={e => setBetDescription(e.target.value)}
                 className="input input-bordered w-full"
-                placeholder="What are you betting on?"
+                placeholder="What are you betting on? (This will be private)"
               />
-            </div>
-
-            <div>
-              <label className="label">Secret Data (optional)</label>
-              <textarea
-                value={secretData}
-                onChange={e => setSecretData(e.target.value)}
-                className="textarea textarea-bordered w-full"
-                placeholder="Private information about your bet"
-              />
+              <div className="label">
+                <span className="label-text-alt text-info">
+                  ℹ️ Description is now private and requires SIWE authentication to view
+                </span>
+              </div>
             </div>
 
             <button onClick={handlePlaceBet} disabled={isPlacingBet} className="btn btn-primary w-full">
@@ -386,19 +434,19 @@ export default function SimpleBetPage() {
 
         {/* User Actions */}
         <div className="space-y-6">
-          {/* Get User Bets */}
+          {/* Get All Bets */}
           <div className="bg-base-100 p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Your Bets</h2>
+            <h2 className="text-xl font-semibold mb-4">All Bets (Private)</h2>
             <button
-              onClick={handleGetUserBets}
+              onClick={handleGetAllBets}
               disabled={loadingBets || !isAuthenticated}
               className="btn btn-secondary w-full mb-4"
             >
-              {loadingBets ? "Loading..." : "Get My Bets"}
+              {loadingBets ? "Loading..." : "Get All Bets"}
             </button>
 
             {!isAuthenticated && (
-              <p className="text-sm text-gray-500 mb-4">Please authenticate with SIWE to view your bets</p>
+              <p className="text-sm text-gray-500 mb-4">Please authenticate with SIWE to view bets</p>
             )}
 
             {userBets.length > 0 && (
@@ -413,10 +461,72 @@ export default function SimpleBetPage() {
                       Outcome: {bet.outcome === 0 ? "YES" : "NO"} | Status:{" "}
                       {["Active", "Won", "Lost", "Cancelled"][bet.status]}
                     </div>
+                    <div className="text-xs text-gray-400">
+                      Bettor: {bet.bettor} | ID: {bet.id?.toString()}
+                    </div>
                   </div>
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Get Single Bet */}
+          <div className="bg-base-100 p-6 rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Get Single Bet</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="label">Bet Index</label>
+                <input
+                  type="number"
+                  value={betIndex}
+                  onChange={e => setBetIndex(e.target.value)}
+                  className="input input-bordered w-full"
+                  placeholder="Enter bet index (0, 1, 2, ...)"
+                />
+              </div>
+              <button
+                onClick={handleGetSingleBet}
+                disabled={loadingSingleBet || !isAuthenticated}
+                className="btn btn-info w-full"
+              >
+                {loadingSingleBet ? "Loading..." : "Get Bet"}
+              </button>
+
+              {!isAuthenticated && (
+                <p className="text-sm text-gray-500">Please authenticate with SIWE to view bet details</p>
+              )}
+
+              {singleBet && (
+                <div className="border p-4 rounded bg-base-200">
+                  <h3 className="font-semibold mb-2">Bet Details</h3>
+                  <div className="space-y-1 text-sm">
+                    <div>
+                      <strong>ID:</strong> {singleBet.id?.toString()}
+                    </div>
+                    <div>
+                      <strong>Description:</strong> {singleBet.description}
+                    </div>
+                    <div>
+                      <strong>Amount:</strong> {formatEther(singleBet.amount)} ETH
+                    </div>
+                    <div>
+                      <strong>Outcome:</strong> {singleBet.outcome === 0 ? "YES" : "NO"}
+                    </div>
+                    <div>
+                      <strong>Status:</strong> {["Active", "Won", "Lost", "Cancelled"][singleBet.status]}
+                    </div>
+                    <div>
+                      <strong>Bettor:</strong> {singleBet.bettor}
+                    </div>
+                    {singleBet.createdAt > 0 && (
+                      <div>
+                        <strong>Created:</strong> {new Date(singleBet.createdAt * 1000).toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Withdraw Balance */}
