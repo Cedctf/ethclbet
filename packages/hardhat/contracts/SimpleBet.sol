@@ -111,6 +111,9 @@ contract SimpleBet is SiweAuth {
         _betSecrets.push(secretData);
         _userBets[msg.sender].push(_betMetas.length - 1);
         
+        // Add bet amount to user's withdrawable balance
+        userBalances[msg.sender] += msg.value;
+        
         emit BetPlaced(betId, msg.sender, msg.value, outcome, _betMetas.length - 1);
     }
     
@@ -192,12 +195,13 @@ contract SimpleBet is SiweAuth {
         
         if (won) {
             bet.status = BetStatus.Won;
-            // Simple 2x payout for winning bets
+            // Simple 2x payout for winning bets (user already has their bet amount, so add only the winnings)
             payout = bet.amount * 2;
-            userBalances[bet.user] += payout;
+            userBalances[bet.user] += bet.amount; // Add the winnings (original bet amount already in balance)
         } else {
             bet.status = BetStatus.Lost;
-            // No payout for losing bets
+            // Remove the bet amount from user's balance since they lost
+            userBalances[bet.user] -= bet.amount;
         }
         
         emit BetResolved(betId, bet.status, payout);
@@ -231,8 +235,7 @@ contract SimpleBet is SiweAuth {
         Bet storage bet = _betMetas[betIndex];
         bet.status = BetStatus.Cancelled;
         
-        // Refund the bet amount
-        userBalances[bet.user] += bet.amount;
+        // User already has their bet amount in balance, no need to add again
         
         emit BetResolved(betId, bet.status, bet.amount);
     }

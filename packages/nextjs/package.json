@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@heroicons/react": "~2.1.5",
+    "@oasisprotocol/sapphire-paratime": "^2.2.0",
     "@rainbow-me/rainbowkit": "2.2.7",
     "@tanstack/react-query": "~5.59.15",
     "@uniswap/sdk-core": "~5.8.2",
@@ -24,6 +25,7 @@
     "blo": "~1.2.0",
     "burner-connector": "0.0.16",
     "daisyui": "5.0.9",
+    "ethers": "^6.15.0",
     "kubo-rpc-client": "~5.0.2",
     "next": "~15.2.3",
     "next-nprogress-bar": "~2.3.13",
@@ -32,6 +34,7 @@
     "react": "~19.0.0",
     "react-dom": "~19.0.0",
     "react-hot-toast": "~2.4.0",
+    "siwe": "^3.0.0",
     "usehooks-ts": "~3.1.0",
     "viem": "2.31.1",
     "wagmi": "2.15.6",
