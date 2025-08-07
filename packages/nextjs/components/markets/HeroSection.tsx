@@ -1,6 +1,7 @@
 "use client";
 
 import React, { CSSProperties, useRef, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface HeroSectionProps {
   className?: string;
@@ -37,11 +38,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className = "" }) => {
   return (
     <div
       ref={heroRef}
-      className={`relative w-full h-[700px] overflow-hidden ${className}`}
+      className={`relative w-full h-[700px] overflow-hidden mt-20 sm:mt-24 ${className}`}
       style={heroStyle}
     >
       {/* Hero Content - Centered and Moved Up */}
-      <div className="absolute inset-0 z-10 flex items-start justify-center pt-35">
+      <div className="absolute inset-0 z-10 flex items-start justify-center pt-32 sm:pt-40">
         <div className="text-center text-white max-w-4xl px-8 w-full">
           <h1
             className="mb-8 tracking-tight text-center leading-tight"

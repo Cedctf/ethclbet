@@ -26,6 +26,7 @@
     "clsx": "^1.2.1",
     "daisyui": "5.0.9",
     "framer-motion": "^12.23.12",
+    "gsap": "^3.13.0",
     "kubo-rpc-client": "~5.0.2",
     "next": "~15.2.3",
     "next-nprogress-bar": "~2.3.13",

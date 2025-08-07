@@ -137,16 +137,6 @@ export const EnhancedMarketDashboard: React.FC = () => {
     }
   };
 
-  const handleMarketClick = (market: CombinedMarket | NormalizedMarket) => {
-    console.log(`Navigating to market details:`, {
-      id: market.id,
-      title: market.title,
-      type: 'combinedVolume' in market ? 'combined' : 'individual'
-    });
-
-    // Navigate to market details page
-    router.push(`/market/${market.id}`);
-  };
 
   if (loading) {
     return (
@@ -391,7 +381,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
               <Expandable key={market.id} transitionDuration={0.5}>
                 <ExpandableCard className="h-fit">
                   <ExpandableTrigger className="w-full h-full flex flex-col">
-                    <ExpandableCardHeader>
+                    <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/analysis/${market.id}`}>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           {'combinedVolume' in market ? (
@@ -412,13 +402,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
                             {market.outcomes?.length || 2} outcomes
                           </div>
                         </div>
-                        <h3
-                          className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleMarketClick(market);
-                          }}
-                        >
+                        <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
                           {/* Show main title - smart extraction based on question type */}
                           {(() => {
                             const title = market.title;

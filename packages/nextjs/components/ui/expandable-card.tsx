@@ -1,4 +1,4 @@
- "use client"
+"use client";
 
 import React, {
   ReactNode,
@@ -14,8 +14,10 @@ import {
   motion,
   useMotionValue,
   useSpring,
+  Easing,
 } from "framer-motion"
 import useMeasure from "react-use-measure"
+import { useRouter } from "next/navigation"
 
 import { cn } from "../../lib/utils"
 
@@ -27,7 +29,7 @@ interface ExpandableContextType {
   expandDirection: "vertical" | "horizontal" | "both"
   expandBehavior: "replace" | "push"
   transitionDuration: number
-  easeType: string
+  easeType: Easing
   initialDelay: number
   onExpandEnd?: () => void
   onCollapseEnd?: () => void
@@ -39,7 +41,7 @@ const ExpandableContext = createContext<ExpandableContextType>({
   expandDirection: "vertical",
   expandBehavior: "replace",
   transitionDuration: 0.3,
-  easeType: "easeInOut",
+  easeType: "easeInOut" as Easing,
   initialDelay: 0,
 })
 
@@ -52,7 +54,7 @@ interface ExpandableProps extends ExpandablePropsBase {
   expanded?: boolean
   onToggle?: () => void
   transitionDuration?: number
-  easeType?: string
+  easeType?: Easing
   expandDirection?: "vertical" | "horizontal" | "both"
   expandBehavior?: "replace" | "push"
   initialDelay?: number
@@ -69,7 +71,7 @@ const Expandable = React.forwardRef<HTMLDivElement, ExpandableProps>(
       expanded,
       onToggle,
       transitionDuration = 0.3,
-      easeType = "easeInOut",
+      easeType = "easeInOut" as Easing,
       expandDirection = "vertical",
       expandBehavior = "replace",
       initialDelay = 0,
@@ -125,6 +127,8 @@ const Expandable = React.forwardRef<HTMLDivElement, ExpandableProps>(
     )
   }
 )
+
+Expandable.displayName = "Expandable"
 
 type AnimationPreset = {
   initial: { [key: string]: any }
@@ -279,6 +283,8 @@ const ExpandableContent = React.forwardRef<
   }
 )
 
+ExpandableContent.displayName = "ExpandableContent"
+
 interface ExpandableCardProps {
   children: ReactNode
   className?: string
@@ -304,7 +310,7 @@ const ExpandableCard = React.forwardRef<HTMLDivElement, ExpandableCardProps>(
     ref
   ) => {
     const { isExpanded, toggleExpand } = useExpandable()
-    const [measureRef, { width, height }] = useMeasure()
+    const [measureRef] = useMeasure()
 
     const handleHover = () => {
       if (hoverToExpand && !isExpanded) {
@@ -360,22 +366,99 @@ const ExpandableTrigger = React.forwardRef<
 
 ExpandableTrigger.displayName = "ExpandableTrigger"
 
+interface ExpandableCardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  onTitleClick?: () => void;
+  navigateToAnalysis?: boolean;
+  analysisPath?: string;
+}
+
 const ExpandableCardHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("p-4 pb-3", className)}
-    {...props}
-  >
-    <motion.div layout className="w-full">
-      {children}
-    </motion.div>
-  </div>
-))
+  ExpandableCardHeaderProps
+>(({ className, children, onTitleClick, navigateToAnalysis = false, analysisPath = "/analysis", ...props }, ref) => {
+  const router = useRouter();
+
+  const handleClick = (e: React.MouseEvent) => {
+    // If there's a custom onTitleClick handler, use it
+    if (onTitleClick) {
+      e.preventDefault();
+      onTitleClick();
+      return;
+    }
+
+    // If navigateToAnalysis is true, navigate to analysis page
+    if (navigateToAnalysis) {
+      e.preventDefault();
+      // Use Next.js router for navigation
+      router.push(analysisPath);
+    }
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={cn("p-4 pb-3", className)}
+      {...props}
+    >
+      <motion.div
+        layout
+        className={cn(
+          "w-full",
+          (onTitleClick || navigateToAnalysis) && "cursor-pointer hover:opacity-80 transition-opacity"
+        )}
+        onClick={handleClick}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+})
 
 ExpandableCardHeader.displayName = "ExpandableCardHeader"
+
+interface ExpandableCardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
+  href?: string;
+  onTitleClick?: () => void;
+  children: React.ReactNode;
+}
+
+const ExpandableCardTitle = React.forwardRef<
+  HTMLDivElement,
+  ExpandableCardTitleProps
+>(({ className, children, href, onTitleClick, ...props }, ref) => {
+  const router = useRouter();
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    // If there's a custom onTitleClick handler, use it
+    if (onTitleClick) {
+      onTitleClick();
+      return;
+    }
+
+    // If href is provided, navigate to that path
+    if (href) {
+      router.push(href);
+    }
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "cursor-pointer hover:text-blue-600 hover:underline transition-colors duration-200 font-semibold",
+        className
+      )}
+      onClick={handleClick}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
+
+ExpandableCardTitle.displayName = "ExpandableCardTitle"
 
 const ExpandableCardContent = React.forwardRef<
   HTMLDivElement,
@@ -413,6 +496,7 @@ export {
   ExpandableContext,
   ExpandableTrigger,
   ExpandableCardHeader,
+  ExpandableCardTitle,
   ExpandableCardContent,
   ExpandableCardFooter,
 }
