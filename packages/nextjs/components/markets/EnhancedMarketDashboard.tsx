@@ -5,6 +5,7 @@ import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2I
 import { useCombinedMarkets, CombinedMarket, NormalizedMarket } from '../../hooks/useCombinedMarkets';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { HeroSection } from './HeroSection';
 
 /**
  * Enhanced dashboard component that displays both individual and combined markets
@@ -82,18 +83,21 @@ export const EnhancedMarketDashboard: React.FC = () => {
   const displayMarkets = viewMode === 'combined' ? data.combinedMarkets : data.individualMarkets;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-base-content mb-4">
-          🎯 Enhanced Prediction Markets Hub
-        </h1>
-        <p className="text-base-content/70 mb-4">
-          Unified market data with intelligent combination and real volume tracking
-        </p>
-        
-        {/* Controls */}
-        <div className="flex items-center gap-4 mb-4 flex-wrap">
+    <div className="relative">
+      <HeroSection />
+
+      <div className="relative z-20 bg-base-200 min-h-screen">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8 pt-8">
+            <h2 className="text-3xl font-bold text-base-content mb-4">
+              Market Dashboard
+            </h2>
+            <p className="text-base-content/70 mb-6">
+              Real-time prediction market data and analytics
+            </p>
+
+            {/* Controls */}
+            <div className="flex items-center gap-4 mb-4 flex-wrap">
           <button
             onClick={handleRefresh}
             disabled={loading}
@@ -141,10 +145,10 @@ export const EnhancedMarketDashboard: React.FC = () => {
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <ClockIcon className="w-4 h-4" />
             Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Unknown'}
+            </div>
           </div>
-        </div>
 
-        {/* Stats */}
+          {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-base-100 rounded-lg shadow-sm p-4">
             <div className="flex items-center">
@@ -196,10 +200,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+          </div>
 
-      {/* Markets Grid */}
+          {/* Markets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayMarkets.map((market) => (
           <div
@@ -231,7 +234,33 @@ export const EnhancedMarketDashboard: React.FC = () => {
                 </div>
               </div>
               <h3 className="text-sm font-medium text-base-content line-clamp-2 leading-tight">
-                {market.title}
+                {/* Show main title - smart extraction based on question type */}
+                {(() => {
+                  const title = market.title;
+
+                  // For sports games (Team vs Team format)
+                  if (title.includes(' vs. ') || title.includes(' vs ')) {
+                    // Extract just the matchup part
+                    const vsMatch = title.match(/^([^:]+(?:\s+vs\.?\s+[^:]+))/i);
+                    if (vsMatch) {
+                      return vsMatch[1].trim();
+                    }
+                  }
+
+                  // For regular questions, split at "?"
+                  if (title.includes('?')) {
+                    return title.split('?')[0] + '?';
+                  }
+
+                  // For other formats, take first sentence or up to 60 characters
+                  const firstSentence = title.split('.')[0];
+                  if (firstSentence.length <= 60) {
+                    return firstSentence + (title.includes('.') ? '.' : '');
+                  }
+
+                  // Fallback: truncate at 60 characters
+                  return title.length > 60 ? title.substring(0, 60) + '...' : title;
+                })()}
               </h3>
             </div>
 
@@ -276,13 +305,15 @@ export const EnhancedMarketDashboard: React.FC = () => {
         ))}
       </div>
 
-      {displayMarkets.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-500">
-            No {viewMode} markets found
-          </div>
+          {displayMarkets.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-gray-500">
+                No {viewMode} markets found
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
