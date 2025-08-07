@@ -155,19 +155,19 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   const hasOmen = isCombinedMarket(market) ? !!market.omenMarket : market.source === 'omen';
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
-      <h3 className="text-lg font-semibold mb-4">Optimal Split Router</h3>
-      
+    <div className="bg-base-100 rounded-lg shadow-sm p-6 mt-6">
+      <h3 className="text-lg font-semibold mb-4 text-base-content">Optimal Split Router</h3>
+
       {/* Data Availability Status */}
-      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-        <div className="text-sm text-gray-600 mb-2">Available Platforms:</div>
+      <div className="mb-4 p-3 bg-base-200 rounded-lg">
+        <div className="text-sm text-base-content/70 mb-2">Available Platforms:</div>
         <div className="flex gap-4">
-          <div className={`flex items-center gap-2 ${hasPolymarket ? 'text-green-600' : 'text-gray-400'}`}>
-            <div className={`w-2 h-2 rounded-full ${hasPolymarket ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+          <div className={`flex items-center gap-2 ${hasPolymarket ? 'text-success' : 'text-base-content/40'}`}>
+            <div className={`w-2 h-2 rounded-full ${hasPolymarket ? 'bg-success' : 'bg-base-content/30'}`}></div>
             Polymarket (Order Book)
           </div>
-          <div className={`flex items-center gap-2 ${hasOmen ? 'text-blue-600' : 'text-gray-400'}`}>
-            <div className={`w-2 h-2 rounded-full ${hasOmen ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+          <div className={`flex items-center gap-2 ${hasOmen ? 'text-primary' : 'text-base-content/40'}`}>
+            <div className={`w-2 h-2 rounded-full ${hasOmen ? 'bg-primary' : 'bg-base-content/30'}`}></div>
             Omen (LMSR)
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
 
       {/* Budget Selector */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-base-content mb-2">
           Budget: ${budget}
         </label>
         <input
@@ -185,9 +185,9 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           step="50"
           value={budget}
           onChange={(e) => setBudget(Number(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          className="w-full h-2 bg-base-300 rounded-lg appearance-none cursor-pointer"
         />
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <div className="flex justify-between text-xs text-base-content/70 mt-1">
           <span>$50</span>
           <span>$5,000</span>
         </div>
@@ -197,62 +197,62 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       <button
         onClick={handleOptimize}
         disabled={isCalculating || (!hasPolymarket && !hasOmen)}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-primary text-primary-content py-2 px-4 rounded-lg hover:bg-primary/80 disabled:bg-base-content/40 disabled:cursor-not-allowed transition-colors"
       >
         {isCalculating ? 'Calculating...' : 'Optimize Split'}
       </button>
 
       {/* Error Display */}
       {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <div className="text-red-800 text-sm">{error}</div>
+        <div className="mt-4 p-3 bg-error/10 border border-error/30 rounded-lg">
+          <div className="text-error text-sm">{error}</div>
         </div>
       )}
 
       {/* Results Display */}
       {result && (
         <div className="mt-6 space-y-4">
-          <h4 className="font-semibold text-gray-900">Optimization Results</h4>
-          
+          <h4 className="font-semibold text-base-content">Optimization Results</h4>
+
           {/* Summary Cards */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-sm text-blue-600 font-medium">Order Book Allocation</div>
-              <div className="text-xl font-bold text-blue-900">${result.orderBookAllocation.toFixed(2)}</div>
-              <div className="text-sm text-blue-700">{result.orderBookShares.toFixed(2)} shares</div>
+            <div className="bg-primary/10 p-4 rounded-lg">
+              <div className="text-sm text-primary font-medium">Order Book Allocation</div>
+              <div className="text-xl font-bold text-primary">${result.orderBookAllocation.toFixed(2)}</div>
+              <div className="text-sm text-primary/80">{result.orderBookShares.toFixed(2)} shares</div>
             </div>
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-sm text-green-600 font-medium">LMSR Allocation</div>
-              <div className="text-xl font-bold text-green-900">${result.lmsrAllocation.toFixed(2)}</div>
-              <div className="text-sm text-green-700">{result.lmsrShares.toFixed(2)} shares</div>
+            <div className="bg-success/10 p-4 rounded-lg">
+              <div className="text-sm text-success font-medium">LMSR Allocation</div>
+              <div className="text-xl font-bold text-success">${result.lmsrAllocation.toFixed(2)}</div>
+              <div className="text-sm text-success/80">{result.lmsrShares.toFixed(2)} shares</div>
             </div>
           </div>
 
           {/* Total Results */}
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-base-200 p-4 rounded-lg">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <div className="text-sm text-gray-600">Total Shares</div>
-                <div className="text-lg font-bold text-gray-900">{result.totalShares.toFixed(2)}</div>
+                <div className="text-sm text-base-content/70">Total Shares</div>
+                <div className="text-lg font-bold text-base-content">{result.totalShares.toFixed(2)}</div>
               </div>
               <div>
-                <div className="text-sm text-gray-600">Total Cost</div>
-                <div className="text-lg font-bold text-gray-900">${result.totalCost.toFixed(2)}</div>
+                <div className="text-sm text-base-content/70">Total Cost</div>
+                <div className="text-lg font-bold text-base-content">${result.totalCost.toFixed(2)}</div>
               </div>
               <div>
-                <div className="text-sm text-gray-600">Strategy</div>
-                <div className="text-lg font-bold text-gray-900">{result.strategy}</div>
+                <div className="text-sm text-base-content/70">Strategy</div>
+                <div className="text-lg font-bold text-base-content">{result.strategy}</div>
               </div>
             </div>
           </div>
 
           {/* Efficiency Metrics */}
-          <div className="bg-yellow-50 p-4 rounded-lg">
-            <div className="text-sm text-yellow-800 font-medium mb-2">Efficiency Analysis</div>
-            <div className="text-sm text-yellow-700">
+          <div className="bg-warning/10 p-4 rounded-lg">
+            <div className="text-sm text-warning font-medium mb-2">Efficiency Analysis</div>
+            <div className="text-sm text-warning/80">
               Cost per share: ${(result.totalCost / result.totalShares).toFixed(4)}
             </div>
-            <div className="text-sm text-yellow-700">
+            <div className="text-sm text-warning/80">
               Allocation ratio: {((result.orderBookAllocation / budget) * 100).toFixed(1)}% OB / {((result.lmsrAllocation / budget) * 100).toFixed(1)}% LMSR
             </div>
           </div>
