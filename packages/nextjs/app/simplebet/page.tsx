@@ -316,32 +316,6 @@ export default function SimpleBetPage() {
           </div>,
           { duration: 8000 }
         );
-      } else {
-        // Use standard wagmi for non-Sapphire networks
-        notification.info("Processing transaction...", { duration: 0 });
-        const result = await placeBet({
-          functionName: "placeBet",
-          args: [betDescription, betOutcome, platforms, amounts, marketIds],
-          value: totalValue,
-        });
-        txHash = result;
-        
-        notification.success(
-          <div>
-            <div>Bet placed successfully!</div>
-            <div className="mt-2">
-              <a 
-                href={`https://etherscan.io/tx/${txHash}`}
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:text-blue-700 underline"
-              >
-                View Transaction →
-              </a>
-            </div>
-          </div>,
-          { duration: 8000 }
-        );
       }
 
       setBetDescription("");
@@ -494,32 +468,7 @@ export default function SimpleBetPage() {
             <div>🔒 Bet {resolveBetId} resolved as {betWon ? "Won" : "Lost"} with encryption!</div>
             <div className="mt-2">
               <a 
-                href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:text-blue-700 underline"
-              >
-                View Transaction →
-              </a>
-            </div>
-          </div>,
-          { duration: 8000 }
-        );
-      } else {
-        // Use standard wagmi for non-Sapphire networks
-        notification.info("Processing bet resolution...", { duration: 0 });
-        const result = await writeContractAsync({
-          functionName: "resolveBet",
-          args: [betId, betWon, tokenBytes],
-        });
-        txHash = result;
-        
-        notification.success(
-          <div>
-            <div>Bet {resolveBetId} resolved as {betWon ? "Won" : "Lost"}!</div>
-            <div className="mt-2">
-              <a 
-                href={`https://etherscan.io/tx/${txHash}`}
+                href={`https://explorer.sapphire.oasis.io/1tx/${txHash}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:text-blue-700 underline"
@@ -626,7 +575,7 @@ export default function SimpleBetPage() {
           <div>Bet {cancelBetId} cancelled successfully!</div>
           <div className="mt-2">
             <a 
-              href={`${isOnSapphire ? 'https://explorer.sapphire.oasis.io' : 'https://etherscan.io'}/tx/${result}`}
+              href={`https://explorer.sapphire.oasis.io/tx/${result}`}
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-500 hover:text-blue-700 underline"
@@ -668,30 +617,6 @@ export default function SimpleBetPage() {
             <div className="mt-2">
               <a 
                 href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:text-blue-700 underline"
-              >
-                View Transaction →
-              </a>
-            </div>
-          </div>,
-          { duration: 8000 }
-        );
-      } else {
-        // Use standard wagmi for non-Sapphire networks
-        notification.info("Processing withdrawal...", { duration: 0 });
-        const result = await withdrawBalance({
-          functionName: "withdrawBalance",
-        });
-        txHash = result;
-        
-        notification.success(
-          <div>
-            <div>Withdrawal successful!</div>
-            <div className="mt-2">
-              <a 
-                href={`https://etherscan.io/tx/${txHash}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:text-blue-700 underline"

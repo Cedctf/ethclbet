@@ -32,17 +32,4 @@ const wallets = [
 export const wagmiConnectors = [
   // Use Sapphire-specific injected connector for encrypted transactions
   injectedWithSapphire(),
-  // Fallback to regular RainbowKit connectors for non-Sapphire networks
-  ...connectorsForWallets(
-    [
-      {
-        groupName: "Supported Wallets",
-        wallets,
-      },
-    ],
-    {
-      appName: "scaffold-eth-2",
-      projectId: scaffoldConfig.walletConnectProjectId,
-    },
-  ),
 ];
