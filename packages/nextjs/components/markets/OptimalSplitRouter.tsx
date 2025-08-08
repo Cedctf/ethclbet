@@ -2,25 +2,31 @@
 
 import React, { useState } from 'react';
 import { CombinedMarket, NormalizedMarket } from '~~/hooks/useCombinedMarkets';
-import { 
-  findOptimalSplit, 
-  generateOrderBookFromStats, 
-  generateLMSRFromStats,
-  type MarketStatistics,
-  type OrderBookData,
-  type LMSRData,
-  type SplitResult
-} from '~~/optimal-split-router';
 
 interface OptimalSplitRouterProps {
   market: CombinedMarket | NormalizedMarket;
 }
 
+interface AIResponse {
+  message: {
+    role: string;
+    content: string;
+  };
+  actionResults?: Array<{
+    actionName: string;
+    success: boolean;
+    result?: any;
+    error?: string;
+  }>;
+  executedActions?: boolean;
+}
+
 export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) {
   const [budget, setBudget] = useState(1000);
-  const [result, setResult] = useState<SplitResult | null>(null);
+  const [result, setResult] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aiResponse, setAiResponse] = useState<string>('');
 
   // Helper to check if market is combined
   const isCombinedMarket = (market: CombinedMarket | NormalizedMarket): market is CombinedMarket => {
@@ -28,7 +34,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   };
 
   // Extract market statistics from market data
-  const extractMarketStats = (marketData: any, source: 'polymarket' | 'omen'): MarketStatistics | null => {
+  const extractMarketStats = (marketData: any, source: 'polymarket' | 'omen') => {
     if (!marketData) return null;
 
     // For individual markets with source
@@ -74,74 +80,84 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     return null;
   };
 
-  const handleOptimize = async () => {
+  const handlePlaceBet = async () => {
     setIsCalculating(true);
     setError(null);
     setResult(null);
+    setAiResponse('');
 
     try {
       // Extract market statistics for both platforms
       const polymarketStats = extractMarketStats(market, 'polymarket');
       const omenStats = extractMarketStats(market, 'omen');
 
-      // Console log the actual fetched data
-      if (polymarketStats) {
-        console.log('POLYMARKET DATA FETCHED:');
-        console.log('  tradesQuantity:', polymarketStats.tradesQuantity);
-        console.log('  buysQuantity:', polymarketStats.buysQuantity);
-        console.log('  sellsQuantity:', polymarketStats.sellsQuantity);
-        console.log('  scaledCollateralVolume:', polymarketStats.scaledCollateralVolume);
-        console.log('  scaledCollateralBuyVolume:', polymarketStats.scaledCollateralBuyVolume);
-        console.log('  scaledCollateralSellVolume:', polymarketStats.scaledCollateralSellVolume);
-      }
-
-      if (omenStats) {
-        console.log('OMEN DATA FETCHED:');
-        console.log('  tradesQuantity:', omenStats.tradesQuantity);
-        console.log('  buysQuantity:', omenStats.buysQuantity);
-        console.log('  sellsQuantity:', omenStats.sellsQuantity);
-        console.log('  scaledCollateralVolume:', omenStats.scaledCollateralVolume);
-        console.log('  scaledCollateralBuyVolume:', omenStats.scaledCollateralBuyVolume);
-        console.log('  scaledCollateralSellVolume:', omenStats.scaledCollateralSellVolume);
-      }
-
       if (!polymarketStats && !omenStats) {
         throw new Error('No market data available for optimization');
       }
 
-      // Generate platform data
-      let orderBookData: OrderBookData | null = null;
-      let lmsrData: LMSRData | null = null;
+      // Prepare the request for the AI agent
+      const requestBody = {
+        messages: [
+          {
+            role: 'user',
+            content: `I want to place a bet with a budget of $${budget}. Please analyze the market data and calculate the optimal split between platforms. Here's the market data:
 
-      if (polymarketStats) {
-        orderBookData = generateOrderBookFromStats(polymarketStats, "Polymarket OrderBook");
+${polymarketStats ? `Polymarket Data:
+- Trades: ${polymarketStats.tradesQuantity}
+- Buys: ${polymarketStats.buysQuantity}
+- Sells: ${polymarketStats.sellsQuantity}
+- Volume: $${polymarketStats.scaledCollateralVolume}
+- Buy Volume: $${polymarketStats.scaledCollateralBuyVolume}
+- Sell Volume: $${polymarketStats.scaledCollateralSellVolume}` : ''}
+
+${omenStats ? `Omen Data:
+- Trades: ${omenStats.tradesQuantity}
+- Buys: ${omenStats.buysQuantity}
+- Sells: ${omenStats.sellsQuantity}
+- Volume: $${omenStats.scaledCollateralVolume}
+- Buy Volume: $${omenStats.scaledCollateralBuyVolume}
+- Sell Volume: $${omenStats.scaledCollateralSellVolume}` : ''}
+
+Please execute the optimization and provide detailed recommendations.`
+          }
+        ],
+        options: {
+          executeActions: true,
+          temperature: 0.3,
+          maxTokens: 1500
+        }
+      };
+
+      // Call the AI agent API
+      const response = await fetch('/api/rofl', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to get AI response');
       }
 
-      if (omenStats) {
-        lmsrData = generateLMSRFromStats(omenStats, "Omen LMSR");
-      }
+      const aiData: AIResponse = await response.json();
+      setAiResponse(aiData.message.content);
 
-      // If we only have one platform, create mock data for the other
-      if (!orderBookData && omenStats) {
-        orderBookData = generateOrderBookFromStats(omenStats, "Mock OrderBook");
-      }
+      // Extract the optimization result from action results
+      if (aiData.actionResults && aiData.actionResults.length > 0) {
+        const optimizationResult = aiData.actionResults.find(
+          action => action.actionName === 'optimizeBettingSplit' && action.success
+        );
 
-      if (!lmsrData && polymarketStats) {
-        lmsrData = generateLMSRFromStats(polymarketStats, "Mock LMSR");
+        if (optimizationResult && optimizationResult.result) {
+          setResult(optimizationResult.result);
+        } else {
+          const errorAction = aiData.actionResults.find(action => !action.success);
+          throw new Error(errorAction?.error || 'Optimization failed');
+        }
       }
-
-      if (!orderBookData || !lmsrData) {
-        throw new Error('Unable to generate platform data for optimization');
-      }
-
-      // Calculate optimal split
-      console.log('CALLING findOptimalSplit WITH:');
-      console.log('  budget:', budget);
-      console.log('  orderBookData:', orderBookData);
-      console.log('  lmsrData:', lmsrData);
-      
-      const optimization = findOptimalSplit(budget, orderBookData, lmsrData);
-      setResult(optimization);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during optimization');
@@ -156,7 +172,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
-      <h3 className="text-lg font-semibold mb-4">Optimal Split Router</h3>
+      <h3 className="text-lg font-semibold mb-4">AI-Powered Betting Optimizer</h3>
       
       {/* Data Availability Status */}
       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
@@ -193,14 +209,22 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         </div>
       </div>
 
-      {/* Optimize Button */}
+      {/* Place Bet Button */}
       <button
-        onClick={handleOptimize}
+        onClick={handlePlaceBet}
         disabled={isCalculating || (!hasPolymarket && !hasOmen)}
         className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
       >
-        {isCalculating ? 'Calculating...' : 'Optimize Split'}
+        {isCalculating ? 'AI is calculating...' : 'Place Bet'}
       </button>
+
+      {/* AI Response */}
+      {aiResponse && (
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="text-sm text-blue-800 font-medium mb-2">AI Analysis:</div>
+          <div className="text-sm text-blue-700 whitespace-pre-wrap">{aiResponse}</div>
+        </div>
+      )}
 
       {/* Error Display */}
       {error && (
@@ -247,15 +271,36 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           </div>
 
           {/* Efficiency Metrics */}
-          <div className="bg-yellow-50 p-4 rounded-lg">
-            <div className="text-sm text-yellow-800 font-medium mb-2">Efficiency Analysis</div>
-            <div className="text-sm text-yellow-700">
-              Cost per share: ${(result.totalCost / result.totalShares).toFixed(4)}
+          {result.efficiency && (
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <div className="text-sm text-yellow-800 font-medium mb-2">Efficiency Analysis</div>
+              <div className="text-sm text-yellow-700">
+                Cost per share: ${result.efficiency.costPerShare.toFixed(4)}
+              </div>
+              <div className="text-sm text-yellow-700">
+                Allocation ratio: {result.efficiency.allocationRatio.orderBookPercent.toFixed(1)}% OB / {result.efficiency.allocationRatio.lmsrPercent.toFixed(1)}% LMSR
+              </div>
             </div>
-            <div className="text-sm text-yellow-700">
-              Allocation ratio: {((result.orderBookAllocation / budget) * 100).toFixed(1)}% OB / {((result.lmsrAllocation / budget) * 100).toFixed(1)}% LMSR
+          )}
+
+          {/* Platform Data */}
+          {result.platformData && (
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="text-sm text-gray-800 font-medium mb-2">Platform Analysis</div>
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                <div>
+                  <strong>Order Book:</strong>
+                  <div>Levels: {result.platformData.orderBook.orderLevels}</div>
+                  <div>Liquidity: {result.platformData.orderBook.totalLiquidity} shares</div>
+                </div>
+                <div>
+                  <strong>LMSR:</strong>
+                  <div>YES Shares: {result.platformData.lmsr.yesShares}</div>
+                  <div>Liquidity Param: {result.platformData.lmsr.liquidityParameter}</div>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>
