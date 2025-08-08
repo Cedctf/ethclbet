@@ -58,7 +58,6 @@
     "node": ">=20.18.3"
   },
   "dependencies": {
-    "@web3icons/react": "^4.0.20",
-    "lucide-react": "^0.539.0"
+    "@web3icons/react": "^4.0.19"
   }
 }

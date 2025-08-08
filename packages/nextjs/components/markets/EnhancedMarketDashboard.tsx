@@ -1,39 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { motion } from "framer-motion";
-import { useCombinedMarkets } from '../../hooks/useCombinedMarkets';
-import { Hero } from '../ui/Hero';
-import { MarketCard } from './MarketCard';
+import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon } from "@heroicons/react/24/outline";
+import { useCombinedMarkets, CombinedMarket, NormalizedMarket } from '../../hooks/useCombinedMarkets';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { HeroSection } from './HeroSection';
 
-// Simplified MarketSection props
-interface MarketSectionProps {
-  className?: string;
-  id?: string;
-}
-
-interface DashboardState {
-  autoRefresh: boolean;
-  loading: boolean;
-  error: string | null;
-  searchQuery: string;
-}
-
-// Market Section with clean layout
-const MarketSection: React.FC<MarketSectionProps & { children: React.ReactNode }> = ({
-  className = "relative min-h-screen",
-  id,
-  children
-}) => {
-  return (
-    <div className={`${className} py-12 px-4 sm:px-8 lg:px-12`} id={id}>
-      <div className="container mx-auto">
-        {children}
-      </div>
-    </div>
-  );
-};
 
 /**
  * Enhanced dashboard component that displays both individual and combined markets
@@ -130,160 +103,32 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   return (
     <div className="relative">
-      {/* Hero Section - Normal document flow */}
-      <div className="relative w-full py-40 overflow-hidden">
-        {/* Background gradient and blur effect */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-br from-primary/5 via-base-100/50 to-primary/5 backdrop-blur-xl" 
-          style={{
-            backgroundImage: 'url(/lightbg.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        />
-        
-        {/* Glass card container */}
-        <div className="relative max-w-[1200px] mx-auto px-6 sm:px-8">
-          <div className="bg-white/10 dark:bg-white/5 backdrop-blur-sm bg-opacity-0 border border-white/20 dark:border-white/10 rounded-2xl shadow-xl shadow-black/10 p-6 sm:p-8">
-              <Hero
-                description="Discover and analyze prediction markets across multiple platforms. Compare odds, track performance, and make data-driven decisions."
-                primaryCTA={{
-                  text: "View Markets",
-                  href: "#market-section"
-                }}
-                secondaryCTA={{
-                  text: "How it Works",
-                  href: "/about"
-                }}
-              />
-          </div>
-        </div>
-      </div>
+      <HeroSection />
 
-      {/* Market Section - Normal document flow, positioned below hero section */}
-      <MarketSection className="relative !bg-white dark:!bg-black min-h-screen pt-30" id="market-section">
-        <div className="mb-6 pt-0">
-          <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handleRefresh}
-                disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary/80 disabled:opacity-50"
-              >
-                <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                Refresh Data
-              </button>
-            </div>
+      <div
+        id="market-section"
+        className="relative z-20 bg-base-200 min-h-screen"
+      >
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8 pt-8">
+            <h2 className="text-3xl font-bold text-base-content mb-4">
+              Market Dashboard
+            </h2>
+            <p className="text-base-content/70 mb-6">
+              Real-time prediction market data and analytics
+            </p>
 
-<<<<<<< HEAD
-            <div className="relative flex-1 max-w-md">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search markets..."
-                value={dashboardState.searchQuery}
-                onChange={(e) => setDashboardState(prev => ({ ...prev, searchQuery: e.target.value }))}
-                className="w-full pl-10 pr-4 py-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg text-sm shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/20"
-              />
-            </div>
-          </div>
+            {/* Controls */}
+            <div className="flex items-center gap-4 mb-4 flex-wrap">
+          <button
+            onClick={handleRefresh}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary/80 disabled:opacity-50"
+          >
+            <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </button>
 
-          {/* Combined Markets Section */}
-          <div className="mb-12">
-            <div className="flex items-center gap-2 mb-6">
-              <Squares2X2Icon className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">Combined Markets ({stats.totalCombined})</h2>
-            </div>
-            
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {combinedMarkets.map((market) => (
-                <motion.div
-                  key={market.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Expandable transitionDuration={0.3}>
-                    <ExpandableCard className="h-fit">
-                      <ExpandableTrigger className="w-full h-full flex flex-col">
-                        <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              {'combinedVolume' in market ? (
-                                <div className="flex items-center gap-2">
-                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
-                                    COMBINED
-                                  </span>
-                                  <span className="text-sm font-bold text-primary">
-                                    {Math.round(market.matchConfidence * 100)}% match
-                                  </span>
-                                </div>
-                              ) : (
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
-                                  {market.source}
-                                </span>
-                              )}
-                              <div className="text-xs text-base-content/70">
-                                {market.outcomes?.length || 2} outcomes
-                              </div>
-                            </div>
-                            <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
-                              {/* Show main title - smart extraction based on question type */}
-                              {(() => {
-                                const title = market.title;
-
-                                // For sports games (Team vs Team format)
-                                if (title.includes(' vs. ') || title.includes(' vs ')) {
-                                  // Extract just the matchup part
-                                  const vsMatch = title.match(/^([^:]+(?:\s+vs\.?\s+[^:]+))/i);
-                                  if (vsMatch) {
-                                    return vsMatch[1].trim();
-                                  }
-                                }
-
-                                // For regular questions, split at "?"
-                                if (title.includes('?')) {
-                                  return title.split('?')[0] + '?';
-                                }
-
-                                // For other formats, take first sentence or up to 60 characters
-                                const firstSentence = title.split('.')[0];
-                                if (firstSentence.length <= 60) {
-                                  return firstSentence + (title.includes('.') ? '.' : '');
-                                }
-
-                                // Fallback: truncate at 60 characters
-                                return title.length > 60 ? title.substring(0, 60) + '...' : title;
-                              })()}
-                            </h3>
-                          </div>
-                        </ExpandableCardHeader>
-
-                        <ExpandableCardContent>
-                          {/* Basic Info - Always Visible */}
-                          <div className="grid grid-cols-2 gap-4 text-xs">
-                            <div className="space-y-2">
-                              <div>
-                                <span className="font-medium text-base-content/60">Volume:</span>
-                                <div className="font-semibold text-base-content">
-                                  {'combinedVolume' in market
-                                    ? formatVolume(market.combinedVolume)
-                                    : formatVolume(market.volume || 0)
-                                  }
-                                </div>
-                              </div>
-                              <div>
-                                <span className="font-medium text-base-content/60">Category:</span>
-=======
-            {/* Refresh Button - Icon only */}
           <button
             onClick={handleRefresh}
             disabled={loading}
@@ -293,11 +138,8 @@ export const EnhancedMarketDashboard: React.FC = () => {
               <ArrowPathIcon className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
           </div>
-
-          {/* Second Row - Filter, Active Filters, and Combined/Individual Toggle */}
-          <div className="flex items-center gap-4 mb-4">
-            {/* Filter Dropdown */}
-            <div className="relative" ref={filterDropdownRef}>
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-2 bg-base-300 rounded-lg p-1">
             <button
                 onClick={toggleFilterDropdown}
                 className="flex items-center justify-center w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none"
@@ -319,49 +161,20 @@ export const EnhancedMarketDashboard: React.FC = () => {
             </button>
           </div>
           
-                  {/* Three Column Layout with Vertical Separators */}
-                  <div className="flex">
-                    {/* Source Filter */}
-                    <div className="flex-1 pr-6">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Source</h4>
-                      <div className="space-y-2">
-                        {['polymarket', 'omen', 'metaculus'].map(source => (
-                          <label key={source} className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={dashboardState.filters.source.includes(source)}
-                              onChange={() => toggleSourceFilter(source)}
-                              className="mr-3 rounded"
-                            />
-                            <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">{source}</span>
-                          </label>
-                        ))}
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <ClockIcon className="w-4 h-4" />
+            Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Unknown'}
           </div>
         </div>
 
-                    {/* Vertical Line */}
-                    <div className="w-px bg-gray-300 dark:bg-gray-600 mx-3"></div>
-
-                    {/* Category Filter */}
-                    <div className="flex-1 pr-6">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Category</h4>
-                      <div className="flex flex-wrap gap-3">
-                        {[
-                          { value: 'cryptocurrency', label: 'Crypto' },
-                          { value: 'general', label: 'General' },
-                          { value: 'sports', label: 'Sports' },
-                          { value: 'meta', label: 'Meta' }
-                        ].map((category) => (
-                          <div key={category.value} className="flex items-center">
-                            <label className="flex items-center">
-                              <input
-                                type="checkbox"
-                                checked={dashboardState.filters.category.includes(category.value)}
-                                onChange={() => toggleCategoryFilter(category.value)}
-                                className="mr-2 rounded"
-                              />
-                              <span className="text-sm text-gray-600 dark:text-gray-400">{category.label}</span>
-                            </label>
+          {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-base-100 rounded-lg shadow-sm p-4">
+            <div className="flex items-center">
+              <Squares2X2Icon className="w-8 h-8 text-primary" />
+              <div className="ml-3">
+                <p className="text-sm font-medium text-base-content/70">Combined Markets</p>
+                <p className="text-2xl font-semibold text-primary">{stats.totalCombined}</p>
               </div>
                         ))}
             </div>
@@ -896,3 +709,5 @@ export const EnhancedMarketDashboard: React.FC = () => {
     </div>
   );
 };
+
+

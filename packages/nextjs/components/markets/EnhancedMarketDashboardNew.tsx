@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon, MagnifyingGlassIcon, XMarkIcon, FunnelIcon, ViewColumnsIcon } from "@heroicons/react/24/outline";
+import React, { useState } from 'react';
+import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon } from "@heroicons/react/24/outline";
 import { useCombinedMarkets } from '../../hooks/useCombinedMarkets';
-import { Hero } from '../ui/Hero';
+import { HeroSection } from './HeroSection';
 import {
   Expandable,
   ExpandableCard,
@@ -14,8 +14,11 @@ import {
 } from '../ui/expandable-card';
 
 // Simplified MarketSection props
+
+// Simplified MarketSection props
 interface MarketSectionProps {
   className?: string;
+  id?: string;
   id?: string;
 }
 
@@ -24,22 +27,18 @@ interface DashboardState {
   autoRefresh: boolean;
   loading: boolean;
   error: string | null;
-  searchQuery: string;
-  showFilterDropdown: boolean;
-  filters: {
-    source: string[];
-    category: string[];
-    volumeRange: string;
-  };
 }
 
 // Market Section with clean layout
 const MarketSection: React.FC<MarketSectionProps & { children: React.ReactNode }> = ({
   className = "relative min-h-screen",
   id,
+  id,
   children
 }) => {
   return (
+    <div className={`${className} py-12 px-4 sm:px-8 lg:px-12`} id={id}>
+      <div className="container mx-auto">
     <div className={`${className} py-12 px-4 sm:px-8 lg:px-12`} id={id}>
       <div className="container mx-auto">
         {children}
@@ -51,6 +50,7 @@ const MarketSection: React.FC<MarketSectionProps & { children: React.ReactNode }
 /**
  * Enhanced dashboard component that displays both individual and combined markets
  * Uses the new JSON structure with combined markets support and clean section layout
+ * Uses the new JSON structure with combined markets support and clean section layout
  */
 export const EnhancedMarketDashboard: React.FC = () => {
   const { data, loading, error, lastUpdated, refetch, triggerUpdate, stats } = useCombinedMarkets();
@@ -61,14 +61,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
     viewMode: 'all',
     autoRefresh: false,
     loading: false,
-    error: null,
-    searchQuery: '',
-    showFilterDropdown: false,
-    filters: {
-      source: [],
-      category: [],
-      volumeRange: 'all'
-    }
+    error: null
   });
 
   // Update view mode with type safety
@@ -295,7 +288,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
       <Hero />
 
       {/* Market Section - Normal document flow, positioned below hero section */}
-      <MarketSection className="relative !bg-white dark:!bg-black min-h-screen bg-base-200 mx-4 sm:mx-8 lg:mx-12" id="market-section">
+      <MarketSection className="relative !bg-white dark:!bg-black min-h-screen" id="market-section">
           <div className="mb-6 pt-0">
             
             {/* First Row - Search and Refresh */}
@@ -719,6 +712,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
               <Expandable key={market.id} transitionDuration={0.5}>
                 <ExpandableCard className="h-fit">
                   <ExpandableTrigger className="w-full h-full flex flex-col">
+                    <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
                     <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
