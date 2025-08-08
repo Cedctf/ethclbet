@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useState, CSSProperties, useEffect, useRef } from 'react';
-import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { useCombinedMarkets, CombinedMarket, NormalizedMarket } from '../../hooks/useCombinedMarkets';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import React, { useState } from 'react';
+import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon } from "@heroicons/react/24/outline";
+import { useCombinedMarkets } from '../../hooks/useCombinedMarkets';
 import { HeroSection } from './HeroSection';
 import {
   Expandable,
@@ -14,31 +12,11 @@ import {
   ExpandableCardHeader,
   ExpandableCardContent
 } from '../ui/expandable-card';
-import '../../styles/scroll-transitions.css';
 
-// TypeScript interfaces for transition effects
-interface TransitionConfig {
-  marginTop: string;
-  clipPath: string;
-  paddingTop: string;
-  zIndex: number;
-  backgroundColor?: string;
-  boxShadow?: string;
-}
-
-interface MarketSectionAnimationConfig {
-  slideInDuration: string;
-  slideInEasing: string;
-  slideInDelay: string;
-  slideInDistance: string;
-}
-
+// Simplified MarketSection props
 interface MarketSectionProps {
-  transitionConfig?: TransitionConfig;
-  animationConfig?: MarketSectionAnimationConfig;
   className?: string;
-  onSlideInStart?: () => void;
-  onSlideInComplete?: () => void;
+  id?: string;
 }
 
 interface DashboardState {
@@ -48,42 +26,15 @@ interface DashboardState {
   error: string | null;
 }
 
-// Default transition configuration
-const defaultTransitionConfig: TransitionConfig = {
-  marginTop: '-8rem',
-  clipPath: 'polygon(0 8rem, 100% 0, 100% 100%, 0 100%)',
-  paddingTop: '10rem',
-  zIndex: 20,
-  backgroundColor: 'rgb(229 231 235)',
-  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-};
-
-// Default animation configuration
-const defaultMarketAnimationConfig: MarketSectionAnimationConfig = {
-  slideInDuration: '1.2s',
-  slideInEasing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-  slideInDelay: '0.3s',
-  slideInDistance: '100px'
-};
-
-// Market Section with white background for light theme
+// Market Section with clean layout
 const MarketSection: React.FC<MarketSectionProps & { children: React.ReactNode }> = ({
   className = "relative min-h-screen",
+  id,
   children
 }) => {
-  const sectionStyle: CSSProperties = {
-    padding: '0px 40px',
-    zIndex: 2,
-    marginTop: '-200px',
-    position: 'relative',
-  };
-
   return (
-    <div
-      className={`${className} market-slide-over`}
-      style={sectionStyle}
-    >
-      <div className="container mx-auto px-4 pt-0 pb-8 market-content relative z-10">
+    <div className={`${className} py-12 px-4 sm:px-8 lg:px-12`} id={id}>
+      <div className="container mx-auto">
         {children}
       </div>
     </div>
@@ -92,7 +43,7 @@ const MarketSection: React.FC<MarketSectionProps & { children: React.ReactNode }
 
 /**
  * Enhanced dashboard component that displays both individual and combined markets
- * Uses the new JSON structure with combined markets support and TypeScript transitions
+ * Uses the new JSON structure with combined markets support and clean section layout
  */
 export const EnhancedMarketDashboard: React.FC = () => {
   const { data, loading, error, lastUpdated, refetch, triggerUpdate, stats } = useCombinedMarkets();
@@ -104,8 +55,6 @@ export const EnhancedMarketDashboard: React.FC = () => {
     loading: false,
     error: null
   });
-
-  const router = useRouter();
 
   // Update view mode with type safety
   const updateViewMode = (mode: 'combined' | 'individual'): void => {
@@ -172,8 +121,8 @@ export const EnhancedMarketDashboard: React.FC = () => {
       {/* Hero Section - Normal document flow */}
       <HeroSection />
 
-      {/* Market Section - Normal document flow, will naturally cover hero when scrolled */}
-      <MarketSection className="relative !bg-white dark:!bg-black min-h-screen">
+      {/* Market Section - Normal document flow, positioned below hero section */}
+      <MarketSection className="relative !bg-white dark:!bg-black min-h-screen" id="market-section">
           <div className="mb-6 pt-0">
             
             <div className="flex items-center gap-4 mb-4 flex-wrap">
@@ -381,7 +330,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
               <Expandable key={market.id} transitionDuration={0.5}>
                 <ExpandableCard className="h-fit">
                   <ExpandableTrigger className="w-full h-full flex flex-col">
-                    <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/analysis/${market.id}`}>
+                    <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           {'combinedVolume' in market ? (
