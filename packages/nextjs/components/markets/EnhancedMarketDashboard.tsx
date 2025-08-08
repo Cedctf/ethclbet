@@ -315,5 +315,6 @@ export const EnhancedMarketDashboard: React.FC = () => {
         </div>
       </div>
     </div>
+    </div>
   );
 };
