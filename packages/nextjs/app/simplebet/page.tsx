@@ -32,6 +32,10 @@ export default function SimpleBetPage() {
   const placeBetWithSapphire = async (description: string, outcome: number, platforms: string[], amounts: bigint[], marketIds: string[], totalValue: bigint) => {
     if (!deployedContractData) throw new Error("Contract not deployed");
     
+    // Use getSapphireProvider for encrypted transactions
+    const sapphireProvider = getSapphireProvider();
+    if (!sapphireProvider) throw new Error("Failed to get Sapphire provider");
+    
     const signer = await getSapphireEthersSigner();
     if (!signer) throw new Error("Failed to get Sapphire signer");
     
@@ -43,6 +47,10 @@ export default function SimpleBetPage() {
   const withdrawWithSapphire = async () => {
     if (!deployedContractData) throw new Error("Contract not deployed");
     
+    // Use getSapphireProvider for encrypted transactions
+    const sapphireProvider = getSapphireProvider();
+    if (!sapphireProvider) throw new Error("Failed to get Sapphire provider");
+    
     const signer = await getSapphireEthersSigner();
     if (!signer) throw new Error("Failed to get Sapphire signer");
     
@@ -51,14 +59,18 @@ export default function SimpleBetPage() {
     return await tx.wait();
   };
 
-  const resolveBetWithSapphire = async (betId: bigint, outcome: number) => {
+  const resolveBetWithSapphire = async (betId: bigint, won: boolean, token: string) => {
     if (!deployedContractData) throw new Error("Contract not deployed");
+    
+    // Use getSapphireProvider for encrypted transactions
+    const sapphireProvider = getSapphireProvider();
+    if (!sapphireProvider) throw new Error("Failed to get Sapphire provider");
     
     const signer = await getSapphireEthersSigner();
     if (!signer) throw new Error("Failed to get Sapphire signer");
     
     const contract = new ethers.Contract(deployedContractData.address, deployedContractData.abi, signer);
-    const tx = await contract.resolveBet(betId, outcome);
+    const tx = await contract.resolveBet(betId, won, token);
     return await tx.wait();
   };
 
@@ -280,19 +292,56 @@ export default function SimpleBetPage() {
       const marketIds = validSubBets.map(sb => sb.marketId);
       const totalValue = parseEther(totalAmount.toString());
 
+      let txHash: string;
+
       if (isOnSapphire) {
         // Use Sapphire encrypted transactions
-        notification.info("🔒 Placing encrypted bet on Sapphire...");
-        await placeBetWithSapphire(betDescription, betOutcome, platforms, amounts, marketIds, totalValue);
-        notification.success("🔒 Encrypted bet placed successfully!");
+        notification.info("🔒 Processing encrypted transaction on Sapphire...", { duration: 0 });
+        const receipt = await placeBetWithSapphire(betDescription, betOutcome, platforms, amounts, marketIds, totalValue);
+        txHash = receipt.hash || receipt.transactionHash;
+        
+        notification.success(
+          <div>
+            <div>🔒 Encrypted bet placed successfully!</div>
+            <div className="mt-2">
+              <a 
+                href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
       } else {
         // Use standard wagmi for non-Sapphire networks
-        await placeBet({
+        notification.info("Processing transaction...", { duration: 0 });
+        const result = await placeBet({
           functionName: "placeBet",
           args: [betDescription, betOutcome, platforms, amounts, marketIds],
           value: totalValue,
         });
-        notification.success("Bet placed successfully!");
+        txHash = result;
+        
+        notification.success(
+          <div>
+            <div>Bet placed successfully!</div>
+            <div className="mt-2">
+              <a 
+                href={`https://etherscan.io/tx/${txHash}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
       }
 
       setBetDescription("");
@@ -432,19 +481,55 @@ export default function SimpleBetPage() {
     try {
       const tokenBytes = siweToken as `0x${string}`;
       const betId = BigInt(parseInt(resolveBetId));
+      let txHash: string;
 
       if (isOnSapphire) {
         // Use Sapphire encrypted transactions
-        notification.info("🔒 Resolving bet with encrypted transaction on Sapphire...");
-        await resolveBetWithSapphire(betId, betWon ? 1 : 0);
-        notification.success(`🔒 Bet ${resolveBetId} resolved as ${betWon ? "Won" : "Lost"} with encryption!`);
+        notification.info("🔒 Processing encrypted bet resolution on Sapphire...", { duration: 0 });
+        const receipt = await resolveBetWithSapphire(betId, betWon, tokenBytes as string);
+        txHash = receipt.hash || receipt.transactionHash;
+        
+        notification.success(
+          <div>
+            <div>🔒 Bet {resolveBetId} resolved as {betWon ? "Won" : "Lost"} with encryption!</div>
+            <div className="mt-2">
+              <a 
+                href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
       } else {
         // Use standard wagmi for non-Sapphire networks
-        await writeContractAsync({
+        notification.info("Processing bet resolution...", { duration: 0 });
+        const result = await writeContractAsync({
           functionName: "resolveBet",
           args: [betId, betWon, tokenBytes],
         });
-        notification.success(`Bet ${resolveBetId} resolved as ${betWon ? "Won" : "Lost"}!`);
+        txHash = result;
+        
+        notification.success(
+          <div>
+            <div>Bet {resolveBetId} resolved as {betWon ? "Won" : "Lost"}!</div>
+            <div className="mt-2">
+              <a 
+                href={`https://etherscan.io/tx/${txHash}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
       }
 
       setResolveBetId("");
@@ -530,12 +615,28 @@ export default function SimpleBetPage() {
       const betId = BigInt(parseInt(cancelBetId));
 
       // Call the contract's cancelBet function
-      await writeContractAsync({
+      notification.info("Processing bet cancellation...", { duration: 0 });
+      const result = await writeContractAsync({
         functionName: "cancelBet",
         args: [betId, tokenBytes],
       });
 
-      notification.success(`Bet ${cancelBetId} cancelled successfully!`);
+      notification.success(
+        <div>
+          <div>Bet {cancelBetId} cancelled successfully!</div>
+          <div className="mt-2">
+            <a 
+              href={`${isOnSapphire ? 'https://explorer.sapphire.oasis.io' : 'https://etherscan.io'}/tx/${result}`}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:text-blue-700 underline"
+            >
+              View Transaction →
+            </a>
+          </div>
+        </div>,
+        { duration: 8000 }
+      );
       setCancelBetId("");
     } catch (error) {
       console.error("Error cancelling bet:", error);
@@ -553,17 +654,54 @@ export default function SimpleBetPage() {
     }
 
     try {
+      let txHash: string;
+
       if (isOnSapphire) {
         // Use Sapphire encrypted transactions
-        notification.info("🔒 Processing encrypted withdrawal on Sapphire...");
-        await withdrawWithSapphire();
-        notification.success("🔒 Encrypted withdrawal successful!");
+        notification.info("🔒 Processing encrypted withdrawal on Sapphire...", { duration: 0 });
+        const receipt = await withdrawWithSapphire();
+        txHash = receipt.hash || receipt.transactionHash;
+        
+        notification.success(
+          <div>
+            <div>🔒 Encrypted withdrawal successful!</div>
+            <div className="mt-2">
+              <a 
+                href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
       } else {
         // Use standard wagmi for non-Sapphire networks
-        await withdrawBalance({
+        notification.info("Processing withdrawal...", { duration: 0 });
+        const result = await withdrawBalance({
           functionName: "withdrawBalance",
         });
-        notification.success("Withdrawal successful!");
+        txHash = result;
+        
+        notification.success(
+          <div>
+            <div>Withdrawal successful!</div>
+            <div className="mt-2">
+              <a 
+                href={`https://etherscan.io/tx/${txHash}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
       }
     } catch (error) {
       console.error("Error withdrawing:", error);
