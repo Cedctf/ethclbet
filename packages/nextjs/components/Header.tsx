@@ -99,11 +99,29 @@ export const Header = () => {
   const isLocalNetwork = targetNetwork.id === hardhat.id;
 
   return (
-    <>
-      {/* Brand Logo - Fixed top left */}
-      <div className="fixed top-6 left-8 z-50">
-        <Link href="/" className="flex items-center">
-          <span className="font-bold text-xl text-base-content tracking-wider uppercase">ETHCLBET</span>
+    <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 shrink-0 justify-between z-20 border-b border-gray-200 dark:border-gray-700 px-0 sm:px-2">
+      <div className="navbar-start w-auto lg:w-1/2">
+        <details className="dropdown" ref={burgerMenuRef}>
+          <summary className="ml-1 btn btn-ghost lg:hidden hover:bg-transparent">
+            <Bars3Icon className="h-1/2" />
+          </summary>
+          <ul
+            className="menu menu-compact dropdown-content mt-3 p-2 shadow-sm bg-base-100 rounded-box w-52"
+            onClick={() => {
+              burgerMenuRef?.current?.removeAttribute("open");
+            }}
+          >
+            <HeaderMenuLinks />
+          </ul>
+        </details>
+        <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
+          <div className="flex relative w-10 h-10">
+            <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold leading-tight">Scaffold-ETH</span>
+            <span className="text-xs">Ethereum dev stack</span>
+          </div>
         </Link>
       </div>
 
