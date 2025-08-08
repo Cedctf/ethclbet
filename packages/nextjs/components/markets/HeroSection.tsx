@@ -1,87 +1,99 @@
+
 "use client";
 
-import React, { CSSProperties, useRef, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { CSSProperties } from 'react';
+import Scroller from '../Scroller';
+import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
 interface HeroSectionProps {
   className?: string;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ className = "" }) => {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Parallax effect - background moves slower than scroll
-  const parallaxOffset = scrollY * 0.5;
-
   const heroStyle: CSSProperties = {
-    // Purple background
-    backgroundColor: '#746097',
-    // Clip path for diagonal edge
-    clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0% 100%)',
-    // Layout
-    padding: '100px 40px',
-    zIndex: 1,
-    // Transform for parallax
-    transform: `translateY(${parallaxOffset}px)`,
+    // Pure white background
+    backgroundColor: '#ffffff',
+    // Simple layout
+    padding: '80px 20px',
+    // Ensure proper positioning
+    position: 'relative',
   };
 
   return (
     <div
-      ref={heroRef}
-      className={`relative w-full h-[700px] overflow-hidden mt-20 sm:mt-24 ${className}`}
+      className={`relative w-full h-[800px] flex items-center justify-center ${className}`}
       style={heroStyle}
     >
-      {/* Hero Content - Centered and Moved Up */}
-      <div className="absolute inset-0 z-10 flex items-start justify-center pt-32 sm:pt-40">
-        <div className="text-center text-white max-w-4xl px-8 w-full">
-          <h1
-            className="mb-8 tracking-tight text-center leading-tight"
-            style={{
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              fontSize: '4rem',
-              fontWeight: '800',
-              color: '#ffffff',
-              lineHeight: '1'
-            }}
-          >
-            Enhanced Prediction Markets Hub
-          </h1>
-          <p
-            className="text-center leading-relaxed"
-            style={{
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              fontSize: '1.5rem',
-              fontWeight: '400',
-              color: '#ffffff',
-              opacity: 0.9
-            }}
-          >
-            Unified market data with intelligent combination and real volume tracking
-          </p>
-        </div>
-      </div>
+      {/* Hero Content - Centered */}
+      <div className="text-center text-gray-900 max-w-4xl px-8 w-full">
+        <h1
+          className="mb-10 tracking-tight text-center leading-tight"
+          style={{
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontSize: '4.5rem',
+            fontWeight: '800',
+            color: '#746097',
+            lineHeight: '1.1',
+            textShadow: 'none'
+          }}
+        >
+          Enhanced Prediction Markets Hub
+        </h1>
+        <p
+          className="text-center leading-relaxed"
+          style={{
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontSize: '1.5rem',
+            fontWeight: '400',
+            color: '#4b5563',
+            opacity: 1,
+            textShadow: 'none'
+          }}
+        >
+          Unified market data with intelligent combination and real volume tracking.
+        </p>
 
-      {/* Floating Character Image */}
-      <div
-        className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
-        style={{ zIndex: 2 }}
-      >
-        <img
-          src="/assets/images/character-float.png"
-          alt="Floating Character"
-          className="max-h-64 object-contain"
-        />
+        {/* Crypto Icons Scroller */}
+        <div className="mt-12 w-full max-w-6xl">
+          <Scroller speed={25} iconSize={40} spacing={60} />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center relative z-10">
+          {/* <button
+            className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+            style={{ backgroundColor: '#746097' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5d4d7a'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#746097'}
+          >
+            Connect Wallet
+          </button> */}
+          <div className="flex items-center gap-4">
+            
+          </div>
+          <button
+            className="relative z-10 pointer-events-auto px-8 py-3 bg-transparent border-2 text-gray-700 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-gray-50"
+            style={{ borderColor: '#746097', color: '#746097' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#746097';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#746097';
+            }}
+            onClick={() => {
+              const el = document.getElementById('market-section');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+          >
+            Explore Market
+          </button>
+        </div>
       </div>
     </div>
   );
 };
+
