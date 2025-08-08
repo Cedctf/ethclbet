@@ -893,5 +893,6 @@ export const EnhancedMarketDashboard: React.FC = () => {
         </div>
       </MarketSection>
     </div>
+    </div>
   );
 };

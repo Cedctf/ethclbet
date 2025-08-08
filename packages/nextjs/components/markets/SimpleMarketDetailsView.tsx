@@ -110,7 +110,7 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
   };
 
   return (
-    <div className="min-h-screen bg-white mx-30 mb-10">
+    <div className="min-h-screen bg-white mx-30 my-15">
       {/* Header */}
       <div className="container mx-auto px-4 mt-4">
         <div className="p-6 bg-white">
@@ -261,7 +261,7 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
           {/* Left Side - Content Container */}
           <div className="flex-1 lg:w-2/3">
             {/* Market Information Card */}
-            <div className="mb-8 bg-white rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               {/* Tabs */}
               <div className="flex flex-col">
                 <div className="border-b border-base-300">
@@ -438,7 +438,7 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
 
             {/* Horizontal Divider */}
             {isCombinedMarket(market) && (
-              <div className="border-t border-gray-200 my-8"></div>
+              <div className="border-t border-gray-300 my-2"></div>
             )}
 
             {/* Platform Breakdown for Combined Markets */}
@@ -587,7 +587,7 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
 
           {/* Right Side - Blue Container for Optimal Split Router (3) - Sticky */}
           <div className="lg:w-1/3 pt-6">
-            <div className="sticky top-24">
+            <div className="sticky top-40">
               <OptimalSplitRouter market={market} />
             </div>
           </div>
