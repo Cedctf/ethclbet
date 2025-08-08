@@ -2948,7 +2948,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@oasisprotocol/sapphire-paratime@npm:^2.2.0":
+"@oasisprotocol/sapphire-ethers-v6@npm:^6.0.1":
+  version: 6.0.1
+  resolution: "@oasisprotocol/sapphire-ethers-v6@npm:6.0.1"
+  dependencies:
+    "@oasisprotocol/sapphire-paratime": ^2.0.1
+    ethers: 6.x
+  peerDependencies:
+    "@oasisprotocol/sapphire-paratime": ^2.0.1
+    ethers: 6.x
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: c040f40a4d941802874707380a342a7d194132fe8a3d1c926cd182da5f98f91c3dd1757fd6473ee1a1a6e25887d9fb859275d61a60cc33650d6dfeed000aabd2
+  languageName: node
+  linkType: hard
+
+"@oasisprotocol/sapphire-paratime@npm:^2.0.1, @oasisprotocol/sapphire-paratime@npm:^2.1.0, @oasisprotocol/sapphire-paratime@npm:^2.2.0":
   version: 2.2.0
   resolution: "@oasisprotocol/sapphire-paratime@npm:2.2.0"
   dependencies:
@@ -2956,6 +2973,56 @@ __metadata:
     "@oasisprotocol/deoxysii": 0.0.6
     cborg: 1.10.2
   checksum: c2625361ecca2c73d91a772307ec3d9f4cbe14df84dbb02ecf810b138aaede9c497962d3e2f29d75362be4dbfade22fa634710ee5a98ac8e7b27675370c4d5d5
+  languageName: node
+  linkType: hard
+
+"@oasisprotocol/sapphire-viem-v2@npm:^2.0.1, @oasisprotocol/sapphire-viem-v2@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@oasisprotocol/sapphire-viem-v2@npm:2.1.0"
+  dependencies:
+    "@oasisprotocol/sapphire-paratime": ^2.2.0
+    viem: 2.x
+  peerDependencies:
+    "@oasisprotocol/sapphire-paratime": ^2.2.0
+    "@wagmi/core": 2.x
+    typescript: ">=5.0.4"
+    viem: 2.x
+  peerDependenciesMeta:
+    "@oasisprotocol/sapphire-paratime":
+      optional: true
+    "@wagmi/core":
+      optional: true
+    typescript:
+      optional: true
+  checksum: 9b9b11820ce5e70e48f525d8308a6c52bc151eb8fc66121660aaf85ce234f20b84166bfdc6257955a9cd1a6ba9e7dfd06dec7466f6a9c15dbfb8047875e2efeb
+  languageName: node
+  linkType: hard
+
+"@oasisprotocol/sapphire-wagmi-v2@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@oasisprotocol/sapphire-wagmi-v2@npm:2.1.0"
+  dependencies:
+    "@oasisprotocol/sapphire-paratime": ^2.1.0
+    "@oasisprotocol/sapphire-viem-v2": ^2.0.1
+    "@wagmi/core": 2.x
+    viem: 2.x
+  peerDependencies:
+    "@oasisprotocol/sapphire-paratime": ^2.1.0
+    "@oasisprotocol/sapphire-viem-v2": ^2.0.1
+    "@wagmi/core": 2.x
+    typescript: ">=5.0.4"
+    viem: 2.x
+    wagmi: 2.x
+  peerDependenciesMeta:
+    "@oasisprotocol/sapphire-paratime":
+      optional: true
+    "@oasisprotocol/sapphire-viem-v2":
+      optional: true
+    "@wagmi/core":
+      optional: true
+    typescript:
+      optional: true
+  checksum: fed3985a85499936f2beece0521981a379f33255063857c10d15b9706a04d09072e4ee53510e6f9e532a07c781384a7b187c42fc16bacf4d23688eb7bf63d155
   languageName: node
   linkType: hard
 
@@ -3474,7 +3541,10 @@ __metadata:
   resolution: "@se-2/nextjs@workspace:packages/nextjs"
   dependencies:
     "@heroicons/react": ~2.1.5
+    "@oasisprotocol/sapphire-ethers-v6": ^6.0.1
     "@oasisprotocol/sapphire-paratime": ^2.2.0
+    "@oasisprotocol/sapphire-viem-v2": ^2.1.0
+    "@oasisprotocol/sapphire-wagmi-v2": ^2.1.0
     "@rainbow-me/rainbowkit": 2.2.7
     "@tailwindcss/postcss": 4.0.15
     "@tanstack/react-query": ~5.59.15
@@ -5069,6 +5139,26 @@ __metadata:
     typescript:
       optional: true
   checksum: 94441fede60a78b6479534b611b08dad7325980bb7f22320a8b358afb52c1b1069c186a5fd3cab4438de6f541a6aa4c8ef94b8b9c417ebbefa344bbe8dc1bd33
+  languageName: node
+  linkType: hard
+
+"@wagmi/core@npm:2.x":
+  version: 2.18.1
+  resolution: "@wagmi/core@npm:2.18.1"
+  dependencies:
+    eventemitter3: 5.0.1
+    mipd: 0.0.7
+    zustand: 5.0.0
+  peerDependencies:
+    "@tanstack/query-core": ">=5.0.0"
+    typescript: ">=5.0.4"
+    viem: 2.x
+  peerDependenciesMeta:
+    "@tanstack/query-core":
+      optional: true
+    typescript:
+      optional: true
+  checksum: 7eb552c881e64e68db91876715b9060cc243d343c7a2c2b7671b7d104deb775dc1548367171e32b2a6acd43b877b7192d0460e9e9ade01a883557905064168c6
   languageName: node
   linkType: hard
 
@@ -8800,6 +8890,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ethers@npm:6.x, ethers@npm:^6.15.0":
+  version: 6.15.0
+  resolution: "ethers@npm:6.15.0"
+  dependencies:
+    "@adraffy/ens-normalize": 1.10.1
+    "@noble/curves": 1.2.0
+    "@noble/hashes": 1.3.2
+    "@types/node": 22.7.5
+    aes-js: 4.0.0-beta.5
+    tslib: 2.7.0
+    ws: 8.17.1
+  checksum: 3e8fb73b5cf2bef564433442adb68fe89a6da0d664c1ebe6e226fe5e7160da7010800334c3ecc53eef51ff8c10a3255fa99160e8d424f1241440043f6faa2ea1
+  languageName: node
+  linkType: hard
+
 "ethers@npm:^5.7.0":
   version: 5.8.0
   resolution: "ethers@npm:5.8.0"
@@ -8835,21 +8940,6 @@ __metadata:
     "@ethersproject/web": 5.8.0
     "@ethersproject/wordlists": 5.8.0
   checksum: fb107bf28dc3aedde4729f9553be066c699e0636346c095b4deeb5349a0c0c8538f48a58b5c8cbefced008706919739c5f7b8f4dd506bb471a31edee18cda228
-  languageName: node
-  linkType: hard
-
-"ethers@npm:^6.15.0":
-  version: 6.15.0
-  resolution: "ethers@npm:6.15.0"
-  dependencies:
-    "@adraffy/ens-normalize": 1.10.1
-    "@noble/curves": 1.2.0
-    "@noble/hashes": 1.3.2
-    "@types/node": 22.7.5
-    aes-js: 4.0.0-beta.5
-    tslib: 2.7.0
-    ws: 8.17.1
-  checksum: 3e8fb73b5cf2bef564433442adb68fe89a6da0d664c1ebe6e226fe5e7160da7010800334c3ecc53eef51ff8c10a3255fa99160e8d424f1241440043f6faa2ea1
   languageName: node
   linkType: hard
 
@@ -17120,6 +17210,27 @@ __metadata:
     typescript:
       optional: true
   checksum: 77ed124b3b2d1bdfaebc229d067db582c202cdb69b8b50a0499bd4e4678d268c1a667301d9e2a1195a59d3451b3429b0bdbcabc38aeeea69cb655663d244944c
+  languageName: node
+  linkType: hard
+
+"viem@npm:2.x":
+  version: 2.33.3
+  resolution: "viem@npm:2.33.3"
+  dependencies:
+    "@noble/curves": 1.9.2
+    "@noble/hashes": 1.8.0
+    "@scure/bip32": 1.7.0
+    "@scure/bip39": 1.6.0
+    abitype: 1.0.8
+    isows: 1.0.7
+    ox: 0.8.6
+    ws: 8.18.2
+  peerDependencies:
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 1053dd69197f23773d1a57d0c652938e4bc53458b1c58409a0f955514b678e207740b8fa54dcf4a0621b6d5ade5e1b8f024b809bfd94488163e4d761bc7725e7
   languageName: node
   linkType: hard
 

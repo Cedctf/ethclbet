@@ -17,7 +17,10 @@
   },
   "dependencies": {
     "@heroicons/react": "~2.1.5",
+    "@oasisprotocol/sapphire-ethers-v6": "^6.0.1",
     "@oasisprotocol/sapphire-paratime": "^2.2.0",
+    "@oasisprotocol/sapphire-viem-v2": "^2.1.0",
+    "@oasisprotocol/sapphire-wagmi-v2": "^2.1.0",
     "@rainbow-me/rainbowkit": "2.2.7",
     "@tanstack/react-query": "~5.59.15",
     "@uniswap/sdk-core": "~5.8.2",

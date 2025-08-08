@@ -4,11 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { SiweMessage } from "siwe";
 import { formatEther, parseEther } from "viem";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useSignMessage, useChainId } from "wagmi";
 import { usePublicClient } from "wagmi";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
+import { getSapphireProvider, getSapphireEthersSigner, isSapphireNetwork } from "~~/utils/scaffold-eth/sapphireProviders";
 
 // Generate random nonce
 const generateNonce = () => Math.random().toString(36).substring(2, 15);
@@ -17,11 +18,49 @@ export default function SimpleBetPage() {
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const publicClient = usePublicClient();
+  const chainId = useChainId();
   const { data: deployedContractData } = useDeployedContractInfo("SimpleBet");
 
   // SIWE Authentication state
   const [siweToken, setSiweToken] = useState<string>("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Check if we're on a Sapphire network for encrypted transactions
+  const isOnSapphire = chainId ? isSapphireNetwork(chainId) : false;
+
+  // Sapphire-specific contract interaction functions
+  const placeBetWithSapphire = async (description: string, outcome: number, platforms: string[], amounts: bigint[], marketIds: string[], totalValue: bigint) => {
+    if (!deployedContractData) throw new Error("Contract not deployed");
+    
+    const signer = await getSapphireEthersSigner();
+    if (!signer) throw new Error("Failed to get Sapphire signer");
+    
+    const contract = new ethers.Contract(deployedContractData.address, deployedContractData.abi, signer);
+    const tx = await contract.placeBet(description, outcome, platforms, amounts, marketIds, { value: totalValue });
+    return await tx.wait();
+  };
+
+  const withdrawWithSapphire = async () => {
+    if (!deployedContractData) throw new Error("Contract not deployed");
+    
+    const signer = await getSapphireEthersSigner();
+    if (!signer) throw new Error("Failed to get Sapphire signer");
+    
+    const contract = new ethers.Contract(deployedContractData.address, deployedContractData.abi, signer);
+    const tx = await contract.withdrawBalance();
+    return await tx.wait();
+  };
+
+  const resolveBetWithSapphire = async (betId: bigint, outcome: number) => {
+    if (!deployedContractData) throw new Error("Contract not deployed");
+    
+    const signer = await getSapphireEthersSigner();
+    if (!signer) throw new Error("Failed to get Sapphire signer");
+    
+    const contract = new ethers.Contract(deployedContractData.address, deployedContractData.abi, signer);
+    const tx = await contract.resolveBet(betId, outcome);
+    return await tx.wait();
+  };
 
   // Form states
   const [betDescription, setBetDescription] = useState("");
@@ -239,14 +278,23 @@ export default function SimpleBetPage() {
       const platforms = validSubBets.map(sb => sb.platform);
       const amounts = validSubBets.map(sb => parseEther(sb.amount));
       const marketIds = validSubBets.map(sb => sb.marketId);
+      const totalValue = parseEther(totalAmount.toString());
 
-      await placeBet({
-        functionName: "placeBet",
-        args: [betDescription, betOutcome, platforms, amounts, marketIds],
-        value: parseEther(totalAmount.toString()),
-      });
+      if (isOnSapphire) {
+        // Use Sapphire encrypted transactions
+        notification.info("🔒 Placing encrypted bet on Sapphire...");
+        await placeBetWithSapphire(betDescription, betOutcome, platforms, amounts, marketIds, totalValue);
+        notification.success("🔒 Encrypted bet placed successfully!");
+      } else {
+        // Use standard wagmi for non-Sapphire networks
+        await placeBet({
+          functionName: "placeBet",
+          args: [betDescription, betOutcome, platforms, amounts, marketIds],
+          value: totalValue,
+        });
+        notification.success("Bet placed successfully!");
+      }
 
-      notification.success("Aggregated bet placed successfully!");
       setBetDescription("");
       setBetOutcome(0);
       setSubBets([{ platform: "", amount: "", marketId: "" }]);
@@ -385,13 +433,20 @@ export default function SimpleBetPage() {
       const tokenBytes = siweToken as `0x${string}`;
       const betId = BigInt(parseInt(resolveBetId));
 
-      // Call the contract's resolveBet function
-      await writeContractAsync({
-        functionName: "resolveBet",
-        args: [betId, betWon, tokenBytes],
-      });
+      if (isOnSapphire) {
+        // Use Sapphire encrypted transactions
+        notification.info("🔒 Resolving bet with encrypted transaction on Sapphire...");
+        await resolveBetWithSapphire(betId, betWon ? 1 : 0);
+        notification.success(`🔒 Bet ${resolveBetId} resolved as ${betWon ? "Won" : "Lost"} with encryption!`);
+      } else {
+        // Use standard wagmi for non-Sapphire networks
+        await writeContractAsync({
+          functionName: "resolveBet",
+          args: [betId, betWon, tokenBytes],
+        });
+        notification.success(`Bet ${resolveBetId} resolved as ${betWon ? "Won" : "Lost"}!`);
+      }
 
-      notification.success(`Bet ${resolveBetId} resolved as ${betWon ? "Won" : "Lost"}!`);
       setResolveBetId("");
     } catch (error) {
       console.error("Error resolving bet:", error);
@@ -498,11 +553,18 @@ export default function SimpleBetPage() {
     }
 
     try {
-      await withdrawBalance({
-        functionName: "withdrawBalance",
-      });
-
-      notification.success("Withdrawal successful!");
+      if (isOnSapphire) {
+        // Use Sapphire encrypted transactions
+        notification.info("🔒 Processing encrypted withdrawal on Sapphire...");
+        await withdrawWithSapphire();
+        notification.success("🔒 Encrypted withdrawal successful!");
+      } else {
+        // Use standard wagmi for non-Sapphire networks
+        await withdrawBalance({
+          functionName: "withdrawBalance",
+        });
+        notification.success("Withdrawal successful!");
+      }
     } catch (error) {
       console.error("Error withdrawing:", error);
       notification.error("Failed to withdraw");
@@ -537,6 +599,35 @@ export default function SimpleBetPage() {
         <div className="bg-base-100 p-4 rounded-lg shadow">
           <h3 className="font-semibold">Total Bets</h3>
           <p className="text-lg">{totalBets?.toString() || "0"}</p>
+        </div>
+      </div>
+
+      {/* Encryption Status */}
+      <div className="mb-8">
+        <div className={`p-4 rounded-lg border-2 ${
+          isOnSapphire 
+            ? 'bg-green-50 border-green-200 text-green-800' 
+            : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+        }`}>
+          <div className="flex items-center justify-center gap-2">
+            {isOnSapphire ? (
+              <>
+                <span className="text-2xl">🔒</span>
+                <div className="text-center">
+                  <div className="font-semibold">Encrypted Transactions Enabled</div>
+                  <div className="text-sm">Connected to Sapphire Network - All transactions are encrypted</div>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="text-2xl">⚠️</span>
+                <div className="text-center">
+                  <div className="font-semibold">Unencrypted Network</div>
+                  <div className="text-sm">Switch to Sapphire Testnet for encrypted transactions</div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
