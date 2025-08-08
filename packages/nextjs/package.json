@@ -25,6 +25,8 @@
     "burner-connector": "0.0.16",
     "clsx": "^1.2.1",
     "daisyui": "5.0.9",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.2",
     "framer-motion": "^12.23.12",
     "gsap": "^3.13.0",
     "kubo-rpc-client": "~5.0.2",
