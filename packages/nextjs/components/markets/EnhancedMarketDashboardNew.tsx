@@ -381,7 +381,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
               <Expandable key={market.id} transitionDuration={0.5}>
                 <ExpandableCard className="h-fit">
                   <ExpandableTrigger className="w-full h-full flex flex-col">
-                    <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/analysis/${market.id}`}>
+                    <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           {'combinedVolume' in market ? (
