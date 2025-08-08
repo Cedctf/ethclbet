@@ -71,7 +71,24 @@ export const EnhancedMarketDashboard: React.FC = () => {
     return `$${volume.toFixed(2)}`;
   };
 
+  const getSourceBadgeColor = (source: string): string => {
+    switch (source) {
+      case 'polymarket': return 'badge-polymarket';
+      case 'omen': return 'badge-omen';
+      default: return 'bg-base-300 text-base-content';
+    }
+  };
 
+  const handleMarketClick = (market: CombinedMarket | NormalizedMarket) => {
+    console.log(`🎯 Navigating to market details:`, {
+      id: market.id,
+      title: market.title,
+      type: 'combinedVolume' in market ? 'combined' : 'individual'
+    });
+
+    // Navigate to market details page
+    router.push(`/market/${market.id}`);
+  };
 
   if (loading) {
     return (
@@ -501,7 +518,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
                           <div className="flex items-center justify-between">
                 {'combinedVolume' in market ? (
                   <div className="flex items-center gap-2">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium gd-combined-tag">
                       COMBINED
                     </span>
                                 <span className="text-sm font-bold text-primary">
