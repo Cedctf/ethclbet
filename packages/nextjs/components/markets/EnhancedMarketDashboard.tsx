@@ -5,14 +5,7 @@ import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2I
 import { motion } from "framer-motion";
 import { useCombinedMarkets } from '../../hooks/useCombinedMarkets';
 import { Hero } from '../ui/Hero';
-import {
-  Expandable,
-  ExpandableCard,
-  ExpandableContent,
-  ExpandableTrigger,
-  ExpandableCardHeader,
-  ExpandableCardContent
-} from '../ui/expandable-card';
+import { MarketCard } from './MarketCard';
 
 // Simplified MarketSection props
 interface MarketSectionProps {
@@ -51,6 +44,10 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   // Typed dashboard state
   const [dashboardState, setDashboardState] = useState<DashboardState>({
+<<<<<<< HEAD
+=======
+    viewMode: 'combined',
+>>>>>>> 24c291f (Market Card Display type change)
     autoRefresh: false,
     loading: false,
     error: null,
@@ -74,13 +71,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
     return `$${volume.toFixed(2)}`;
   };
 
-  const getSourceBadgeColor = (source: string): string => {
-    switch (source) {
-      case 'polymarket': return 'bg-[#4c56ab]/10 text-[#4c56ab]';
-      case 'omen': return 'bg-[#f2a5db]/10 text-[#f2a5db]';
-      default: return 'bg-base-300 text-base-content';
-    }
-  };
+
 
   if (loading) {
     return (
@@ -137,8 +128,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
         
         {/* Glass card container */}
         <div className="relative max-w-[1200px] mx-auto px-6 sm:px-8">
-          <div className="bg-white/[0.37] dark:bg-black/[0.37] backdrop-blur-[13.8px] rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] p-6 sm:p-8">
-            <div className="relative z-10 flex flex-col items-center justify-center min-h-[240px] sm:min-h-[280px]">
+          <div className="bg-white/10 dark:bg-white/5 backdrop-blur-sm bg-opacity-0 border border-white/20 dark:border-white/10 rounded-2xl shadow-xl shadow-black/10 p-6 sm:p-8">
               <Hero
                 description="Discover and analyze prediction markets across multiple platforms. Compare odds, track performance, and make data-driven decisions."
                 primaryCTA={{
@@ -150,11 +140,6 @@ export const EnhancedMarketDashboard: React.FC = () => {
                   href: "/about"
                 }}
               />
-            </div>
-            
-            {/* Decorative elements */}
-            <div className="absolute -top-8 -right-8 w-48 h-32 bg-primary/10 rounded-full blur-2xl transform rotate-12" />
-            <div className="absolute -bottom-12 -left-12 w-64 h-40 bg-primary/5 rounded-full blur-3xl transform -rotate-12" />
           </div>
         </div>
       </div>
@@ -501,8 +486,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {displayMarkets.map((market) => (
-              <motion.div
+          <MarketCard 
             key={market.id}
+<<<<<<< HEAD
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.15, ease: "easeOut" }}
@@ -866,6 +852,11 @@ export const EnhancedMarketDashboard: React.FC = () => {
                   </ExpandableCard>
                 </Expandable>
               </motion.div>
+=======
+            market={market}
+            formatVolumeAction={formatVolume}
+          />
+>>>>>>> 24c291f (Market Card Display type change)
         ))}
       </div>
 
