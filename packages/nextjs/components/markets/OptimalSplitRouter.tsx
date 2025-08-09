@@ -470,7 +470,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             </div>
             <div className="mt-2">
               <a 
-                href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
+                href={`https://explorer.oasis.io/testnet/sapphire/tx/${txHash}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:text-blue-700 underline"

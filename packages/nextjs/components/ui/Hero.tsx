@@ -86,7 +86,7 @@ export const Hero = ({
   description = "Explore and analyze prediction markets across multiple platforms. Get insights, compare odds, and make informed decisions.",
   primaryCTA = {
     text: "Start Exploring",
-    href: "#market-section",
+    href: "/EnhancedMarketDashboard",
   },
   secondaryCTA = {
     text: "Learn More",
@@ -99,7 +99,7 @@ export const Hero = ({
     : false;
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-b from-base-300/20 to-base-100">
+    <div className="relative overflow-hidden">
       <div className="relative pt-24 pb-20 sm:pt-32 sm:pb-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
@@ -152,21 +152,22 @@ export const Hero = ({
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <a
                 href={primaryCTA.href}
-                className="group inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-content shadow-sm transition-all duration-200 hover:bg-primary/90"
+                className="group inline-flex items-center gap-2 rounded-lg bg-primary/80 border border-base-300 backdrop-blur-lg px-6 py-3 text-sm font-semibold text-primary-content transition-all duration-200 hover:bg-primary/60"
               >
                 {primaryCTA.text}
                 <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
               </a>
               <a
                 href={secondaryCTA.href}
-                className="text-sm font-semibold leading-6 text-base-content transition-colors hover:text-primary"
+                className="group inline-flex items-center gap-2 rounded-lg bg-black border border-base-300 backdrop-blur-lg px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-black/60"
               >
-                {secondaryCTA.text} <span aria-hidden="true">→</span>
+                {secondaryCTA.text}
+                <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
               </a>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>
+  );
 };
