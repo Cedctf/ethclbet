@@ -292,14 +292,11 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         let marketTitle = 'Optimal Split Bet';
         
         if (isCombinedMarket(market)) {
-          // For combined markets, prefer the main title or question
-          marketTitle = market.title || 
-                      market.polymarketMarket?.question || 
-                      market.omenMarket?.question || 
-                      'Combined Market Bet';
+          // For combined markets, prefer the main title
+          marketTitle = market.title || 'Combined Market Bet';
         } else {
           // For individual markets
-          marketTitle = market.title || market.question || 'Market Bet';
+          marketTitle = market.title || 'Market Bet';
         }
         
         // Extract only the first part before "-" if it exists
@@ -308,6 +305,9 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         
         // Convert to ETH
         await convertToEth(data.result.orderBookAllocation, data.result.lmsrAllocation);
+        
+        // Save optimal split output to history for AI training
+        await saveOptimalSplitToHistory(data.result);
         
         console.log('Optimal split result:', data.result);
       } else {
@@ -319,6 +319,63 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       setError(err instanceof Error ? err.message : 'An error occurred during optimization');
     } finally {
       setIsCalculating(false);
+    }
+  };
+
+  // Save optimal split output to history for AI training
+  const saveOptimalSplitToHistory = async (optimalSplitResult: any) => {
+    try {
+      // Extract market statistics for both platforms
+      const polymarketStats = extractMarketStats(market, 'polymarket');
+      const omenStats = extractMarketStats(market, 'omen');
+
+      // Prepare market info
+      let marketInfo: any = {};
+      if (isCombinedMarket(market)) {
+        marketInfo = {
+          title: market.title,
+          question: market.title, // Use title as question for combined markets
+          source: 'combined',
+          category: 'combined'
+        };
+      } else {
+        marketInfo = {
+          title: market.title,
+          question: market.title, // Use title as question for individual markets
+          source: market.source,
+          category: 'individual'
+        };
+      }
+
+      const saveData = {
+        userId: address || 'anonymous',
+        budget,
+        polymarketStats,
+        omenStats,
+        optimalSplit: optimalSplitResult,
+        priceData,
+        betOutcome,
+        betDescription,
+        marketInfo
+      };
+
+      const response = await fetch('/api/saveoutput', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(saveData),
+      });
+
+      if (!response.ok) {
+        console.warn('Failed to save optimal split to history:', await response.text());
+      } else {
+        const saveResult = await response.json();
+        console.log('Optimal split saved to history:', saveResult);
+      }
+    } catch (error) {
+      console.warn('Error saving optimal split to history:', error);
+      // Don't throw error as this is not critical for the main functionality
     }
   };
 
@@ -525,6 +582,18 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           total: formatEther(totalValue)
         }
       });
+
+      // Save bet placement to history for AI training
+      if (result) {
+        await saveOptimalSplitToHistory({
+          ...result,
+          betPlaced: true,
+          betOutcome,
+          betDescription,
+          actualAmounts: amounts.map(a => formatEther(a)),
+          actualPlatforms: platforms
+        });
+      }
 
     } catch (error) {
       console.error("Error placing optimal split bet:", error);
