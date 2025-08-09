@@ -49,7 +49,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
     });
 
     // Navigate to market details page
-    router.push(`/market/${market.id}`);
+    router.push(`/marketplace/${market.id}`);
   };
 
   if (loading) {
