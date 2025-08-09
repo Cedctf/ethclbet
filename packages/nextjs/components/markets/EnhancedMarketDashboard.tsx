@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HeroSection } from './HeroSection';
 
+
 /**
  * Enhanced dashboard component that displays both individual and combined markets
  * Uses the new JSON structure with combined markets support
@@ -86,7 +87,10 @@ export const EnhancedMarketDashboard: React.FC = () => {
     <div className="relative">
       <HeroSection />
 
-      <div className="relative z-20 bg-base-200 min-h-screen">
+      <div
+        id="market-section"
+        className="relative z-20 bg-base-200 min-h-screen"
+      >
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8 pt-8">
             <h2 className="text-3xl font-bold text-base-content mb-4">
@@ -115,7 +119,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
             <ArrowPathIcon className="w-4 h-4" />
             Update from APIs
           </button>
-          
+          </div>
           {/* View Mode Toggle */}
           <div className="flex items-center gap-2 bg-base-300 rounded-lg p-1">
             <button
@@ -145,8 +149,8 @@ export const EnhancedMarketDashboard: React.FC = () => {
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <ClockIcon className="w-4 h-4" />
             Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Unknown'}
-            </div>
           </div>
+        </div>
 
           {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -318,3 +322,5 @@ export const EnhancedMarketDashboard: React.FC = () => {
     </div>
   );
 };
+
+
