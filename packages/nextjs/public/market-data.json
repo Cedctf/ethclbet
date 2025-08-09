@@ -811,363 +811,148 @@
     }
   ],
   "combinedMarkets": [
-      {
-        "id": "combined-0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0-0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+    {
+      "id": "combined-0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0-0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+      "title": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "category": "cryptocurrency",
+      "combinedVolume": 881921.939756,
+      "matchConfidence": 1.7,
+      "polymarketMarket": {
+        "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
         "title": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
-        "category": "cryptocurrency",
-        "combinedVolume": 881921.939756,
-        "matchConfidence": 1.7,
-        "polymarketMarket": {
-          "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
-          "title": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
-          "originalTitle": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
-          "volume": 871345.209836,
-          "tradesQuantity": "6738",
-          "buysQuantity": "3863",
-          "sellsQuantity": "2875",
-          "scaledCollateralBuyVolume": "495079.428983",
-          "scaledCollateralSellVolume": "376265.780853",
-          "rawData": {
-            "market": {
-              "creator": "0x91430cad2d3975766499717fa0d66a78d814e5c5",
-              "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
-              "question": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
-              "questionID": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0"
-            },
-            "orderbook": {
-              "id": "82651091301986089113085526490272944697099417369701161905977825651956926104631",
-              "tradesQuantity": "6738",
-              "buysQuantity": "3863",
-              "sellsQuantity": "2875",
-              "scaledCollateralVolume": "871345.209836",
-              "scaledCollateralBuyVolume": "495079.428983",
-              "scaledCollateralSellVolume": "376265.780853"
-            }
+        "originalTitle": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+        "volume": 871345.209836,
+        "tradesQuantity": "6738",
+        "buysQuantity": "3863",
+        "sellsQuantity": "2875",
+        "scaledCollateralBuyVolume": "495079.428983",
+        "scaledCollateralSellVolume": "376265.780853",
+        "rawData": {
+          "market": {
+            "creator": "0x91430cad2d3975766499717fa0d66a78d814e5c5",
+            "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
+            "question": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+            "questionID": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0"
+          },
+          "orderbook": {
+            "id": "82651091301986089113085526490272944697099417369701161905977825651956926104631",
+            "tradesQuantity": "6738",
+            "buysQuantity": "3863",
+            "sellsQuantity": "2875",
+            "scaledCollateralVolume": "871345.209836",
+            "scaledCollateralBuyVolume": "495079.428983",
+            "scaledCollateralSellVolume": "376265.780853"
           }
-        },
-        "omenMarket": {
-          "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
-          "title": "Will Bitcoin Rise or Fall on June 11",
-          "originalTitle": "Will the Grayscale Bitcoin Trust (GBTC) have a discount to NAV at the end of August 2021?",
-          "volume": 10576.72992,
-          "category": "cryptocurrency",
-          "tradesQuantity": "141",
-          "buysQuantity": "77",
-          "sellsQuantity": "107",
-          "scaledCollateralBuyVolume": "6346.037952",
-          "scaledCollateralSellVolume": "4230.691968",
-          "rawData": {
-            "market": {
-              "category": "cryptocurrency",
-              "creationTimestamp": "1624480175",
-              "creator": "0x1de6e51e74f11a21784f7073f1dd351a98c944ea",
-              "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
-              "liquidityMeasure": "0",
-              "outcomeSlotCount": 2,
-              "outcomes": [
-                "Yes",
-                "No"
-              ],
-              "scaledCollateralVolume": "10576.72992",
-              "scaledLiquidityMeasure": "0",
-              "title": "Will the Grayscale Bitcoin Trust (GBTC) have a discount to NAV at the end of August 2021?",
-              "usdLiquidityMeasure": "0",
-              "usdVolume": "10576.7296967110157093712684262752"
-            }
-          }
-        },
-        "createdAt": "2025-08-06T05:40:34.402Z",
-        "outcomes": [
-          "Yes",
-          "No"
-        ]
+        }
       },
-      {
-        "id": "combined-0xffc7c25e194d9de311e9c87ea24e6b94689344f03b43f28d39f2b09974dd5838-0x57c6bab1ba758d911f11e67ef323acebcfca04b7",
+      "omenMarket": {
+        "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+        "title": "Will Bitcoin Rise or Fall on June 11",
+        "originalTitle": "Will the Grayscale Bitcoin Trust (GBTC) have a discount to NAV at the end of August 2021?",
+        "volume": 10576.72992,
+        "category": "cryptocurrency",
+        "tradesQuantity": "141",
+        "buysQuantity": "77",
+        "sellsQuantity": "107",
+        "scaledCollateralBuyVolume": "6346.037952",
+        "scaledCollateralSellVolume": "4230.691968",
+        "rawData": {
+          "market": {
+            "category": "cryptocurrency",
+            "creationTimestamp": "1624480175",
+            "creator": "0x1de6e51e74f11a21784f7073f1dd351a98c944ea",
+            "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+            "liquidityMeasure": "0",
+            "outcomeSlotCount": 2,
+            "outcomes": [
+              "Yes",
+              "No"
+            ],
+            "scaledCollateralVolume": "10576.72992",
+            "scaledLiquidityMeasure": "0",
+            "title": "Will the Grayscale Bitcoin Trust (GBTC) have a discount to NAV at the end of August 2021?",
+            "usdLiquidityMeasure": "0",
+            "usdVolume": "10576.7296967110157093712684262752"
+          }
+        }
+      },
+      "createdAt": "2025-08-06T05:40:34.402Z",
+      "outcomes": [
+        "Yes",
+        "No"
+      ]
+    },
+    {
+      "id": "combined-0xffc7c25e194d9de311e9c87ea24e6b94689344f03b43f28d39f2b09974dd5838-0x57c6bab1ba758d911f11e67ef323acebcfca04b7",
+      "title": "Will Dogecoin reach $0.18 in July? - This market will immediately resolve to \"Yes\" if any Binance 1 minute candle for Dogecoin (DOGE/USDT) between July 1, 2025, 00:00 and July 31, 2025, 23:59 in the ET timezone has a final \"High\" price of $0.",
+      "category": "cryptocurrency",
+      "combinedVolume": 781008.9667183963,
+      "matchConfidence": 0.5,
+      "polymarketMarket": {
+        "id": "0xffc7c25e194d9de311e9c87ea24e6b94689344f03b43f28d39f2b09974dd5838",
         "title": "Will Dogecoin reach $0.18 in July? - This market will immediately resolve to \"Yes\" if any Binance 1 minute candle for Dogecoin (DOGE/USDT) between July 1, 2025, 00:00 and July 31, 2025, 23:59 in the ET timezone has a final \"High\" price of $0.",
-        "category": "cryptocurrency",
-        "combinedVolume": 781008.9667183963,
-        "matchConfidence": 0.5,
-        "polymarketMarket": {
-          "id": "0xffc7c25e194d9de311e9c87ea24e6b94689344f03b43f28d39f2b09974dd5838",
-          "title": "Will Dogecoin reach $0.18 in July? - This market will immediately resolve to \"Yes\" if any Binance 1 minute candle for Dogecoin (DOGE/USDT) between July 1, 2025, 00:00 and July 31, 2025, 23:59 in the ET timezone has a final \"High\" price of $0.",
-          "originalTitle": "Will Dogecoin reach $0.18 in July? - This market will immediately resolve to \"Yes\" if any Binance 1 minute candle for Dogecoin (DOGE/USDT) between July 1, 2025, 00:00 and July 31, 2025, 23:59 in the ET timezone has a final \"High\" price of $0.",
-          "volume": 750627.076023,
-          "tradesQuantity": "7022",
-          "buysQuantity": "4390",
-          "sellsQuantity": "2632",
-          "scaledCollateralBuyVolume": "503658.39788",
-          "scaledCollateralSellVolume": "246968.678143",
-          "rawData": {
-            "market": {
-              "creator": "0x91430cad2d3975766499717fa0d66a78d814e5c5",
-              "id": "0xffc7c25e194d9de311e9c87ea24e6b94689344f03b43f28d39f2b09974dd5838",
-              "question": "Will Dogecoin reach $0.18 in July? - This market will immediately resolve to \"Yes\" if any Binance 1 minute candle for Dogecoin (DOGE/USDT) between July 1, 2025, 00:00 and July 31, 2025, 23:59 in the ET timezone has a final \"High\" price of $0.",
-              "questionID": "0xffc7c25e194d9de311e9c87ea24e6b94689344f03b43f28d39f2b09974dd5838"
-            },
-            "orderbook": {
-              "id": "25576058321120233631953665979060466858369324557031607141467685533892970617491",
-              "tradesQuantity": "7022",
-              "buysQuantity": "4390",
-              "sellsQuantity": "2632",
-              "scaledCollateralVolume": "750627.076023",
-              "scaledCollateralBuyVolume": "503658.39788",
-              "scaledCollateralSellVolume": "246968.678143"
-            }
+        "originalTitle": "Will Dogecoin reach $0.18 in July? - This market will immediately resolve to \"Yes\" if any Binance 1 minute candle for Dogecoin (DOGE/USDT) between July 1, 2025, 00:00 and July 31, 2025, 23:59 in the ET timezone has a final \"High\" price of $0.",
+        "volume": 750627.076023,
+        "tradesQuantity": "7022",
+        "buysQuantity": "4390",
+        "sellsQuantity": "2632",
+        "scaledCollateralBuyVolume": "503658.39788",
+        "scaledCollateralSellVolume": "246968.678143",
+        "rawData": {
+          "market": {
+            "creator": "0x91430cad2d3975766499717fa0d66a78d814e5c5",
+            "id": "0xffc7c25e194d9de311e9c87ea24e6b94689344f03b43f28d39f2b09974dd5838",
+            "question": "Will Dogecoin reach $0.18 in July? - This market will immediately resolve to \"Yes\" if any Binance 1 minute candle for Dogecoin (DOGE/USDT) between July 1, 2025, 00:00 and July 31, 2025, 23:59 in the ET timezone has a final \"High\" price of $0.",
+            "questionID": "0xffc7c25e194d9de311e9c87ea24e6b94689344f03b43f28d39f2b09974dd5838"
+          },
+          "orderbook": {
+            "id": "25576058321120233631953665979060466858369324557031607141467685533892970617491",
+            "tradesQuantity": "7022",
+            "buysQuantity": "4390",
+            "sellsQuantity": "2632",
+            "scaledCollateralVolume": "750627.076023",
+            "scaledCollateralBuyVolume": "503658.39788",
+            "scaledCollateralSellVolume": "246968.678143"
           }
-        },
-        "omenMarket": {
-          "id": "0x57c6bab1ba758d911f11e67ef323acebcfca04b7",
-          "title": "Can Dogecoin Hit $0.18 in July?",
-          "originalTitle": "Can Dogecoin Hit $0.18 in July?",
-          "volume": 30381.89069539639,
-          "category": "cryptocurrency",
-          "tradesQuantity": "139",
-          "buysQuantity": "284",
-          "sellsQuantity": "81",
-          "scaledCollateralBuyVolume": "18229.134417237834",
-          "scaledCollateralSellVolume": "12152.756278158557",
-          "rawData": {
-            "market": {
-              "category": "cryptocurrency",
-              "creationTimestamp": "1614487785",
-              "creator": "0x5367f217f5942cb10db16f2831a11fa287d78216",
-              "id": "0x57c6bab1ba758d911f11e67ef323acebcfca04b7",
-              "liquidityMeasure": "85616545494655040634",
-              "outcomeSlotCount": 2,
-              "outcomes": [
-                "Yes, USDT price will drop below 0.05 USD permanently, causing BTC/USD will remain below $5,000 for at least 6 months.",
-                "No,  USDT will retain its peg."
-              ],
-              "scaledCollateralVolume": "30381.890695396390391705",
-              "scaledLiquidityMeasure": "85.616545494655040634",
-              "title": "Will Tether collapse and take down the whole crypto market before the end of 2024?",
-              "usdLiquidityMeasure": "85.61646739637264493982159097238189",
-              "usdVolume": "30381.89080506050015338920159114932"
-            }
-          }
-        },
-        "createdAt": "2025-08-06T05:40:34.402Z",
-        "outcomes": [
-          "Yes, USDT price will drop below 0.05 USD permanently, causing BTC/USD will remain below $5,000 for at least 6 months.",
-          "No,  USDT will retain its peg."
-        ]
+        }
       },
-      {
-    "id": "combined-0xabc123def4567890fedcba0987654321abcdeffedcba9876543210fedcba1234-0x9876fedcba1234567890abcdef1234567890fedcbaabcdef1234567890abcdef12",
-    "title": "Will the stock price of MemeCoin skyrocket above $1000 after Elon Musk's surprise Mars tweet in 2025?",
-    "category": "cryptocurrency",
-    "combinedVolume": 781009.9667183963,
-    "matchConfidence": 0.7,
-    "polymarketMarket": {
-      "id": "0xabc123def4567890fedcba0987654321abcdeffedcba9876543210fedcba1234",
-      "title": "Will the stock price of MemeCoin skyrocket above $1000 after Elon Musk's surprise Mars tweet in 2025?",
-      "originalTitle": "Will the stock price of MemeCoin skyrocket above $1000 after Elon Musk's surprise Mars tweet in 2025?",
-      "volume": 750627.076023,
-      "tradesQuantity": "7022",
-      "buysQuantity": "4390",
-      "sellsQuantity": "2632",
-      "scaledCollateralBuyVolume": "503658.39788",
-      "scaledCollateralSellVolume": "246968.678143",
-      "rawData": {
-        "market": {
-          "creator": "0x91430cad2d3975766499717fa0d66a78d814e5c5",
-          "id": "0xabc123def4567890fedcba0987654321abcdeffedcba9876543210fedcba1234",
-          "question": "Will the stock price of MemeCoin skyrocket above $1000 after Elon Musk's surprise Mars tweet in 2025?",
-          "questionID": "0xabc123def4567890fedcba0987654321abcdeffedcba9876543210fedcba1234"
-        },
-        "orderbook": {
-          "id": "25576058321120233631953665979060466858369324557031607141467685533892970617491",
-          "tradesQuantity": "7022",
-          "buysQuantity": "4390",
-          "sellsQuantity": "2632",
-          "scaledCollateralVolume": "750627.076023",
-          "scaledCollateralBuyVolume": "503658.39788",
-          "scaledCollateralSellVolume": "246968.678143"
+      "omenMarket": {
+        "id": "0x57c6bab1ba758d911f11e67ef323acebcfca04b7",
+        "title": "Can Dogecoin Hit $0.18 in July?",
+        "originalTitle": "Can Dogecoin Hit $0.18 in July?",
+        "volume": 30381.89069539639,
+        "category": "cryptocurrency",
+        "tradesQuantity": "139",
+        "buysQuantity": "284",
+        "sellsQuantity": "81",
+        "scaledCollateralBuyVolume": "18229.134417237834",
+        "scaledCollateralSellVolume": "12152.756278158557",
+        "rawData": {
+          "market": {
+            "category": "cryptocurrency",
+            "creationTimestamp": "1614487785",
+            "creator": "0x5367f217f5942cb10db16f2831a11fa287d78216",
+            "id": "0x57c6bab1ba758d911f11e67ef323acebcfca04b7",
+            "liquidityMeasure": "85616545494655040634",
+            "outcomeSlotCount": 2,
+            "outcomes": [
+              "Yes, USDT price will drop below 0.05 USD permanently, causing BTC/USD will remain below $5,000 for at least 6 months.",
+              "No,  USDT will retain its peg."
+            ],
+            "scaledCollateralVolume": "30381.890695396390391705",
+            "scaledLiquidityMeasure": "85.616545494655040634",
+            "title": "Will Tether collapse and take down the whole crypto market before the end of 2024?",
+            "usdLiquidityMeasure": "85.61646739637264493982159097238189",
+            "usdVolume": "30381.89080506050015338920159114932"
+          }
         }
-      }
-    },
-    "omenMarket": {
-      "id": "0x9876fedcba1234567890abcdef1234567890fedcbaabcdef1234567890abcdef12",
-      "title": "Will MemeCoin reach a $1000 price following Elon Musk's Mars tweet in 2025?",
-      "originalTitle": "Will MemeCoin reach a $1000 price following Elon Musk's Mars tweet in 2025?",
-      "volume": 30382.89069539639,
-      "category": "cryptocurrency",
-      "tradesQuantity": "139",
-      "buysQuantity": "284",
-      "sellsQuantity": "81",
-      "scaledCollateralBuyVolume": "18229.134417237834",
-      "scaledCollateralSellVolume": "12152.756278158557",
-      "rawData": {
-        "market": {
-          "category": "cryptocurrency",
-          "creationTimestamp": "1614487785",
-          "creator": "0x5367f217f5942cb10db16f2831a11fa287d78216",
-          "id": "0x9876fedcba1234567890abcdef1234567890fedcbaabcdef1234567890abcdef12",
-          "liquidityMeasure": "85616545494655040634",
-          "outcomeSlotCount": 2,
-          "outcomes": [
-            "Yes",
-            "No"
-          ],
-          "scaledCollateralVolume": "30382.890695396390391705",
-          "scaledLiquidityMeasure": "85.616545494655040634",
-          "title": "Will MemeCoin reach a $1000 price following Elon Musk's Mars tweet in 2025?",
-          "usdLiquidityMeasure": "85.61646739637264493982159097238189",
-          "usdVolume": "30382.89080506050015338920159114932"
-        }
-      }
-    },
-    "createdAt": "2025-08-08T00:00:00.000Z",
-    "outcomes": [
-      "Yes",
-      "No"
-    ]
-  },
-
-      {
-    "id": "combined-0xffee993d7a9c5953af920a17a6f24db7873b41122bb1687a401efa69fb07c57c-0x617df4629b2b11ab775562b69ff20e148fe77fb8",
-    "title": "Will Elon Musk tweet about launching a Dogecoin-themed rollercoaster by the end of 2025?",
-    "category": "cryptocurrency",
-    "combinedVolume": 985639.7153864486,
-    "matchConfidence": 0.95,
-    "polymarketMarket": {
-      "id": "0xffee993d7a9c5953af920a17a6f24db7873b41122bb1687a401efa69fb07c57c",
-      "title": "Will Elon Musk tweet about launching a Dogecoin-themed rollercoaster by the end of 2025?",
-      "originalTitle": "Will Elon Musk tweet about launching a Dogecoin-themed rollercoaster by the end of 2025?",
-      "volume": 971851.499945,
-      "tradesQuantity": "760",
-      "buysQuantity": "643",
-      "sellsQuantity": "117",
-      "scaledCollateralBuyVolume": "939737.932389",
-      "scaledCollateralSellVolume": "32113.567556",
-      "rawData": {
-        "market": {
-          "creator": "0x91430cad2d3975766499717fa0d66a78d814e5c5",
-          "id": "0xffee993d7a9c5953af920a17a6f24db7873b41122bb1687a401efa69fb07c57c",
-          "question": "Will Elon Musk tweet about launching a Dogecoin-themed rollercoaster by the end of 2025?",
-          "questionID": "0xffee993d7a9c5953af920a17a6f24db7873b41122bb1687a401efa69fb07c57c"
-        },
-        "orderbook": {
-          "id": "40460234561972344656356425052803765767474572868261174702660739860194868113325",
-          "tradesQuantity": "760",
-          "buysQuantity": "643",
-          "sellsQuantity": "117",
-          "scaledCollateralVolume": "971851.499945",
-          "scaledCollateralBuyVolume": "939737.932389",
-          "scaledCollateralSellVolume": "32113.567556"
-        }
-      }
-    },
-    "omenMarket": {
-      "id": "0x617df4629b2b11ab775562b69ff20e148fe77fb8",
-      "title": "Will Elon Musk announce plans for a Dogecoin-themed rollercoaster on Twitter ",
-      "originalTitle": "Will Elon Musk announce plans for a Dogecoin-themed rollercoaster on Twitter ",
-      "volume": 13788.215441448596,
-      "category": "cryptocurrency",
-      "tradesQuantity": "569",
-      "buysQuantity": "263",
-      "sellsQuantity": "128",
-      "scaledCollateralBuyVolume": "8272.929264869157",
-      "scaledCollateralSellVolume": "5515.286176579439",
-      "rawData": {
-        "market": {
-          "category": "cryptocurrency",
-          "creationTimestamp": "1624480370",
-          "creator": "0x1de6e51e74f11a21784f7073f1dd351a98c944ea",
-          "id": "0x617df4629b2b11ab775562b69ff20e148fe77fb8",
-          "liquidityMeasure": "846955314315499841",
-          "outcomeSlotCount": 2,
-          "outcomes": [
-            "Yes",
-            "No"
-          ],
-          "scaledCollateralVolume": "13788.215441448596158401",
-          "scaledLiquidityMeasure": "0.846955314315499841",
-          "title": "Will Elon Musk announce plans for a Dogecoin-themed rollercoaster on Twitter ",
-          "usdLiquidityMeasure": "0.8469550690006778991128101026445144",
-          "usdVolume": "13788.21501385278351054565464054763"
-        }
-      }
-    },
-    "createdAt": "2025-08-06T05:40:34.399Z",
-    "outcomes": [
-      "Yes",
-      "No"
-    ]
-  },
-
-      {
-    "id": "combined-0xffc9820559239c245ee62d82b122a8f3f64a2ab4a4fc5299d8bc570b65cbd57d-0x4adff28532f94a8d97b3a603e3eb6273ee9fb0c2",
-    "title": "Will xDai’s STAKE token have a circulating market cap exceeding $100 million by the end of 2025?",
-    "category": "cryptocurrency",
-    "combinedVolume": 816854.0625360759,
-    "matchConfidence": 0.95,
-    "polymarketMarket": {
-      "id": "0xffc9820559239c245ee62d82b122a8f3f64a2ab4a4fc5299d8bc570b65cbd57d",
-      "title": "Will xDai’s STAKE token have a circulating market cap exceeding $100 million by the end of 2025?",
-      "originalTitle": "Will xDai’s STAKE token have a circulating market cap exceeding $100 million by the end of 2025?",
-      "volume": 802746.257987,
-      "tradesQuantity": "646",
-      "buysQuantity": "472",
-      "sellsQuantity": "174",
-      "scaledCollateralBuyVolume": "636239.496282",
-      "scaledCollateralSellVolume": "166506.761705",
-      "rawData": {
-        "market": {
-          "creator": "0x91430cad2d3975766499717fa0d66a78d814e5c5",
-          "id": "0xffc9820559239c245ee62d82b122a8f3f64a2ab4a4fc5299d8bc570b65cbd57d",
-          "question": "Lexus Eastbourne Open: Evans vs. Paul - Daniel Evans and Tommy Paul are scheduled to play each other in a Round 2 matchup in the Lexus Eastbourne Open mens singles tournament on June 25, 2025, at 9:30 AM ET.",
-          "questionID": "0xffc9820559239c245ee62d82b122a8f3f64a2ab4a4fc5299d8bc570b65cbd57d"
-        },
-        "orderbook": {
-          "id": "48257633084977603187300165450475946569920866266593797946416150301538288340898",
-          "tradesQuantity": "646",
-          "buysQuantity": "472",
-          "sellsQuantity": "174",
-          "scaledCollateralVolume": "802746.257987",
-          "scaledCollateralBuyVolume": "636239.496282",
-          "scaledCollateralSellVolume": "166506.761705"
-        }
-      }
-    },
-    "omenMarket": {
-      "id": "0x4adff28532f94a8d97b3a603e3eb6273ee9fb0c2",
-      "title": "Will the circulating market cap for xDai’s STAKE be over $100 million at the end of 2025?",
-      "originalTitle": "Will the circulating market cap for xDai’s STAKE be over $100 million at the end of 2025?",
-      "volume": 14107.804549075898,
-      "category": "cryptocurrency",
-      "tradesQuantity": "597",
-      "buysQuantity": "302",
-      "sellsQuantity": "67",
-      "scaledCollateralBuyVolume": "8464.682729445538",
-      "scaledCollateralSellVolume": "5643.12181963036",
-      "rawData": {
-        "market": {
-          "category": "cryptocurrency",
-          "creationTimestamp": "1624480205",
-          "creator": "0x1de6e51e74f11a21784f7073f1dd351a98c944ea",
-          "id": "0x4adff28532f94a8d97b3a603e3eb6273ee9fb0c2",
-          "liquidityMeasure": "45760560673651934719",
-          "outcomeSlotCount": 2,
-          "outcomes": [
-            "Yes",
-            "No"
-          ],
-          "scaledCollateralVolume": "14107.804549075898182988",
-          "scaledLiquidityMeasure": "45.760560673651934719",
-          "title": "Will the circulating market cap for xDai’s STAKE be over $100 million at the end of 2021?",
-          "usdLiquidityMeasure": "45.76075040782911014340024953171926",
-          "usdVolume": "14107.80844980208150439263587253167"
-        }
-      }
-    },
-    "createdAt": "2025-08-06T05:40:34.402Z",
-    "outcomes": [
-      "Yes",
-      "No"
-    ]
-  }
+      },
+      "createdAt": "2025-08-06T05:40:34.402Z",
+      "outcomes": [
+        "Yes, USDT price will drop below 0.05 USD permanently, causing BTC/USD will remain below $5,000 for at least 6 months.",
+        "No,  USDT will retain its peg."
+      ]
+    }
   ],
   "metadata": {
     "polymarketEndpoint": "https://gateway.thegraph.com/api/subgraphs/id/22CoTbEtpv6fURB6moTNfJPWNUPXtiFGRA8h1zajMha3",
