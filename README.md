@@ -2,7 +2,7 @@
 
 Prediction markets are powerful tools for gauging public sentiment and making informed bets on real-world events. However, today’s ecosystem is fragmented. Liquidity, pricing, and market opportunities are scattered across multiple platforms. This makes it difficult for users to compare odds, split bets optimally, and keep their strategies private.
 
-Our platform solves this by acting as a **prediction market aggregator and optimizer**. We aggregate market data from multiple platforms using **subgraphs**, use an **LLM** to identify and group equivalent events, and calculate the **optimal allocation** of funds to maximize potential returns. All sensitive computations and bet storage are handled privately using **Oasis ROFL** and **Sapphire**, ensuring users maintain full control over their strategies.
+Our platform solves this by acting as a **prediction market aggregator and optimizer**. We query events and statistics from multiple prediction market platforms via **subgraphs**, and calculate the **optimal allocation** of funds to maximize potential returns. All sensitive computations and bet storage are handled privately using **Oasis ROFL** and **Sapphire**, ensuring users maintain full control over their strategies.
 
 With seamless USD-to-crypto conversion via **Pyth Network**, automated bet execution, and private settlement tracking, we give users a one-stop solution for discovering, optimizing, and placing bets across the entire prediction market landscape all in a single, secure transaction.
 
@@ -42,7 +42,8 @@ That question sparked our project: the invisible layer connecting all major pred
 ## 🔄 User Flow
 
 1. **Browse Events**  
-   - User opens the app and sees a unified list of prediction markets aggregated from platforms like Polymarket and Omen.  
+   - User opens the app and sees a unified list of prediction markets aggregated from platforms like Polymarket and Omen.
+   - All event data is fetched via The Graph subgraphs for real-time updates.
    - Each market shows liquidity, prices, order book depth, and AMM/LMSR stats in one view.
 
 2. **Event Matching & Selection**  
