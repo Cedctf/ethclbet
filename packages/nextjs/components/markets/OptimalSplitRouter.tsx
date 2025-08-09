@@ -86,6 +86,10 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   const [betOutcome, setBetOutcome] = useState(0); // 0 = YES, 1 = NO
   const [betDescription, setBetDescription] = useState("");
   
+  // Cross-chain bet results
+  const [crossChainResults, setCrossChainResults] = useState<any[]>([]);
+  const [isPlacingCrossChainBet, setIsPlacingCrossChainBet] = useState(false);
+  
   // Adjustable allocations (user can modify these)
   const [adjustedPolymarketAllocation, setAdjustedPolymarketAllocation] = useState<number>(0);
   const [adjustedOmenAllocation, setAdjustedOmenAllocation] = useState<number>(0);
@@ -122,6 +126,138 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     const contract = new ethers.Contract(deployedContractData.address, deployedContractData.abi, signer);
     const tx = await contract.placeBet(description, outcome, platforms, amounts, marketIds, { value: totalValue });
     return await tx.wait();
+  };
+
+  // Cross-chain bet placement function
+  const placeCrossChainBet = async (userAddress: string, polymarketAmount: number, omenAmount: number) => {
+    try {
+      // Configuration for different chains
+      const CHAINS = {
+        gnosis: {
+          name: 'Gnosis Testnet',
+          chainId: 10200,
+          contractAddress: '0x04F367D5aa61617C541136632B1227a74CEEF18e',
+          rpcUrl: 'https://gnosis-chiado.g.alchemy.com/v2/6U7t79S89NhHIspqDQ7oKGRWp5ZOfsNj',
+          explorerTx: (hash: string) => `https://gnosis-chiado.blockscout.com/tx/${hash}`
+        },
+        polygon: {
+          name: 'Polygon Amoy',
+          chainId: 80002,
+          contractAddress: '0xbd83b1126C4A2885619C793634a929FF1146dE1d',
+          rpcUrl: 'https://polygon-amoy.g.alchemy.com/v2/6U7t79S89NhHIspqDQ7oKGRWp5ZOfsNj',
+          explorerTx: (hash: string) => `https://amoy.polygonscan.com/tx/${hash}`
+        }
+      };
+
+      // Minimal ABI for PayToContract
+      const ABI = [
+        'function pay(address user, uint256 priceWei) payable',
+      ];
+
+      // Private keys for cross-chain transactions
+      // Different private keys for different chains
+      const GNOSIS_PRIVATE_KEY = '0x7c1ecc9314f6d75259fed6e1714d9bd74478f422013d71289d2839fec2972384';
+      const POLYGON_PRIVATE_KEY = '0x2a29ac35545d1fe2666f36d5d7976b8b379472d27c226de17777b765dc35633c';
+      
+      // Validate private keys
+      if (!GNOSIS_PRIVATE_KEY || !POLYGON_PRIVATE_KEY) {
+        throw new Error('Private keys not found');
+      }
+      
+      if (!ethers.isHexString(GNOSIS_PRIVATE_KEY, 32) || !ethers.isHexString(POLYGON_PRIVATE_KEY, 32)) {
+        throw new Error('Invalid private key format. Must be 32-byte hex strings starting with 0x');
+      }
+      
+      // Validate private key lengths (should be 64 hex characters + 0x prefix = 66 characters total)
+      if (GNOSIS_PRIVATE_KEY.length !== 66 || POLYGON_PRIVATE_KEY.length !== 66) {
+        throw new Error('Invalid private key length. Must be exactly 66 characters (0x + 64 hex chars)');
+      }
+
+      const results: any[] = [];
+
+      // Helper function to place bet on a specific chain
+      const placeBetOnChain = async (chainConfig: any, amountUsd: number, chainName: string) => {
+        try {
+          // Convert USD amount to ETH (using current price data)
+          const ethAmount = priceData ? (amountUsd / priceData.ethUsdPrice) : (amountUsd / 2000); // fallback price
+          const amountWei = ethers.parseEther(ethAmount.toString());
+          
+          console.log(`🚀 Placing bet on ${chainName}: ${amountUsd} USD (${ethAmount} ETH)`);
+          
+          // Create provider and signer for the specific chain
+          const provider = new ethers.JsonRpcProvider(chainConfig.rpcUrl);
+          
+          // Use appropriate private key for each chain
+          const privateKey = chainName === 'Gnosis' ? GNOSIS_PRIVATE_KEY : POLYGON_PRIVATE_KEY;
+          const wallet = new ethers.Wallet(privateKey, provider);
+          const contract = new ethers.Contract(chainConfig.contractAddress, ABI, wallet);
+          
+          // Get fee data for EIP-1559 if available
+          const feeData = await provider.getFeeData();
+          const overrides: any = {};
+          
+          if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+            overrides.maxFeePerGas = feeData.maxFeePerGas;
+            overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+          } else if (feeData.gasPrice) {
+            overrides.gasPrice = feeData.gasPrice;
+          }
+          
+          // Gas estimate + safety margin
+          const gasEstimate = await contract.pay.estimateGas(userAddress, amountWei, { value: amountWei, ...overrides });
+          const gasLimit = gasEstimate + (gasEstimate / 5n); // +20% buffer
+          
+          console.log(`⛽ [${chainName}] gas estimate: ${gasEstimate} → using gasLimit ${gasLimit}`);
+          
+          const tx = await contract.pay(userAddress, amountWei, { 
+            value: amountWei, 
+            gasLimit, 
+            ...overrides 
+          });
+          
+          console.log(`🚀 [${chainName}] sent: ${tx.hash}`);
+          const receipt = await tx.wait();
+          console.log(`✅ [${chainName}] confirmed in block ${receipt.blockNumber}`);
+          
+          return {
+            chain: chainName,
+            success: true,
+            hash: tx.hash,
+            amount: amountUsd,
+            ethAmount,
+            explorer: chainConfig.explorerTx(tx.hash),
+            blockNumber: receipt.blockNumber
+          };
+        } catch (error) {
+          console.error(`❌ ${chainName} bet failed:`, error);
+          return {
+            chain: chainName,
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          };
+        }
+      };
+
+      // Place bets on both chains in parallel
+      const betPromises = [];
+      
+      if (polymarketAmount > 0) {
+        betPromises.push(placeBetOnChain(CHAINS.gnosis, polymarketAmount, 'Gnosis'));
+      }
+      
+      if (omenAmount > 0) {
+        betPromises.push(placeBetOnChain(CHAINS.polygon, omenAmount, 'Polygon'));
+      }
+      
+      // Wait for all bets to complete
+      const betResults = await Promise.all(betPromises);
+      results.push(...betResults);
+
+      return results;
+    } catch (error) {
+      console.error('Cross-chain bet placement error:', error);
+      throw error;
+    }
   };
 
   // Helper to check if market is combined
@@ -601,6 +737,106 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     }
   };
 
+  // Place Cross-Chain Bet with Optimal Split
+  const handlePlaceCrossChainBet = async () => {
+    if (!isConnected) {
+      notification.error("Please connect your wallet");
+      return;
+    }
+
+    if (!betDescription.trim()) {
+      notification.error("Please enter a bet description");
+      return;
+    }
+
+    if (!priceData) {
+      notification.error("Price data not loaded. Please calculate optimal split first.");
+      return;
+    }
+
+    if (adjustedPolymarketAllocation <= 0 && adjustedOmenAllocation <= 0) {
+      notification.error("Please allocate funds to at least one platform");
+      return;
+    }
+
+    setIsPlacingCrossChainBet(true);
+    setCrossChainResults([]);
+
+    try {
+      notification.info("🚀 Placing cross-chain bets...", { duration: 0 });
+
+      // Place cross-chain bets using the connected wallet address
+      const results = await placeCrossChainBet(
+        address || '',
+        adjustedPolymarketAllocation,
+        adjustedOmenAllocation
+      );
+
+      setCrossChainResults(results);
+
+      // Show success/error notifications for each chain
+      const successfulBets = results.filter(r => r.success);
+      const failedBets = results.filter(r => !r.success);
+
+      if (successfulBets.length > 0) {
+        notification.success(
+          <div>
+            <div>✅ Cross-chain bets placed successfully!</div>
+            <div className="text-sm mt-1">
+              {successfulBets.map((bet, index) => (
+                <div key={index} className="mt-1">
+                  {bet.chain}: ${bet.amount} USD ({bet.ethAmount.toFixed(6)} ETH)
+                  <a 
+                    href={bet.explorer}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-700 underline ml-2"
+                  >
+                    View →
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>,
+          { duration: 10000 }
+        );
+      }
+
+      if (failedBets.length > 0) {
+        notification.error(
+          <div>
+            <div>❌ Some cross-chain bets failed:</div>
+            {failedBets.map((bet, index) => (
+              <div key={index} className="text-sm mt-1">
+                {bet.chain}: {bet.error}
+              </div>
+            ))}
+          </div>,
+          { duration: 8000 }
+        );
+      }
+
+      // Save cross-chain bet results to history for AI training
+      if (result) {
+        await saveOptimalSplitToHistory({
+          ...result,
+          betPlaced: true,
+          betOutcome,
+          betDescription,
+          actualAmounts: [adjustedPolymarketAllocation, adjustedOmenAllocation],
+          actualPlatforms: ['Gnosis', 'Polygon'],
+          crossChainResults: results
+        });
+      }
+
+    } catch (error) {
+      console.error("Error placing cross-chain bet:", error);
+      notification.error(`Failed to place cross-chain bet: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsPlacingCrossChainBet(false);
+    }
+  };
+
   // Check what data is available
   const hasPolymarket = isCombinedMarket(market) ? !!market.polymarketMarket : market.source === 'polymarket';
   const hasOmen = isCombinedMarket(market) ? !!market.omenMarket : market.source === 'omen';
@@ -839,28 +1075,57 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           {/* Place Bet Button */}
           <div className="pt-4 border-t">
             <button 
-              className="w-full text-white py-3 px-4 rounded-lg transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
-              onClick={handlePlaceBet}
-              disabled={isPlacingBet || !isConnected || !betDescription.trim()}
+              className="w-full text-white py-3 px-4 rounded-lg transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed mb-3"
+              onClick={handlePlaceCrossChainBet}
+              disabled={isPlacingCrossChainBet || !betDescription.trim() || (adjustedPolymarketAllocation <= 0 && adjustedOmenAllocation <= 0)}
               style={{
-                backgroundColor: isPlacingBet || !isConnected || !betDescription.trim() ? '#9ca3af' : '#746097'
+                backgroundColor: isPlacingCrossChainBet || !betDescription.trim() || (adjustedPolymarketAllocation <= 0 && adjustedOmenAllocation <= 0) ? '#9ca3af' : '#746097'
               }}
               onMouseEnter={(e) => {
-                if (!isPlacingBet && isConnected && betDescription.trim()) {
+                if (!isPlacingCrossChainBet && betDescription.trim() && (adjustedPolymarketAllocation > 0 || adjustedOmenAllocation > 0)) {
                   e.currentTarget.style.backgroundColor = '#5a4b7a';
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isPlacingBet && isConnected && betDescription.trim()) {
+                if (!isPlacingCrossChainBet && betDescription.trim() && (adjustedPolymarketAllocation > 0 || adjustedOmenAllocation > 0)) {
                   e.currentTarget.style.backgroundColor = '#746097';
                 }
               }}
             >
-              {isPlacingBet 
-                ? "Placing Bet..." 
-                : `Place ${betOutcome === 0 ? 'YES' : 'NO'} Bet (${priceData.totalEth?.toFixed(6) || '0.000000'} ETH)`
+              {isPlacingCrossChainBet 
+                ? "Placing Cross-Chain Bet..." 
+                : `Place Cross-Chain ${betOutcome === 0 ? 'YES' : 'NO'} Bet (${priceData?.totalEth?.toFixed(6) || '0.000000'} ETH)`
               }
             </button>
+            
+            {/* Cross-chain bet results display */}
+            {crossChainResults.length > 0 && (
+              <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                <h4 className="font-medium text-sm mb-2">Cross-Chain Bet Results:</h4>
+                {crossChainResults.map((result, index) => (
+                  <div key={index} className="text-sm mb-2">
+                    {result.success ? (
+                      <div className="text-green-600">
+                        ✅ {result.chain}: ${result.amount} USD ({result.ethAmount.toFixed(6)} ETH)
+                        <a 
+                          href={result.explorer}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:text-blue-700 underline ml-2"
+                        >
+                          View →
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="text-red-600">
+                        ❌ {result.chain}: {result.error}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            
             {!isConnected && (
               <p className="text-sm text-gray-500 text-center mt-2">Please connect your wallet to place a bet</p>
             )}

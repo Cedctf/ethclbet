@@ -285,5 +285,649 @@
         "efficiency": 0.5471941600027961
       }
     }
+  },
+  {
+    "timestamp": "2025-08-09T23:07:46.997Z",
+    "userId": "0x8fdd8FF672BEf99e33A1F821ECDC57571391e9B5",
+    "budget": 1000,
+    "polymarketStats": {
+      "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
+      "tradesQuantity": "6738",
+      "buysQuantity": "3863",
+      "sellsQuantity": "2875",
+      "scaledCollateralVolume": "871345.209836",
+      "scaledCollateralBuyVolume": "495079.428983",
+      "scaledCollateralSellVolume": "376265.780853"
+    },
+    "omenStats": {
+      "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+      "tradesQuantity": "141",
+      "buysQuantity": "77",
+      "sellsQuantity": "107",
+      "scaledCollateralVolume": "10576.72992",
+      "scaledCollateralBuyVolume": "6346.037952",
+      "scaledCollateralSellVolume": "4230.691968"
+    },
+    "optimalSplit": {
+      "orderBookAllocation": 450,
+      "lmsrAllocation": 550,
+      "orderBookShares": 926.2588454376165,
+      "lmsrShares": 912.7400815486908,
+      "totalShares": 1838.9989269863072,
+      "totalCost": 999.9999795516374,
+      "strategy": "Split: 45% OB, 55% LMSR",
+      "efficiency": {
+        "costPerShare": 0.5437740962635609,
+        "allocationRatio": {
+          "orderBookPercent": 45,
+          "lmsrPercent": 55.00000000000001
+        }
+      },
+      "platformData": {
+        "orderBook": {
+          "orderLevels": 16,
+          "totalLiquidity": 935,
+          "priceRange": {
+            "min": 0.434,
+            "max": 0.537
+          }
+        },
+        "lmsr": {
+          "yesShares": 2200,
+          "noShares": 2031,
+          "liquidityParameter": 1491
+        }
+      }
+    },
+    "priceData": null,
+    "betOutcome": 0,
+    "betDescription": "",
+    "marketInfo": {
+      "title": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "question": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "source": "combined",
+      "category": "combined"
+    },
+    "aiTrainingData": {
+      "inputFeatures": {
+        "budget": 1000,
+        "polymarketVolume": 871345.209836,
+        "polymarketTradeRatio": 0.007732870880495448,
+        "polymarketBuySellRatio": 1.3436521739130434,
+        "omenVolume": 10576.72992,
+        "omenTradeRatio": 0.013331152545871191,
+        "omenBuySellRatio": 0.719626168224299,
+        "marketCategory": "combined"
+      },
+      "outputTargets": {
+        "orderBookAllocation": 450,
+        "lmsrAllocation": 550,
+        "orderBookPercent": 45,
+        "lmsrPercent": 55.00000000000001,
+        "strategy": "Split: 45% OB, 55% LMSR",
+        "costPerShare": 0.5437740962635609
+      },
+      "performanceMetrics": {
+        "totalShares": 1838.9989269863072,
+        "totalCost": 999.9999795516374,
+        "efficiency": 0.5437740962635609
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-09T23:10:29.806Z",
+    "userId": "0x8fdd8FF672BEf99e33A1F821ECDC57571391e9B5",
+    "budget": 1000,
+    "polymarketStats": {
+      "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
+      "tradesQuantity": "6738",
+      "buysQuantity": "3863",
+      "sellsQuantity": "2875",
+      "scaledCollateralVolume": "871345.209836",
+      "scaledCollateralBuyVolume": "495079.428983",
+      "scaledCollateralSellVolume": "376265.780853"
+    },
+    "omenStats": {
+      "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+      "tradesQuantity": "141",
+      "buysQuantity": "77",
+      "sellsQuantity": "107",
+      "scaledCollateralVolume": "10576.72992",
+      "scaledCollateralBuyVolume": "6346.037952",
+      "scaledCollateralSellVolume": "4230.691968"
+    },
+    "optimalSplit": {
+      "orderBookAllocation": 450,
+      "lmsrAllocation": 550,
+      "orderBookShares": 926.2588454376165,
+      "lmsrShares": 912.7400815486908,
+      "totalShares": 1838.9989269863072,
+      "totalCost": 999.9999795516374,
+      "strategy": "Split: 45% OB, 55% LMSR",
+      "efficiency": {
+        "costPerShare": 0.5437740962635609,
+        "allocationRatio": {
+          "orderBookPercent": 45,
+          "lmsrPercent": 55.00000000000001
+        }
+      },
+      "platformData": {
+        "orderBook": {
+          "orderLevels": 16,
+          "totalLiquidity": 935,
+          "priceRange": {
+            "min": 0.434,
+            "max": 0.537
+          }
+        },
+        "lmsr": {
+          "yesShares": 2200,
+          "noShares": 2031,
+          "liquidityParameter": 1491
+        }
+      },
+      "betPlaced": true,
+      "betOutcome": 0,
+      "betDescription": "Bitcoin Up or Down",
+      "actualAmounts": [
+        "0.10548402600084071",
+        "0.1289249206676942"
+      ],
+      "actualPlatforms": [
+        "Polymarket",
+        "Omen"
+      ]
+    },
+    "priceData": {
+      "polymarketEth": 0.10548402600084071,
+      "omenEth": 0.1289249206676942,
+      "totalEth": 0.2344089466685349,
+      "ethUsdPrice": 4266.0487759200005,
+      "usingFallback": false
+    },
+    "betOutcome": 0,
+    "betDescription": "Bitcoin Up or Down",
+    "marketInfo": {
+      "title": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "question": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "source": "combined",
+      "category": "combined"
+    },
+    "aiTrainingData": {
+      "inputFeatures": {
+        "budget": 1000,
+        "polymarketVolume": 871345.209836,
+        "polymarketTradeRatio": 0.007732870880495448,
+        "polymarketBuySellRatio": 1.3436521739130434,
+        "omenVolume": 10576.72992,
+        "omenTradeRatio": 0.013331152545871191,
+        "omenBuySellRatio": 0.719626168224299,
+        "marketCategory": "combined"
+      },
+      "outputTargets": {
+        "orderBookAllocation": 450,
+        "lmsrAllocation": 550,
+        "orderBookPercent": 45,
+        "lmsrPercent": 55.00000000000001,
+        "strategy": "Split: 45% OB, 55% LMSR",
+        "costPerShare": 0.5437740962635609
+      },
+      "performanceMetrics": {
+        "totalShares": 1838.9989269863072,
+        "totalCost": 999.9999795516374,
+        "efficiency": 0.5437740962635609
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-09T23:18:23.295Z",
+    "userId": "0x8fdd8FF672BEf99e33A1F821ECDC57571391e9B5",
+    "budget": 1000,
+    "polymarketStats": {
+      "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
+      "tradesQuantity": "6738",
+      "buysQuantity": "3863",
+      "sellsQuantity": "2875",
+      "scaledCollateralVolume": "871345.209836",
+      "scaledCollateralBuyVolume": "495079.428983",
+      "scaledCollateralSellVolume": "376265.780853"
+    },
+    "omenStats": {
+      "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+      "tradesQuantity": "141",
+      "buysQuantity": "77",
+      "sellsQuantity": "107",
+      "scaledCollateralVolume": "10576.72992",
+      "scaledCollateralBuyVolume": "6346.037952",
+      "scaledCollateralSellVolume": "4230.691968"
+    },
+    "optimalSplit": {
+      "orderBookAllocation": 440,
+      "lmsrAllocation": 560,
+      "orderBookShares": 908.9217877094972,
+      "lmsrShares": 927.5568604469299,
+      "totalShares": 1836.478648156427,
+      "totalCost": 999.9999820410903,
+      "strategy": "Split: 44% OB, 56% LMSR",
+      "efficiency": {
+        "costPerShare": 0.544520342256608,
+        "allocationRatio": {
+          "orderBookPercent": 44,
+          "lmsrPercent": 56.00000000000001
+        }
+      },
+      "platformData": {
+        "orderBook": {
+          "orderLevels": 16,
+          "totalLiquidity": 920,
+          "priceRange": {
+            "min": 0.434,
+            "max": 0.537
+          }
+        },
+        "lmsr": {
+          "yesShares": 2200,
+          "noShares": 2031,
+          "liquidityParameter": 1491
+        }
+      }
+    },
+    "priceData": null,
+    "betOutcome": 0,
+    "betDescription": "",
+    "marketInfo": {
+      "title": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "question": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "source": "combined",
+      "category": "combined"
+    },
+    "aiTrainingData": {
+      "inputFeatures": {
+        "budget": 1000,
+        "polymarketVolume": 871345.209836,
+        "polymarketTradeRatio": 0.007732870880495448,
+        "polymarketBuySellRatio": 1.3436521739130434,
+        "omenVolume": 10576.72992,
+        "omenTradeRatio": 0.013331152545871191,
+        "omenBuySellRatio": 0.719626168224299,
+        "marketCategory": "combined"
+      },
+      "outputTargets": {
+        "orderBookAllocation": 440,
+        "lmsrAllocation": 560,
+        "orderBookPercent": 44,
+        "lmsrPercent": 56.00000000000001,
+        "strategy": "Split: 44% OB, 56% LMSR",
+        "costPerShare": 0.544520342256608
+      },
+      "performanceMetrics": {
+        "totalShares": 1836.478648156427,
+        "totalCost": 999.9999820410903,
+        "efficiency": 0.544520342256608
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-09T23:18:26.760Z",
+    "userId": "0x8fdd8FF672BEf99e33A1F821ECDC57571391e9B5",
+    "budget": 1000,
+    "polymarketStats": {
+      "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
+      "tradesQuantity": "6738",
+      "buysQuantity": "3863",
+      "sellsQuantity": "2875",
+      "scaledCollateralVolume": "871345.209836",
+      "scaledCollateralBuyVolume": "495079.428983",
+      "scaledCollateralSellVolume": "376265.780853"
+    },
+    "omenStats": {
+      "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+      "tradesQuantity": "141",
+      "buysQuantity": "77",
+      "sellsQuantity": "107",
+      "scaledCollateralVolume": "10576.72992",
+      "scaledCollateralBuyVolume": "6346.037952",
+      "scaledCollateralSellVolume": "4230.691968"
+    },
+    "optimalSplit": {
+      "orderBookAllocation": 440,
+      "lmsrAllocation": 560,
+      "orderBookShares": 908.9217877094972,
+      "lmsrShares": 927.5568604469299,
+      "totalShares": 1836.478648156427,
+      "totalCost": 999.9999820410903,
+      "strategy": "Split: 44% OB, 56% LMSR",
+      "efficiency": {
+        "costPerShare": 0.544520342256608,
+        "allocationRatio": {
+          "orderBookPercent": 44,
+          "lmsrPercent": 56.00000000000001
+        }
+      },
+      "platformData": {
+        "orderBook": {
+          "orderLevels": 16,
+          "totalLiquidity": 920,
+          "priceRange": {
+            "min": 0.434,
+            "max": 0.537
+          }
+        },
+        "lmsr": {
+          "yesShares": 2200,
+          "noShares": 2031,
+          "liquidityParameter": 1491
+        }
+      },
+      "betPlaced": true,
+      "betOutcome": 0,
+      "betDescription": "Bitcoin Up or Down",
+      "actualAmounts": [
+        440,
+        560
+      ],
+      "actualPlatforms": [
+        "Gnosis",
+        "Polygon"
+      ],
+      "crossChainResults": [
+        {
+          "chain": "Gnosis",
+          "success": false,
+          "error": "invalid private key (argument=\"privateKey\", value=\"[REDACTED]\", code=INVALID_ARGUMENT, version=6.15.0)"
+        },
+        {
+          "chain": "Polygon",
+          "success": false,
+          "error": "invalid private key (argument=\"privateKey\", value=\"[REDACTED]\", code=INVALID_ARGUMENT, version=6.15.0)"
+        }
+      ]
+    },
+    "priceData": {
+      "polymarketEth": 0.10331504738636962,
+      "omenEth": 0.13149187849174315,
+      "totalEth": 0.23480692587811278,
+      "ethUsdPrice": 4258.8181599,
+      "usingFallback": false
+    },
+    "betOutcome": 0,
+    "betDescription": "Bitcoin Up or Down",
+    "marketInfo": {
+      "title": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "question": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "source": "combined",
+      "category": "combined"
+    },
+    "aiTrainingData": {
+      "inputFeatures": {
+        "budget": 1000,
+        "polymarketVolume": 871345.209836,
+        "polymarketTradeRatio": 0.007732870880495448,
+        "polymarketBuySellRatio": 1.3436521739130434,
+        "omenVolume": 10576.72992,
+        "omenTradeRatio": 0.013331152545871191,
+        "omenBuySellRatio": 0.719626168224299,
+        "marketCategory": "combined"
+      },
+      "outputTargets": {
+        "orderBookAllocation": 440,
+        "lmsrAllocation": 560,
+        "orderBookPercent": 44,
+        "lmsrPercent": 56.00000000000001,
+        "strategy": "Split: 44% OB, 56% LMSR",
+        "costPerShare": 0.544520342256608
+      },
+      "performanceMetrics": {
+        "totalShares": 1836.478648156427,
+        "totalCost": 999.9999820410903,
+        "efficiency": 0.544520342256608
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-09T23:23:19.990Z",
+    "userId": "0x8fdd8FF672BEf99e33A1F821ECDC57571391e9B5",
+    "budget": 1000,
+    "polymarketStats": {
+      "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
+      "tradesQuantity": "6738",
+      "buysQuantity": "3863",
+      "sellsQuantity": "2875",
+      "scaledCollateralVolume": "871345.209836",
+      "scaledCollateralBuyVolume": "495079.428983",
+      "scaledCollateralSellVolume": "376265.780853"
+    },
+    "omenStats": {
+      "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+      "tradesQuantity": "141",
+      "buysQuantity": "77",
+      "sellsQuantity": "107",
+      "scaledCollateralVolume": "10576.72992",
+      "scaledCollateralBuyVolume": "6346.037952",
+      "scaledCollateralSellVolume": "4230.691968"
+    },
+    "optimalSplit": {
+      "orderBookAllocation": 440,
+      "lmsrAllocation": 560,
+      "orderBookShares": 908.9217877094972,
+      "lmsrShares": 927.5568604469299,
+      "totalShares": 1836.478648156427,
+      "totalCost": 999.9999820410903,
+      "strategy": "Split: 44% OB, 56% LMSR",
+      "efficiency": {
+        "costPerShare": 0.544520342256608,
+        "allocationRatio": {
+          "orderBookPercent": 44,
+          "lmsrPercent": 56.00000000000001
+        }
+      },
+      "platformData": {
+        "orderBook": {
+          "orderLevels": 16,
+          "totalLiquidity": 920,
+          "priceRange": {
+            "min": 0.434,
+            "max": 0.537
+          }
+        },
+        "lmsr": {
+          "yesShares": 2200,
+          "noShares": 2031,
+          "liquidityParameter": 1491
+        }
+      },
+      "betPlaced": true,
+      "betOutcome": 0,
+      "betDescription": "Bitcoin Up or Down",
+      "actualAmounts": [
+        440,
+        560
+      ],
+      "actualPlatforms": [
+        "Gnosis",
+        "Polygon"
+      ],
+      "crossChainResults": [
+        {
+          "chain": "Gnosis",
+          "success": true,
+          "hash": "0xfb69e68565cacab4b6af9a4779581de6c42ced77680c6dc2c3a8837cca2d35b5",
+          "amount": 440,
+          "ethAmount": 0.10331504738636962,
+          "explorer": "https://gnosis-chiado.blockscout.com/tx/0xfb69e68565cacab4b6af9a4779581de6c42ced77680c6dc2c3a8837cca2d35b5",
+          "blockNumber": 17190090
+        },
+        {
+          "chain": "Polygon",
+          "success": false,
+          "error": "insufficient funds (transaction={ \"data\": \"0xc40768760000000000000000000000008fdd8ff672bef99e33a1f821ecdc57571391e9b500000000000000000000000000000000000000000000000001d3272ab45963ae\", \"from\": \"0x8fdd8ff672bef99e33a1f821ecdc57571391e9b5\", \"maxFeePerGas\": \"0x1092cb422a\", \"maxPriorityFeePerGas\": \"0x1092cb41ac\", \"to\": \"0xbd83b1126c4a2885619c793634a929ff1146de1d\", \"value\": \"0x1d3272ab45963ae\" }, info={ \"error\": { \"code\": -32000, \"message\": \"insufficient funds for transfer\" }, \"payload\": { \"id\": 6, \"jsonrpc\": \"2.0\", \"method\": \"eth_estimateGas\", \"params\": [ { \"data\": \"0xc40768760000000000000000000000008fdd8ff672bef99e33a1f821ecdc57571391e9b500000000000000000000000000000000000000000000000001d3272ab45963ae\", \"from\": \"0x8fdd8ff672bef99e33a1f821ecdc57571391e9b5\", \"maxFeePerGas\": \"0x1092cb422a\", \"maxPriorityFeePerGas\": \"0x1092cb41ac\", \"to\": \"0xbd83b1126c4a2885619c793634a929ff1146de1d\", \"value\": \"0x1d3272ab45963ae\" } ] } }, code=INSUFFICIENT_FUNDS, version=6.15.0)"
+        }
+      ]
+    },
+    "priceData": {
+      "polymarketEth": 0.10331504738636962,
+      "omenEth": 0.13149187849174315,
+      "totalEth": 0.23480692587811278,
+      "ethUsdPrice": 4258.8181599,
+      "usingFallback": false
+    },
+    "betOutcome": 0,
+    "betDescription": "Bitcoin Up or Down",
+    "marketInfo": {
+      "title": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "question": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "source": "combined",
+      "category": "combined"
+    },
+    "aiTrainingData": {
+      "inputFeatures": {
+        "budget": 1000,
+        "polymarketVolume": 871345.209836,
+        "polymarketTradeRatio": 0.007732870880495448,
+        "polymarketBuySellRatio": 1.3436521739130434,
+        "omenVolume": 10576.72992,
+        "omenTradeRatio": 0.013331152545871191,
+        "omenBuySellRatio": 0.719626168224299,
+        "marketCategory": "combined"
+      },
+      "outputTargets": {
+        "orderBookAllocation": 440,
+        "lmsrAllocation": 560,
+        "orderBookPercent": 44,
+        "lmsrPercent": 56.00000000000001,
+        "strategy": "Split: 44% OB, 56% LMSR",
+        "costPerShare": 0.544520342256608
+      },
+      "performanceMetrics": {
+        "totalShares": 1836.478648156427,
+        "totalCost": 999.9999820410903,
+        "efficiency": 0.544520342256608
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-09T23:31:44.055Z",
+    "userId": "0x8fdd8FF672BEf99e33A1F821ECDC57571391e9B5",
+    "budget": 1000,
+    "polymarketStats": {
+      "id": "0xffcc3d9996dbd4e254e923a0fdf50e848b5610a8883f40ea2db5bdb9c67af7d0",
+      "tradesQuantity": "6738",
+      "buysQuantity": "3863",
+      "sellsQuantity": "2875",
+      "scaledCollateralVolume": "871345.209836",
+      "scaledCollateralBuyVolume": "495079.428983",
+      "scaledCollateralSellVolume": "376265.780853"
+    },
+    "omenStats": {
+      "id": "0x0433e8d20f1b09b009d2ddf89d7fd0a31d6c9757",
+      "tradesQuantity": "141",
+      "buysQuantity": "77",
+      "sellsQuantity": "107",
+      "scaledCollateralVolume": "10576.72992",
+      "scaledCollateralBuyVolume": "6346.037952",
+      "scaledCollateralSellVolume": "4230.691968"
+    },
+    "optimalSplit": {
+      "orderBookAllocation": 440,
+      "lmsrAllocation": 560,
+      "orderBookShares": 908.9217877094972,
+      "lmsrShares": 927.5568604469299,
+      "totalShares": 1836.478648156427,
+      "totalCost": 999.9999820410903,
+      "strategy": "Split: 44% OB, 56% LMSR",
+      "efficiency": {
+        "costPerShare": 0.544520342256608,
+        "allocationRatio": {
+          "orderBookPercent": 44,
+          "lmsrPercent": 56.00000000000001
+        }
+      },
+      "platformData": {
+        "orderBook": {
+          "orderLevels": 16,
+          "totalLiquidity": 920,
+          "priceRange": {
+            "min": 0.434,
+            "max": 0.537
+          }
+        },
+        "lmsr": {
+          "yesShares": 2200,
+          "noShares": 2031,
+          "liquidityParameter": 1491
+        }
+      },
+      "betPlaced": true,
+      "betOutcome": 0,
+      "betDescription": "Bitcoin Up or Down",
+      "actualAmounts": [
+        440,
+        560
+      ],
+      "actualPlatforms": [
+        "Gnosis",
+        "Polygon"
+      ],
+      "crossChainResults": [
+        {
+          "chain": "Gnosis",
+          "success": true,
+          "hash": "0xc6c41f8bfc0533f78e5752b0491200f607ec416c3af2b5cf567e9aa9d1ed86bb",
+          "amount": 440,
+          "ethAmount": 0.10331504738636962,
+          "explorer": "https://gnosis-chiado.blockscout.com/tx/0xc6c41f8bfc0533f78e5752b0491200f607ec416c3af2b5cf567e9aa9d1ed86bb",
+          "blockNumber": 17190190
+        },
+        {
+          "chain": "Polygon",
+          "success": true,
+          "hash": "0xa92c36485fd980e2c13712ffcfbcba6d0bfd97cc3ac4c36a3d6446deb3073902",
+          "amount": 560,
+          "ethAmount": 0.13149187849174315,
+          "explorer": "https://amoy.polygonscan.com/tx/0xa92c36485fd980e2c13712ffcfbcba6d0bfd97cc3ac4c36a3d6446deb3073902",
+          "blockNumber": 24965518
+        }
+      ]
+    },
+    "priceData": {
+      "polymarketEth": 0.10331504738636962,
+      "omenEth": 0.13149187849174315,
+      "totalEth": 0.23480692587811278,
+      "ethUsdPrice": 4258.8181599,
+      "usingFallback": false
+    },
+    "betOutcome": 0,
+    "betDescription": "Bitcoin Up or Down",
+    "marketInfo": {
+      "title": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "question": "Bitcoin Up or Down - June 11 - This market will resolve to \"Up\" if the change for BTCUSDT, measured in percentage, is greater than or equal to 0 for the 1 Hour candle that begins on the time and date specified in the title.",
+      "source": "combined",
+      "category": "combined"
+    },
+    "aiTrainingData": {
+      "inputFeatures": {
+        "budget": 1000,
+        "polymarketVolume": 871345.209836,
+        "polymarketTradeRatio": 0.007732870880495448,
+        "polymarketBuySellRatio": 1.3436521739130434,
+        "omenVolume": 10576.72992,
+        "omenTradeRatio": 0.013331152545871191,
+        "omenBuySellRatio": 0.719626168224299,
+        "marketCategory": "combined"
+      },
+      "outputTargets": {
+        "orderBookAllocation": 440,
+        "lmsrAllocation": 560,
+        "orderBookPercent": 44,
+        "lmsrPercent": 56.00000000000001,
+        "strategy": "Split: 44% OB, 56% LMSR",
+        "costPerShare": 0.544520342256608
+      },
+      "performanceMetrics": {
+        "totalShares": 1836.478648156427,
+        "totalCost": 999.9999820410903,
+        "efficiency": 0.544520342256608
+      }
+    }
   }
 ]
