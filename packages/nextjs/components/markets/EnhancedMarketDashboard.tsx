@@ -1,7 +1,12 @@
 "use client";
 
+<<<<<<< HEAD
 import React, { useState } from 'react';
 import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+=======
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon, MagnifyingGlassIcon, XMarkIcon, FunnelIcon, ViewColumnsIcon } from "@heroicons/react/24/outline";
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
 import { motion } from "framer-motion";
 import { useCombinedMarkets } from '../../hooks/useCombinedMarkets';
 import { Hero } from '../ui/Hero';
@@ -14,10 +19,23 @@ interface MarketSectionProps {
 }
 
 interface DashboardState {
+<<<<<<< HEAD
+=======
+  viewMode: 'combined' | 'individual' | 'all';
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
   autoRefresh: boolean;
   loading: boolean;
   error: string | null;
   searchQuery: string;
+<<<<<<< HEAD
+=======
+  showFilterDropdown: boolean;
+  filters: {
+    source: string[];
+    category: string[];
+    volumeRange: string;
+  };
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
 }
 
 // Market Section with clean layout
@@ -45,12 +63,137 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   // Typed dashboard state
   const [dashboardState, setDashboardState] = useState<DashboardState>({
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
     viewMode: 'combined',
     autoRefresh: false,
     loading: false,
     error: null,
     searchQuery: ''
   });
+=======
+    viewMode: 'combined',
+    autoRefresh: false,
+    loading: false,
+    error: null,
+    searchQuery: '',
+    showFilterDropdown: false,
+    filters: {
+      source: [],
+      category: [],
+      volumeRange: 'all'
+    }
+  });
+  
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Update view mode with type safety
+  const updateViewMode = (mode: 'combined' | 'individual' | 'all'): void => {
+    setDashboardState(prev => ({ ...prev, viewMode: mode }));
+  };
+
+  // Search functionality
+  const handleSearchChange = (value: string) => {
+    setDashboardState(prev => ({ ...prev, searchQuery: value }));
+  };
+
+  const clearSearch = () => {
+    setDashboardState(prev => ({ ...prev, searchQuery: '' }));
+  };
+
+  // Filter functionality
+  const toggleFilterDropdown = () => {
+    setDashboardState(prev => ({ ...prev, showFilterDropdown: !prev.showFilterDropdown }));
+  };
+
+  const toggleSourceFilter = (source: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        source: prev.filters.source.includes(source)
+          ? prev.filters.source.filter(s => s !== source)
+          : [...prev.filters.source, source]
+      }
+    }));
+  };
+
+  const toggleCategoryFilter = (category: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        category: prev.filters.category.includes(category)
+          ? prev.filters.category.filter(c => c !== category)
+          : [...prev.filters.category, category]
+      }
+    }));
+  };
+
+  const setVolumeFilter = (range: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: { ...prev.filters, volumeRange: range }
+    }));
+  };
+
+  const clearAllFilters = () => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        source: [],
+        category: [],
+        volumeRange: 'all'
+      }
+    }));
+  };
+
+  // Remove individual filters
+  const removeSourceFilter = (source: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        source: prev.filters.source.filter(s => s !== source)
+      }
+    }));
+  };
+
+  const removeCategoryFilter = (category: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        category: prev.filters.category.filter(c => c !== category)
+      }
+    }));
+  };
+
+  const removeVolumeFilter = () => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: { ...prev.filters, volumeRange: 'all' }
+    }));
+  };
+
+  // Close filter dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setDashboardState(prev => ({ ...prev, showFilterDropdown: false }));
+      }
+    };
+
+    if (dashboardState.showFilterDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dashboardState.showFilterDropdown]);
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
 
   const handleRefresh = async () => {
     await refetch();
@@ -98,6 +241,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
     );
   }
 
+<<<<<<< HEAD
   const filterMarkets = (markets: any[]) => {
     return markets.filter(market => 
       dashboardState.searchQuery === '' || 
@@ -118,6 +262,50 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   const combinedMarkets = filterMarkets(data.combinedMarkets);
   const individualMarkets = filterMarkets(data.individualMarkets);
+=======
+  // Filter markets based on search query, view mode, and filters
+  const allMarkets = dashboardState.viewMode === 'combined'
+    ? data.combinedMarkets
+    : dashboardState.viewMode === 'individual'
+    ? data.individualMarkets
+    : [...data.combinedMarkets, ...data.individualMarkets]; // 'all' mode shows both
+
+  // Apply search filter
+  let filteredMarkets = dashboardState.searchQuery.trim()
+    ? allMarkets.filter(market =>
+        market.title.toLowerCase().includes(dashboardState.searchQuery.toLowerCase()) ||
+        market.category?.toLowerCase().includes(dashboardState.searchQuery.toLowerCase())
+      )
+    : allMarkets;
+
+  // Apply additional filters
+  if (dashboardState.filters.source.length > 0) {
+    filteredMarkets = filteredMarkets.filter(market =>
+      'source' in market && dashboardState.filters.source.includes(market.source.toLowerCase())
+    );
+  }
+
+  if (dashboardState.filters.category.length > 0) {
+    filteredMarkets = filteredMarkets.filter(market =>
+      market.category && dashboardState.filters.category.includes(market.category.toLowerCase())
+    );
+  }
+
+  // Apply volume filter
+  if (dashboardState.filters.volumeRange !== 'all') {
+    filteredMarkets = filteredMarkets.filter(market => {
+      const volume = 'combinedVolume' in market ? market.combinedVolume : (market.volume || 0);
+      switch (dashboardState.filters.volumeRange) {
+        case 'low': return volume < 1000;
+        case 'medium': return volume >= 1000 && volume < 10000;
+        case 'high': return volume >= 10000;
+        default: return true;
+      }
+    });
+  }
+
+  const displayMarkets = filteredMarkets;
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
 
   return (
     <div className="relative">
@@ -180,9 +368,142 @@ export const EnhancedMarketDashboard: React.FC = () => {
                     <XMarkIcon className="w-4 h-4" />
                   </button>
                 )}
+<<<<<<< HEAD
+          <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary/80 disabled:opacity-50"
+              >
+                <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                Refresh Data
+              </button>
+            </div>
+
+<<<<<<< HEAD
+            <div className="relative flex-1 max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
               </div>
             </div>
 
+            
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {combinedMarkets.map((market) => (
+                <motion.div
+                  key={market.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Expandable transitionDuration={0.3}>
+                    <ExpandableCard className="h-fit">
+                      <ExpandableTrigger className="w-full h-full flex flex-col">
+                        <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              {'combinedVolume' in market ? (
+                                <div className="flex items-center gap-2">
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
+                                    COMBINED
+                                  </span>
+                                  <span className="text-sm font-bold text-primary">
+                                    {Math.round(market.matchConfidence * 100)}% match
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
+                                  {market.source}
+                                </span>
+                              )}
+                              <div className="text-xs text-base-content/70">
+                                {market.outcomes?.length || 2} outcomes
+                              </div>
+                            </div>
+                            <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
+                              {/* Show main title - smart extraction based on question type */}
+                              {(() => {
+                                const title = market.title;
+
+                                // For sports games (Team vs Team format)
+                                if (title.includes(' vs. ') || title.includes(' vs ')) {
+                                  // Extract just the matchup part
+                                  const vsMatch = title.match(/^([^:]+(?:\s+vs\.?\s+[^:]+))/i);
+                                  if (vsMatch) {
+                                    return vsMatch[1].trim();
+                                  }
+                                }
+
+                                // For regular questions, split at "?"
+                                if (title.includes('?')) {
+                                  return title.split('?')[0] + '?';
+                                }
+
+                                // For other formats, take first sentence or up to 60 characters
+                                const firstSentence = title.split('.')[0];
+                                if (firstSentence.length <= 60) {
+                                  return firstSentence + (title.includes('.') ? '.' : '');
+                                }
+
+                                // Fallback: truncate at 60 characters
+                                return title.length > 60 ? title.substring(0, 60) + '...' : title;
+                              })()}
+                            </h3>
+                          </div>
+                        </ExpandableCardHeader>
+
+                        <ExpandableCardContent>
+                          {/* Basic Info - Always Visible */}
+                          <div className="grid grid-cols-2 gap-4 text-xs">
+                            <div className="space-y-2">
+                              <div>
+                                <span className="font-medium text-base-content/60">Volume:</span>
+                                <div className="font-semibold text-base-content">
+                                  {'combinedVolume' in market
+                                    ? formatVolume(market.combinedVolume)
+                                    : formatVolume(market.volume || 0)
+                                  }
+                                </div>
+                              </div>
+                              <div>
+                                <span className="font-medium text-base-content/60">Category:</span>
+=======
+=======
+          {/* First Row - Search and Refresh */}
+          <div className="flex items-center gap-4 mb-4">
+            {/* Search Component - Takes all available space */}
+            <div className="relative flex-1">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={dashboardState.searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder="Search markets by title, description, or source..."
+                  className="w-full pl-12 pr-12 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
+                />
+                {/* Search icon - Left side */}
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <MagnifyingGlassIcon className="w-4 h-4" />
+                </div>
+                {/* Clear button (X icon) - Right side */}
+                {dashboardState.searchQuery && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  >
+                    <XMarkIcon className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
             {/* Refresh Button - Icon only */}
           <button
             onClick={handleRefresh}
@@ -405,9 +726,381 @@ export const EnhancedMarketDashboard: React.FC = () => {
         {displayMarkets.map((market) => (
           <MarketCard 
             key={market.id}
+<<<<<<< HEAD
+<<<<<<< HEAD
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+              >
+                <Expandable transitionDuration={0.15}>
+                  <ExpandableCard className="h-fit">
+                    <ExpandableTrigger className="w-full h-full flex flex-col">
+                      <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                {'combinedVolume' in market ? (
+                  <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
+                      COMBINED
+                    </span>
+                                <span className="text-sm font-bold text-primary">
+                      {Math.round(market.matchConfidence * 100)}% match
+                    </span>
+                  </div>
+                ) : (
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
+                    {market.source}
+                  </span>
+                )}
+                <div className="text-xs text-base-content/70">
+                  {market.outcomes?.length || 2} outcomes
+                </div>
+              </div>
+                          <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
+                {/* Show main title - smart extraction based on question type */}
+                {(() => {
+                  const title = market.title;
+
+                  // For sports games (Team vs Team format)
+                  if (title.includes(' vs. ') || title.includes(' vs ')) {
+                    // Extract just the matchup part
+                    const vsMatch = title.match(/^([^:]+(?:\s+vs\.?\s+[^:]+))/i);
+                    if (vsMatch) {
+                      return vsMatch[1].trim();
+                    }
+                  }
+
+                  // For regular questions, split at "?"
+                  if (title.includes('?')) {
+                    return title.split('?')[0] + '?';
+                  }
+
+                  // For other formats, take first sentence or up to 60 characters
+                  const firstSentence = title.split('.')[0];
+                  if (firstSentence.length <= 60) {
+                    return firstSentence + (title.includes('.') ? '.' : '');
+                  }
+
+                  // Fallback: truncate at 60 characters
+                  return title.length > 60 ? title.substring(0, 60) + '...' : title;
+                })()}
+              </h3>
+            </div>
+                      </ExpandableCardHeader>
+
+                      <ExpandableCardContent>
+                        {/* Basic Info - Always Visible */}
+                        <div className="grid grid-cols-2 gap-4 text-xs">
+                          <div className="space-y-2">
+                <div>
+                              <span className="font-medium text-base-content/60">Volume:</span>
+                              <div className="font-semibold text-base-content">
+                                {'combinedVolume' in market
+                      ? formatVolume(market.combinedVolume)
+                      : formatVolume(market.volume || 0)
+                  }
+                              </div>
+                </div>
+                <div>
+                              <span className="font-medium text-base-content/60">Category:</span>
+                              <div className="text-base-content">
+                                {(market.category || 'General').charAt(0).toUpperCase() + (market.category || 'General').slice(1)}
+                              </div>
+                            </div>
+                </div>
+                          <div className="space-y-2">
+                {'combinedVolume' in market ? (
+                  <div>
+                                <span className="font-medium text-base-content/60">Platforms:</span>
+                                <div className="text-base-content">
+                                  {[market.polymarketMarket && 'Polymarket', market.omenMarket && 'Omen']
+                        .filter(Boolean).join(' + ')
+                    }
+                                </div>
+                  </div>
+                ) : (
+                  <div>
+                                <span className="font-medium text-base-content/60">Source:</span>
+>>>>>>> 2f7be9b (Hero Section Adjustment)
+                                <div className="text-base-content">
+                                  {(market.category || 'General').charAt(0).toUpperCase() + (market.category || 'General').slice(1)}
+                                </div>
+<<<<<<< HEAD
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              {'combinedVolume' in market ? (
+                                <div>
+                                  <span className="font-medium text-base-content/60">Platforms:</span>
+                                  <div className="text-base-content">
+                                    {[market.polymarketMarket && 'Polymarket', market.omenMarket && 'Omen']
+                                      .filter(Boolean).join(' + ')
+                                    }
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  <span className="font-medium text-base-content/60">Source:</span>
+                                  <div className="text-base-content">
+                                    {market.source.charAt(0).toUpperCase() + market.source.slice(1)}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </ExpandableCardContent>
+                      </ExpandableTrigger>
+
+                      <ExpandableCardContent>
+                        <div className="space-y-3">
+                          {/* Expandable Details */}
+                          <ExpandableContent preset="slide-up">
+                            <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                              {/* Complete Title - Only shown when expanded */}
+                              <div className="space-y-2">
+                                <h4 className="text-sm font-semibold text-base-content">Complete Question</h4>
+                                <p className="text-sm text-base-content/80 leading-relaxed">
+                                  {market.title}
+                                </p>
+                              </div>
+
+                              <h4 className="text-sm font-semibold text-base-content">Market Details</h4>
+
+                              {/* Outcomes */}
+                              {market.outcomes && market.outcomes.length > 0 && (
+                                <div className="space-y-2">
+                                  <span className="text-xs font-medium text-base-content/70">Outcomes:</span>
+                                  <div className="space-y-2">
+                                    {market.outcomes.map((outcome: any, index: number) => {
+                                      const outcomeText = typeof outcome === 'string'
+                                        ? outcome
+                                        : (outcome as any)?.name || `Outcome ${index + 1}`;
+                                      const outcomePrice = typeof outcome === 'object' && (outcome as any)?.price
+                                        ? `${((outcome as any).price * 100).toFixed(1)}%`
+                                        : 'N/A';
+
+                                      return (
+                                        <div key={index} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
+                                          <span className="text-xs text-base-content/80">{outcomeText}</span>
+                                          <span className="text-sm font-bold text-primary">{outcomePrice}</span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Additional Details for Combined Markets */}
+                              {'combinedVolume' in market && (
+                                <div className="space-y-3">
+                                  <span className="text-xs font-medium text-base-content/70">Platform Breakdown:</span>
+                                  <div className="grid grid-cols-1 gap-2">
+                                    {market.polymarketMarket && (
+                                      <div className="flex justify-between items-center p-2 bg-[#0000FF]/5 dark:bg-[#0000FF]/20 rounded-md">
+                                        <span className="text-xs font-medium text-[#0000FF] dark:text-[#0000FF]">Polymarket</span>
+                                        <span className="text-xs font-semibold text-[#0000FF]/90">{formatVolume(market.polymarketMarket.volume || 0)}</span>
+                                      </div>
+                                    )}
+                                    {market.omenMarket && (
+                                      <div className="flex justify-between items-center p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
+                                        <span className="text-xs font-medium text-green-700 dark:text-green-300">Omen</span>
+                                        <span className="text-xs font-semibold">{formatVolume(market.omenMarket.volume || 0)}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </ExpandableContent>
+                        </div>
+=======
+                  </div>
+                )}
+              </div>
+            </div>
+>>>>>>> 2f7be9b (Hero Section Adjustment)
+                      </ExpandableCardContent>
+                    </ExpandableCard>
+                  </Expandable>
+                </motion.div>
+              ))}
+            </motion.div>
+
+<<<<<<< HEAD
+            {combinedMarkets.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                className="text-center py-12"
+              >
+                <div className="text-gray-500">
+                  No combined markets found
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Individual Markets Section */}
+          <div>
+            <div className="flex items-center gap-2 mb-6">
+              <RectangleStackIcon className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold">Individual Markets ({stats.totalIndividual})</h2>
+            </div>
+            
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {individualMarkets.map((market) => (
+                <motion.div
+                  key={market.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Expandable transitionDuration={0.3}>
+                    <ExpandableCard className="h-fit">
+                      <ExpandableTrigger className="w-full h-full flex flex-col">
+                        <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
+                                {market.source}
+                              </span>
+                              <div className="text-xs text-base-content/70">
+                                {market.outcomes?.length || 2} outcomes
+                              </div>
+                            </div>
+                            <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
+                              {market.title}
+                            </h3>
+                          </div>
+                        </ExpandableCardHeader>
+
+                        <ExpandableCardContent>
+                          <div className="grid grid-cols-2 gap-4 text-xs">
+                            <div className="space-y-2">
+                              <div>
+                                <span className="font-medium text-base-content/60">Volume:</span>
+                                <div className="font-semibold text-base-content">
+                                  {formatVolume(market.volume || 0)}
+                                </div>
+                              </div>
+                              <div>
+                                <span className="font-medium text-base-content/60">Category:</span>
+                                <div className="text-base-content">
+                                  {(market.category || 'General').charAt(0).toUpperCase() + (market.category || 'General').slice(1)}
+                                </div>
+                              </div>
+                            </div>
+                            <div>
+                              <span className="font-medium text-base-content/60">Source:</span>
+                              <div className="text-base-content">
+                                {market.source.charAt(0).toUpperCase() + market.source.slice(1)}
+                              </div>
+                            </div>
+                          </div>
+                        </ExpandableCardContent>
+                      </ExpandableTrigger>
+                    </ExpandableCard>
+                  </Expandable>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {individualMarkets.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                className="text-center py-12"
+              >
+                <div className="text-gray-500">
+                  No individual markets found
+                </div>
+              </motion.div>
+            )}
+          </div>
+=======
+                    <ExpandableCardContent>
+                      <div className="space-y-3">
+                        {/* Expandable Details */}
+                        <ExpandableContent preset="slide-up">
+                          <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                            {/* Complete Title - Only shown when expanded */}
+                            <div className="space-y-2">
+                              <h4 className="text-sm font-semibold text-base-content">Complete Question</h4>
+                              <p className="text-sm text-base-content/80 leading-relaxed">
+                                {market.title}
+                              </p>
+                            </div>
+
+                            <h4 className="text-sm font-semibold text-base-content">Market Details</h4>
+
+                            {/* Outcomes */}
+                            {market.outcomes && market.outcomes.length > 0 && (
+                              <div className="space-y-2">
+                                <span className="text-xs font-medium text-base-content/70">Outcomes:</span>
+                                <div className="space-y-2">
+                                  {market.outcomes.map((outcome: any, index: number) => {
+                                    const outcomeText = typeof outcome === 'string'
+                                      ? outcome
+                                      : (outcome as any)?.name || `Outcome ${index + 1}`;
+                                    const outcomePrice = typeof outcome === 'object' && (outcome as any)?.price
+                                      ? `${((outcome as any).price * 100).toFixed(1)}%`
+                                      : 'N/A';
+
+                                    return (
+                                      <div key={index} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
+                                        <span className="text-xs text-base-content/80">{outcomeText}</span>
+                                        <span className="text-sm font-bold text-primary">{outcomePrice}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Additional Details for Combined Markets */}
+                            {'combinedVolume' in market && (
+                              <div className="space-y-3">
+                                <span className="text-xs font-medium text-base-content/70">Platform Breakdown:</span>
+                                <div className="grid grid-cols-1 gap-2">
+                                  {market.polymarketMarket && (
+                                    <div className="flex justify-between items-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                                      <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Polymarket</span>
+                                      <span className="text-xs font-semibold">{formatVolume(market.polymarketMarket.volume || 0)}</span>
+                                    </div>
+                                  )}
+                                  {market.omenMarket && (
+                                    <div className="flex justify-between items-center p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
+                                      <span className="text-xs font-medium text-green-700 dark:text-green-300">Omen</span>
+                                      <span className="text-xs font-semibold">{formatVolume(market.omenMarket.volume || 0)}</span>
+                                    </div>
+                                  )}
+              </div>
+            </div>
+                            )}
+                          </div>
+                        </ExpandableContent>
+          </div>
+                    </ExpandableCardContent>
+                  </ExpandableCard>
+                </Expandable>
+              </motion.div>
+=======
             market={market}
             formatVolumeAction={formatVolume}
           />
+>>>>>>> 24c291f (Market Card Display type change)
+=======
+            market={market}
+            formatVolumeAction={formatVolume}
+          />
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
         ))}
       </div>
 
