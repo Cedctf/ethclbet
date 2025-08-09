@@ -3466,6 +3466,7 @@ __metadata:
     next: ~15.2.3
     next-nprogress-bar: ~2.3.13
     next-themes: ~0.3.0
+    openai: ^5.12.2
     postcss: ~8.4.45
     prettier: ~3.5.3
     qrcode.react: ~4.0.1
@@ -13283,6 +13284,23 @@ __metadata:
   dependencies:
     mimic-fn: ^4.0.0
   checksum: 0846ce78e440841335d4e9182ef69d5762e9f38aa7499b19f42ea1c4cd40f0b4446094c455c713f9adac3f4ae86f613bb5e30c99e52652764d06a89f709b3788
+  languageName: node
+  linkType: hard
+
+"openai@npm:^5.12.2":
+  version: 5.12.2
+  resolution: "openai@npm:5.12.2"
+  peerDependencies:
+    ws: ^8.18.0
+    zod: ^3.23.8
+  peerDependenciesMeta:
+    ws:
+      optional: true
+    zod:
+      optional: true
+  bin:
+    openai: bin/cli
+  checksum: b48116979c0666b1438d68a71df2c57833bca8c20c5d43e0c17e4d8594ca72294a1b62f40c7e3b8e5d5be644c2de5ba27fe97b8136f1de36e0490fd49c552a70
   languageName: node
   linkType: hard
 
