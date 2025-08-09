@@ -330,7 +330,8 @@ export const EnhancedMarketDashboard: React.FC = () => {
               <button
                 onClick={handleRefresh}
                 disabled={loading}
-                className="flex items-center justify-center w-10 h-10 bg-primary text-primary-content rounded-lg hover:bg-primary/80 disabled:opacity-50 transition-colors"
+                className="flex items-center justify-center w-10 h-10 rounded-lg text-white hover:opacity-80 disabled:opacity-50 transition-colors"
+                style={{ backgroundColor: '#746097' }}
                 title="Refresh Data"
               >
                 <ArrowPathIcon className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
