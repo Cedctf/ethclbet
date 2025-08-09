@@ -54,12 +54,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className = "" }) => {
         </p>
 
         {/* Crypto Icons Scroller */}
-        <div className="mt-12 w-full max-w-6xl">
+        <div className="mt-12 w-full max-w-6xl relative z-0">
           <Scroller speed={25} iconSize={40} spacing={60} />
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center relative z-10">
+        <div className="mt-16 flex flex-col sm:flex-row gap-4 justify-center items-center relative z-50">
           {/* <button
             className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
             style={{ backgroundColor: '#746097' }}
@@ -72,9 +72,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className = "" }) => {
             
           </div>
           <button
-            className="relative z-10 pointer-events-auto px-8 py-3 bg-transparent border-2 text-gray-700 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-gray-50"
+            className="relative z-50 pointer-events-auto px-8 py-3 bg-transparent border-2 text-gray-700 font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:bg-gray-50"
             style={{ borderColor: '#746097', color: '#746097' }}
             onMouseEnter={(e) => {
+              console.log('Button hover detected - button is clickable!');
               e.currentTarget.style.backgroundColor = '#746097';
               e.currentTarget.style.color = 'white';
             }}
@@ -83,9 +84,33 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ className = "" }) => {
               e.currentTarget.style.color = '#746097';
             }}
             onClick={() => {
+              console.log('Explore Market button clicked');
+
+              // Debug: Check all elements with IDs
+              const allElementsWithIds = document.querySelectorAll('[id]');
+              console.log('All elements with IDs:', Array.from(allElementsWithIds).map(el => el.id));
+
               const el = document.getElementById('market-section');
+              console.log('Market section element:', el);
+              console.log('Element position:', el?.getBoundingClientRect());
+
               if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                console.log('Scrolling to market section');
+
+                // Calculate position with offset (my-15 = 60px below top)
+                const elementTop = el.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementTop - 60; // 60px offset (my-15 equivalent)
+
+                // Smooth scroll to position with offset
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth'
+                });
+              } else {
+                console.error('Market section element not found');
+                // List all possible market-related elements
+                const marketElements = document.querySelectorAll('[id*="market"], [class*="market"]');
+                console.log('Market-related elements:', marketElements);
               }
             }}
           >
