@@ -54,6 +54,7 @@ interface PriceConversion {
   usdAmount: number;
   ethUsdPrice: number;
   ethEquivalent: number;
+  usingFallback?: boolean;
 }
 
 export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) {
