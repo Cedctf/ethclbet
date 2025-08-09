@@ -37,8 +37,8 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   const getSourceBadgeColor = (source: string): string => {
     switch (source) {
-      case 'polymarket': return 'bg-primary/20 text-primary';
-      case 'omen': return 'bg-success/20 text-success';
+      case 'polymarket': return 'badge-polymarket';
+      case 'omen': return 'badge-omen';
       default: return 'bg-base-300 text-base-content';
     }
   };
@@ -220,7 +220,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
                 {'combinedVolume' in market ? (
                   // Combined market badges
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium gd-combined-tag">
                       COMBINED
                     </span>
                     <span className="text-xs text-base-content/70">
@@ -318,6 +318,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 };

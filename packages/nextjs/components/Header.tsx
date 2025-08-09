@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { hardhat } from "viem/chains";
-import { HomeIcon, BugAntIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, BugAntIcon, Bars3Icon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth";
 import { cn } from "~~/lib/utils";
@@ -97,6 +98,7 @@ export const NavBar = () => {
 export const Header = () => {
   const { targetNetwork } = useTargetNetwork();
   const isLocalNetwork = targetNetwork.id === hardhat.id;
+  const burgerMenuRef = useRef<HTMLDetailsElement>(null);
 
   return (
     <>
