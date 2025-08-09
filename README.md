@@ -18,7 +18,7 @@ With seamless USD-to-crypto conversion via **Pyth Network**, automated bet execu
 
 ## 💡 Inspiration
 
-Our team actively participates in prediction markets, and we kept running into three recurring frustrations:
+While researching defi, our team noticed three pain points in prediction markets:
 
 1. **Market hunters** waste time hopping between platforms to find the best liquidity and odds.  
 2. **Privacy-conscious bettors** hesitate to reveal their strategies on public ledgers.  
