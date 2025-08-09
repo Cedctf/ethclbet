@@ -47,7 +47,7 @@ interface OptimalSplitResponse {
       };
     };
   };
-  error?: string;
+    error?: string;
 }
 
 interface PriceConversion {
@@ -276,11 +276,21 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         setAdjustedPolymarketAllocation(data.result.orderBookAllocation);
         setAdjustedOmenAllocation(data.result.lmsrAllocation);
         
-        // Set default bet description based on market
-        const marketTitle = isCombinedMarket(market) 
-          ? market.polymarketMarket?.question || market.omenMarket?.question || 'Optimal Split Bet'
-          : market.question || 'Optimal Split Bet';
-        setBetDescription(`Optimal split bet on: ${marketTitle}`);
+        // Set default bet description based on market title
+        let marketTitle = 'Optimal Split Bet';
+        
+        if (isCombinedMarket(market)) {
+          // For combined markets, prefer the main title or question
+          marketTitle = market.title || 
+                      market.polymarketMarket?.question || 
+                      market.omenMarket?.question || 
+                      'Combined Market Bet';
+        } else {
+          // For individual markets
+          marketTitle = market.title || market.question || 'Market Bet';
+        }
+        
+        setBetDescription(marketTitle);
         
         // Convert to ETH
         await convertToEth(data.result.orderBookAllocation, data.result.lmsrAllocation);
@@ -568,7 +578,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             <pre className="text-xs font-mono whitespace-pre-wrap">
               {JSON.stringify(generateOptimalSplitJSON(), null, 2)}
             </pre>
-          </div>
+            </div>
 
           {/* ETH Price Info */}
           <div className="bg-yellow-50 p-3 rounded-lg">
@@ -594,7 +604,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                 className="w-full p-2 border border-purple-200 rounded-lg text-sm"
                 placeholder="Enter bet description..."
               />
-            </div>
+              </div>
 
             {/* Outcome Selection */}
             <div className="mb-4">
@@ -703,7 +713,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                 </div>
               </div>
             )}
-          </div>
+            </div>
 
           {/* Place Bet Button */}
           <div className="pt-4 border-t">
