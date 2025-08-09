@@ -8,6 +8,7 @@ import {
   walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import { rainbowkitBurnerWallet } from "burner-connector";
+import { injectedWithSapphire } from "@oasisprotocol/sapphire-wagmi-v2";
 import * as chains from "viem/chains";
 import scaffoldConfig from "~~/scaffold.config";
 
@@ -28,16 +29,7 @@ const wallets = [
 /**
  * wagmi connectors for the wagmi context
  */
-export const wagmiConnectors = connectorsForWallets(
-  [
-    {
-      groupName: "Supported Wallets",
-      wallets,
-    },
-  ],
-
-  {
-    appName: "scaffold-eth-2",
-    projectId: scaffoldConfig.walletConnectProjectId,
-  },
-);
+export const wagmiConnectors = [
+  // Use Sapphire-specific injected connector for encrypted transactions
+  injectedWithSapphire(),
+];

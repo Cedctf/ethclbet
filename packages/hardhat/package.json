@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@inquirer/password": "^4.0.2",
+    "@oasisprotocol/sapphire-contracts": "^0.2.14",
     "@openzeppelin/contracts": "~5.0.2",
     "@typechain/ethers-v6": "~0.5.1",
     "dotenv": "~16.4.5",

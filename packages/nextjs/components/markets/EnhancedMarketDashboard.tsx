@@ -110,24 +110,24 @@ export const EnhancedMarketDashboard: React.FC = () => {
             <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh Data
           </button>
-
+          
           <button
             onClick={handleUpdateData}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-success text-success-content rounded-lg hover:bg-success/80 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
             <ArrowPathIcon className="w-4 h-4" />
             Update from APIs
           </button>
-          </div>
+          
           {/* View Mode Toggle */}
-          <div className="flex items-center gap-2 bg-base-300 rounded-lg p-1">
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode('combined')}
               className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'combined'
-                  ? 'bg-base-100 text-primary shadow-sm'
-                  : 'text-base-content/70 hover:text-base-content'
+                viewMode === 'combined' 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               <Squares2X2Icon className="w-4 h-4" />
