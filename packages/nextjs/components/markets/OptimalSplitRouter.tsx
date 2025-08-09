@@ -570,18 +570,18 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             </span>
           )}
         </label>
-        <input
-          type="range"
-          min="50"
-          max="5000"
-          step="50"
-          value={budget}
-          onChange={(e) => setBudget(Number(e.target.value))}
+          <input
+            type="range"
+            min="50"
+            max="5000"
+            step="50"
+            value={budget}
+            onChange={(e) => setBudget(Number(e.target.value))}
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
         />
         <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>$50</span>
-          <span>$5,000</span>
+            <span>$50</span>
+            <span>$5,000</span>
         </div>
       </div>
 
@@ -626,8 +626,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               ) : (
                 <span className="text-green-600 ml-2">(via Pyth Network)</span>
               )}
-            </div>
-          </div>
+                      </div>
+                    </div>
 
           {/* Bet Configuration */}
           <div className="bg-purple-50 p-4 rounded-lg">
@@ -638,14 +638,14 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               <label className="block text-sm font-medium text-purple-800 mb-2">
                 Bet Description
               </label>
-              <input
+                        <input
                 type="text"
                 value={betDescription}
                 onChange={(e) => setBetDescription(e.target.value)}
                 className="w-full p-2 border border-purple-200 rounded-lg text-sm"
                 placeholder="Enter bet description..."
               />
-              </div>
+                        </div>
 
             {/* Outcome Selection */}
             <div className="mb-4">
@@ -673,9 +673,9 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                 >
                   NO
                 </button>
-              </div>
-            </div>
-          </div>
+                    </div>
+                  </div>
+                </div>
 
           {/* Adjustment Controls */}
           <div className="bg-blue-50 p-4 rounded-lg">
@@ -699,8 +699,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                   className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
                   disabled={isLoadingPrice}
                 />
-              </div>
-            )}
+                    </div>
+                  )}
 
             {hasOmen && (
               <div className="mb-4">
@@ -720,7 +720,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                   className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
                   disabled={isLoadingPrice}
                 />
-              </div>
+                        </div>
             )}
 
             <div className="text-sm text-blue-700">
@@ -728,8 +728,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               <span className="block text-xs">
                 (≈ {priceData.totalEth?.toFixed(6) || '0.000000'} ETH total)
               </span>
-            </div>
-          </div>
+                    </div>
+                  </div>
 
           {/* Current Allocation Summary with ETH */}
           <div className="grid grid-cols-2 gap-4">
@@ -740,8 +740,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                 <div className="text-sm font-medium text-green-800">{priceData.polymarketEth?.toFixed(6) || '0.000000'} ETH</div>
                 <div className="text-xs text-green-700">
                   {((adjustedPolymarketAllocation / budget) * 100).toFixed(1)}% of budget
-                </div>
-              </div>
+                          </div>
+                        </div>
             )}
             
             {hasOmen && (
@@ -751,10 +751,10 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                 <div className="text-sm font-medium text-purple-800">{priceData.omenEth?.toFixed(6) || '0.000000'} ETH</div>
                 <div className="text-xs text-purple-700">
                   {((adjustedOmenAllocation / budget) * 100).toFixed(1)}% of budget
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
-            </div>
 
           {/* Place Bet Button */}
           <div className="pt-4 border-t">
@@ -774,8 +774,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             {isOnSapphire && (
               <p className="text-sm text-green-600 text-center mt-2">🔒 Encrypted transaction on Sapphire Network</p>
             )}
-          </div>
-        </div>
+                    </div>
+                  </div>
       )}
     </div>
   );
