@@ -40,6 +40,7 @@ That question sparked our project: the invisible layer connecting all major pred
 ---
 
 ## 🔄 User Flow
+<img width="1122" height="629" alt="image" src="https://github.com/user-attachments/assets/2bc618fd-bd6d-450f-80da-4fbe3decd90c" />
 
 1. **Browse Events**  
    - User opens the app and sees a unified list of prediction markets aggregated from platforms like Polymarket and Omen.
@@ -74,6 +75,7 @@ That question sparked our project: the invisible layer connecting all major pred
  ---
 
 ## 🛠 Tech Stack
+<img width="1121" height="635" alt="image" src="https://github.com/user-attachments/assets/eb8b4e4c-bc31-4269-8870-63ea33d4c7dc" />
 
 **Data Aggregation & Indexing**  
 - **The Graph Protocol** – Index and query events, liquidity, order books, and AMM/LMSR stats from multiple prediction market platforms.  
