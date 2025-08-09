@@ -308,7 +308,7 @@ export default function SimpleBetPage() {
 
     try {
       const platforms = validSubBets.map(sb => sb.platform);
-      const amounts = validSubBets.map(sb => parseEther(sb.amount));
+      const amounts = validSubBets.map(sb => parseEther(sb.amount.toString()));
       const marketIds = validSubBets.map(sb => sb.marketId);
       const totalValue = parseEther(totalAmount.toString());
 
@@ -652,7 +652,7 @@ export default function SimpleBetPage() {
         
         notification.success(
           <div>
-            <div>🔒 Transfer of {transferAmount} ETH to {transferAddress} successful!</div>
+            <div>🔒 Transfer of {transferAmount} TEST to {transferAddress} successful!</div>
             <div className="mt-2">
               <a 
                 href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
@@ -675,7 +675,7 @@ export default function SimpleBetPage() {
 
         notification.success(
           <div>
-            <div>Transfer of {transferAmount} ETH to {transferAddress} successful!</div>
+            <div>Transfer of {transferAmount} TEST to {transferAddress} successful!</div>
             <div className="mt-2">
               <a 
                 href={`https://etherscan.io/tx/${result}`}
@@ -759,11 +759,11 @@ export default function SimpleBetPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-base-100 p-4 rounded-lg shadow">
           <h3 className="font-semibold">Your Balance</h3>
-          <p className="text-lg">{userBalance ? formatEther(userBalance) : "0"} ETH</p>
+          <p className="text-lg">{userBalance ? formatEther(userBalance) : "0"} TEST</p>
         </div>
         <div className="bg-base-100 p-4 rounded-lg shadow">
           <h3 className="font-semibold">Contract Balance</h3>
-          <p className="text-lg">{contractBalance ? formatEther(contractBalance) : "0"} ETH</p>
+          <p className="text-lg">{contractBalance ? formatEther(contractBalance) : "0"} TEST</p>
         </div>
         <div className="bg-base-100 p-4 rounded-lg shadow">
           <h3 className="font-semibold">Total Bets</h3>
@@ -894,7 +894,7 @@ export default function SimpleBetPage() {
                     </div>
 
                     <div>
-                      <label className="label label-text-sm">Amount (ETH)</label>
+                      <label className="label label-text-sm">Amount (TEST)</label>
                       <input
                         type="number"
                         step="0.01"
@@ -920,7 +920,7 @@ export default function SimpleBetPage() {
               ))}
 
               <div className="text-right">
-                <span className="text-lg font-semibold">Total: {getTotalAmount().toFixed(4)} ETH</span>
+                <span className="text-lg font-semibold">Total: {getTotalAmount().toFixed(4)} TEST</span>
               </div>
             </div>
 
@@ -953,11 +953,11 @@ export default function SimpleBetPage() {
                   <div key={index} className="border p-3 rounded">
                     <div className="flex justify-between">
                       <span className="font-medium">{bet.description}</span>
-                      <span>{formatEther(bet.amount)} ETH</span>
+                      <span>{formatEther(bet.amount)} TEST</span>
                     </div>
                     <div className="text-sm text-gray-500">
                       Status: {["Active", "Won", "Lost", "Cancelled"][bet.status]}
-                      {bet.totalPayout > 0 && <span> | Payout: {formatEther(bet.totalPayout)} ETH</span>}
+                      {bet.totalPayout > 0 && <span> | Payout: {formatEther(bet.totalPayout)} TEST</span>}
                     </div>
                     <div className="text-xs text-gray-400">
                       Bettor: {bet.bettor} | ID: {bet.id?.toString()}
@@ -1005,7 +1005,7 @@ export default function SimpleBetPage() {
                       <strong>Description:</strong> {singleBet.description}
                     </div>
                     <div>
-                      <strong>Amount:</strong> {formatEther(singleBet.amount)} ETH
+                      <strong>Amount:</strong> {formatEther(singleBet.amount)} TEST
                     </div>
                     <div>
                       <strong>Outcome:</strong> {singleBet.outcome === 0 ? "YES" : "NO"}
@@ -1021,7 +1021,7 @@ export default function SimpleBetPage() {
                     </div>
                     {singleBet.totalPayout > 0 && (
                       <div>
-                        <strong>Total Payout:</strong> {formatEther(singleBet.totalPayout)} ETH
+                        <strong>Total Payout:</strong> {formatEther(singleBet.totalPayout)} TEST
                       </div>
                     )}
                     {singleBet.createdAt > 0 && (
@@ -1118,7 +1118,7 @@ export default function SimpleBetPage() {
                   />
                 </div>
                 <div>
-                  <label className="label">Amount (ETH)</label>
+                  <label className="label">Amount (TEST)</label>
                   <input
                     type="number"
                     step="0.001"
@@ -1129,7 +1129,7 @@ export default function SimpleBetPage() {
                   />
                   <div className="label">
                     <span className="label-text-alt text-info">
-                      Available: {contractBalance ? formatEther(contractBalance) : "0"} ETH
+                      Available: {contractBalance ? formatEther(contractBalance) : "0"} TEST
                     </span>
                   </div>
                 </div>
@@ -1197,7 +1197,7 @@ export default function SimpleBetPage() {
                           <strong>Market ID:</strong> {subBet.marketId}
                         </div>
                         <div>
-                          <strong>Amount:</strong> {formatEther(subBet.amount)} ETH
+                          <strong>Amount:</strong> {formatEther(subBet.amount)} TEST
                         </div>
                         <div>
                           <strong>Outcome:</strong> {subBet.outcome === 0 ? "YES" : "NO"}
@@ -1207,7 +1207,7 @@ export default function SimpleBetPage() {
                         </div>
                         {subBet.payout > 0 && (
                           <div className="col-span-2 md:col-span-3">
-                            <strong>Payout:</strong> {formatEther(subBet.payout)} ETH
+                            <strong>Payout:</strong> {formatEther(subBet.payout)} TEST
                           </div>
                         )}
                       </div>
@@ -1221,7 +1221,7 @@ export default function SimpleBetPage() {
           {/* Withdraw Balance */}
           <div className="bg-base-100 p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-4">Withdraw Balance</h2>
-            <p className="mb-4">Available: {userBalance ? formatEther(userBalance) : "0"} ETH</p>
+            <p className="mb-4">Available: {userBalance ? formatEther(userBalance) : "0"} TEST</p>
             <button
               onClick={handleWithdraw}
               disabled={isWithdrawing || !userBalance || userBalance === 0n}
