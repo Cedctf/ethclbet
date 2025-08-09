@@ -587,8 +587,20 @@ export async function GET(request: NextRequest) {
           fs.mkdirSync(publicDir, { recursive: true });
         }
 
+        // Determine what data to write based on filename
+        let dataToWrite;
+        if (fileName.includes('rematched') || fileName.includes('combined')) {
+          // If filename suggests combined markets only, write just the combinedMarkets array
+          dataToWrite = combinedMarkets;
+          console.log(`📝 Writing only combined markets data (${combinedMarkets.length} markets)`);
+        } else {
+          // Otherwise write the full data structure
+          dataToWrite = savedData;
+          console.log(`📝 Writing full data structure`);
+        }
+
         // Write the JSON file
-        fs.writeFileSync(filePath, JSON.stringify(savedData, null, 2), 'utf8');
+        fs.writeFileSync(filePath, JSON.stringify(dataToWrite, null, 2), 'utf8');
 
         console.log(`💾 Data saved to ${filePath}`);
         console.log(`🌐 File accessible at ${fileUrl}`);
