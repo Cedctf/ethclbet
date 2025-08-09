@@ -72,3 +72,31 @@ That question sparked our project: the invisible layer connecting all major pred
    - User can withdraw winnings at any time to their connected wallet.  
 
  ---
+
+## 🛠 Tech Stack
+
+**Data Aggregation & Indexing**  
+- **The Graph Protocol** – Index and query events, liquidity, order books, and AMM/LMSR stats from multiple prediction market platforms.  
+- **Custom Subgraphs** – Unified schema for normalized market data across sources like Polymarket and Omen.  
+
+**Computation & Intelligence**  
+- **Oasis ROFL** – Confidential compute environment for LLM inference and optimization algorithms.  
+- **Large Language Model (LLM)** – Event title matching, duplicate detection, and optimal bet allocation calculation.  
+
+**Smart Contracts & Privacy**  
+- **Oasis Sapphire** – EVM-compatible, privacy-preserving smart contracts for storing and managing bets.  
+- **Ethereum Scaffold-ETH** – Rapid prototyping, development, and deployment framework for Ethereum smart contracts.  
+- **SIWE (Sign-In With Ethereum)** – Private authentication to access and manage user-specific bet data.  
+
+**Oracles & Pricing**  
+- **Pyth Network** – Real-time USD ↔ crypto price feeds for accurate bet allocations.  
+
+**Frontend & User Interface**  
+- **Next.js / React** – Web app for browsing markets, configuring bets, and tracking performance.  
+- **Tailwind CSS** – Responsive and modern UI design.  
+
+**Execution & Settlement**  
+- **Event Listeners** – Track market resolution events from external platforms.  
+- **Automated Settlement Logic** – Update private balances and enable withdrawals for winning bets.
+  
+---
