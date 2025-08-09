@@ -1,6 +1,13 @@
 "use client";
 
 import React, { useState } from 'react';
+import { parseEther } from "viem";
+import { useAccount, useChainId } from "wagmi";
+import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
+import { getSapphireProvider, getSapphireEthersSigner, isSapphireNetwork } from "~~/utils/scaffold-eth/sapphireProviders";
+import { ethers } from "ethers";
 import { CombinedMarket, NormalizedMarket } from '~~/hooks/useCombinedMarkets';
 
 interface OptimalSplitRouterProps {
@@ -50,10 +57,18 @@ interface PriceConversion {
 }
 
 export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) {
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { data: deployedContractData } = useDeployedContractInfo("SimpleBet");
+  
   const [budget, setBudget] = useState(1000);
   const [result, setResult] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Betting outcome selection
+  const [betOutcome, setBetOutcome] = useState(0); // 0 = YES, 1 = NO
+  const [betDescription, setBetDescription] = useState("");
   
   // Adjustable allocations (user can modify these)
   const [adjustedPolymarketAllocation, setAdjustedPolymarketAllocation] = useState<number>(0);
@@ -67,6 +82,30 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     ethUsdPrice: number;
   } | null>(null);
   const [isLoadingPrice, setIsLoadingPrice] = useState(false);
+
+  // Check if we're on a Sapphire network for encrypted transactions
+  const isOnSapphire = chainId ? isSapphireNetwork(chainId) : false;
+
+  // Contract interactions
+  const { writeContractAsync: placeBet, isMining: isPlacingBet } = useScaffoldWriteContract({
+    contractName: "SimpleBet",
+  });
+
+  // Sapphire-specific contract interaction function
+  const placeBetWithSapphire = async (description: string, outcome: number, platforms: string[], amounts: bigint[], marketIds: string[], totalValue: bigint) => {
+    if (!deployedContractData) throw new Error("Contract not deployed");
+    
+    // Use getSapphireProvider for encrypted transactions
+    const sapphireProvider = getSapphireProvider();
+    if (!sapphireProvider) throw new Error("Failed to get Sapphire provider");
+    
+    const signer = await getSapphireEthersSigner();
+    if (!signer) throw new Error("Failed to get Sapphire signer");
+    
+    const contract = new ethers.Contract(deployedContractData.address, deployedContractData.abi, signer);
+    const tx = await contract.placeBet(description, outcome, platforms, amounts, marketIds, { value: totalValue });
+    return await tx.wait();
+  };
 
   // Helper to check if market is combined
   const isCombinedMarket = (market: CombinedMarket | NormalizedMarket): market is CombinedMarket => {
@@ -137,6 +176,11 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       
       const polymarketData: PriceConversion = await polymarketResponse.json();
 
+      // Validate the response data
+      if (!polymarketData.ethUsdPrice || !polymarketData.ethEquivalent) {
+        throw new Error('Invalid price data received from Pyth API');
+      }
+
       // Get price for Omen allocation
       const omenResponse = await fetch('/api/pyth', {
         method: 'POST',
@@ -150,12 +194,17 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       
       const omenData: PriceConversion = await omenResponse.json();
 
-      // Set price data
+      // Validate the response data
+      if (!omenData.ethUsdPrice || !omenData.ethEquivalent) {
+        throw new Error('Invalid price data received from Pyth API');
+      }
+
+      // Set price data with validation
       setPriceData({
-        polymarketEth: polymarketData.ethEquivalent,
-        omenEth: omenData.ethEquivalent,
-        totalEth: polymarketData.ethEquivalent + omenData.ethEquivalent,
-        ethUsdPrice: polymarketData.ethUsdPrice // Should be the same for both
+        polymarketEth: polymarketData.ethEquivalent || 0,
+        omenEth: omenData.ethEquivalent || 0,
+        totalEth: (polymarketData.ethEquivalent || 0) + (omenData.ethEquivalent || 0),
+        ethUsdPrice: polymarketData.ethUsdPrice || 0
       });
 
     } catch (err) {
@@ -227,6 +276,12 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         setAdjustedPolymarketAllocation(data.result.orderBookAllocation);
         setAdjustedOmenAllocation(data.result.lmsrAllocation);
         
+        // Set default bet description based on market
+        const marketTitle = isCombinedMarket(market) 
+          ? market.polymarketMarket?.question || market.omenMarket?.question || 'Optimal Split Bet'
+          : market.question || 'Optimal Split Bet';
+        setBetDescription(`Optimal split bet on: ${marketTitle}`);
+        
         // Convert to ETH
         await convertToEth(data.result.orderBookAllocation, data.result.lmsrAllocation);
         
@@ -252,33 +307,34 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         total_budget_usd: budget,
         total_budget_eth: priceData.totalEth,
         eth_usd_price: priceData.ethUsdPrice,
+        bet_outcome: betOutcome === 0 ? "YES" : "NO",
         allocations: {
           polymarket: {
             platform: "Polymarket",
             type: "Order Book",
-            allocation_usd: result.orderBookAllocation,
+            allocation_usd: adjustedPolymarketAllocation,
             allocation_eth: priceData.polymarketEth,
-            allocation_percent: result.efficiency.allocationRatio.orderBookPercent,
+            allocation_percent: (adjustedPolymarketAllocation / budget) * 100,
             shares: result.orderBookShares,
-            avg_price_per_share_usd: result.orderBookAllocation / result.orderBookShares,
+            avg_price_per_share_usd: adjustedPolymarketAllocation / result.orderBookShares,
             avg_price_per_share_eth: priceData.polymarketEth / result.orderBookShares
           },
           omen: {
             platform: "Omen",
             type: "LMSR AMM",
-            allocation_usd: result.lmsrAllocation,
+            allocation_usd: adjustedOmenAllocation,
             allocation_eth: priceData.omenEth,
-            allocation_percent: result.efficiency.allocationRatio.lmsrPercent,
+            allocation_percent: (adjustedOmenAllocation / budget) * 100,
             shares: result.lmsrShares,
-            avg_price_per_share_usd: result.lmsrAllocation / result.lmsrShares,
+            avg_price_per_share_usd: adjustedOmenAllocation / result.lmsrShares,
             avg_price_per_share_eth: priceData.omenEth / result.lmsrShares
           }
         },
         summary: {
           total_shares: result.totalShares,
-          total_cost_usd: result.totalCost,
+          total_cost_usd: adjustedPolymarketAllocation + adjustedOmenAllocation,
           total_cost_eth: priceData.totalEth,
-          cost_per_share_usd: result.efficiency.costPerShare,
+          cost_per_share_usd: (adjustedPolymarketAllocation + adjustedOmenAllocation) / result.totalShares,
           cost_per_share_eth: priceData.totalEth / result.totalShares,
           strategy: result.strategy
         }
@@ -304,6 +360,134 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     // Recalculate ETH conversion for adjusted amounts
     if (priceData) {
       await convertToEth(budget - value, value);
+    }
+  };
+
+  // Place Bet with Optimal Split
+  const handlePlaceBet = async () => {
+    if (!isConnected) {
+      notification.error("Please connect your wallet");
+      return;
+    }
+
+    if (!betDescription.trim()) {
+      notification.error("Please enter a bet description");
+      return;
+    }
+
+    if (!priceData) {
+      notification.error("Price data not loaded. Please calculate optimal split first.");
+      return;
+    }
+
+    if (adjustedPolymarketAllocation <= 0 && adjustedOmenAllocation <= 0) {
+      notification.error("Please allocate funds to at least one platform");
+      return;
+    }
+
+    try {
+      // Prepare subbet data
+      const platforms: string[] = [];
+      const amounts: bigint[] = [];
+      const marketIds: string[] = [];
+
+      // Add Polymarket subbet if allocation > 0
+      if (adjustedPolymarketAllocation > 0) {
+        platforms.push("Polymarket");
+        amounts.push(parseEther(priceData.polymarketEth.toString()));
+        
+        // Get market ID from the market data
+        const polymarketStats = extractMarketStats(market, 'polymarket');
+        marketIds.push(polymarketStats?.id || 'polymarket_optimal_split');
+      }
+
+      // Add Omen subbet if allocation > 0
+      if (adjustedOmenAllocation > 0) {
+        platforms.push("Omen");
+        amounts.push(parseEther(priceData.omenEth.toString()));
+        
+        // Get market ID from the market data
+        const omenStats = extractMarketStats(market, 'omen');
+        marketIds.push(omenStats?.id || 'omen_optimal_split');
+      }
+
+      const totalValue = parseEther(priceData.totalEth.toString());
+
+      let txHash: string;
+
+      if (isOnSapphire) {
+        // Use Sapphire encrypted transactions
+        notification.info("🔒 Processing encrypted optimal split bet on Sapphire...", { duration: 0 });
+        const receipt = await placeBetWithSapphire(betDescription, betOutcome, platforms, amounts, marketIds, totalValue);
+        txHash = receipt.hash || receipt.transactionHash;
+        
+        notification.success(
+          <div>
+            <div>🔒 Encrypted optimal split bet placed successfully!</div>
+            <div className="text-sm mt-1">
+              Outcome: {betOutcome === 0 ? 'YES' : 'NO'} | Total: {priceData.totalEth.toFixed(6)} ETH
+            </div>
+            <div className="mt-2">
+              <a 
+                href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
+      } else {
+        // Use regular contract interaction
+        notification.info("Processing optimal split bet...", { duration: 0 });
+        const txHash = await placeBet({
+          functionName: "placeBet",
+          args: [betDescription, betOutcome, platforms, amounts, marketIds],
+          value: totalValue,
+        });
+
+        notification.success(
+          <div>
+            <div>Optimal split bet placed successfully!</div>
+            <div className="text-sm mt-1">
+              Outcome: {betOutcome === 0 ? 'YES' : 'NO'} | Total: {priceData.totalEth.toFixed(6)} ETH
+            </div>
+            <div className="mt-2">
+              <a 
+                href={`https://etherscan.io/tx/${txHash}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
+      }
+
+      // Log the bet details
+      console.log('Optimal split bet placed:', {
+        description: betDescription,
+        outcome: betOutcome === 0 ? 'YES' : 'NO',
+        platforms,
+        amounts: amounts.map(a => a.toString()),
+        marketIds,
+        totalValue: totalValue.toString(),
+        ethAmounts: {
+          polymarket: priceData.polymarketEth,
+          omen: priceData.omenEth,
+          total: priceData.totalEth
+        }
+      });
+
+    } catch (error) {
+      console.error("Error placing optimal split bet:", error);
+      notification.error("Failed to place bet");
     }
   };
 
@@ -334,7 +518,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Budget: ${budget}
-          {priceData && (
+          {priceData && priceData.totalEth !== undefined && priceData.ethUsdPrice !== undefined && (
             <span className="text-sm text-gray-500 ml-2">
               (≈ {priceData.totalEth.toFixed(6)} ETH @ ${priceData.ethUsdPrice.toFixed(2)}/ETH)
             </span>
@@ -390,7 +574,55 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           <div className="bg-yellow-50 p-3 rounded-lg">
             <div className="text-sm text-yellow-800 font-medium mb-1">Live ETH Price</div>
             <div className="text-yellow-700 text-sm">
-              1 ETH = ${priceData.ethUsdPrice.toFixed(2)} USD (via Pyth Network)
+              1 ETH = ${priceData.ethUsdPrice?.toFixed(2) || 'N/A'} USD (via Pyth Network)
+            </div>
+          </div>
+
+          {/* Bet Configuration */}
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <h5 className="font-medium text-purple-900 mb-3">Bet Configuration</h5>
+            
+            {/* Bet Description */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-purple-800 mb-2">
+                Bet Description
+              </label>
+              <input
+                type="text"
+                value={betDescription}
+                onChange={(e) => setBetDescription(e.target.value)}
+                className="w-full p-2 border border-purple-200 rounded-lg text-sm"
+                placeholder="Enter bet description..."
+              />
+            </div>
+
+            {/* Outcome Selection */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-purple-800 mb-2">
+                Betting Outcome
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setBetOutcome(0)}
+                  className={`py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                    betOutcome === 0
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  YES
+                </button>
+                <button
+                  onClick={() => setBetOutcome(1)}
+                  className={`py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                    betOutcome === 1
+                      ? 'bg-red-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  NO
+                </button>
+              </div>
             </div>
           </div>
 
@@ -403,7 +635,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                 <label className="block text-sm font-medium text-blue-800 mb-2">
                   Polymarket: ${adjustedPolymarketAllocation.toFixed(2)} 
                   <span className="text-xs text-blue-600 ml-2">
-                    (≈ {priceData.polymarketEth.toFixed(6)} ETH)
+                    (≈ {priceData.polymarketEth?.toFixed(6) || '0.000000'} ETH)
                   </span>
                 </label>
                 <input
@@ -424,7 +656,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                 <label className="block text-sm font-medium text-blue-800 mb-2">
                   Omen: ${adjustedOmenAllocation.toFixed(2)}
                   <span className="text-xs text-blue-600 ml-2">
-                    (≈ {priceData.omenEth.toFixed(6)} ETH)
+                    (≈ {priceData.omenEth?.toFixed(6) || '0.000000'} ETH)
                   </span>
                 </label>
                 <input
@@ -443,7 +675,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             <div className="text-sm text-blue-700">
               Total: ${(adjustedPolymarketAllocation + adjustedOmenAllocation).toFixed(2)} / ${budget}
               <span className="block text-xs">
-                (≈ {priceData.totalEth.toFixed(6)} ETH total)
+                (≈ {priceData.totalEth?.toFixed(6) || '0.000000'} ETH total)
               </span>
             </div>
           </div>
@@ -454,7 +686,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               <div className="bg-green-50 p-3 rounded-lg">
                 <div className="text-sm text-green-600 font-medium">Polymarket</div>
                 <div className="text-lg font-bold text-green-900">${adjustedPolymarketAllocation.toFixed(2)}</div>
-                <div className="text-sm font-medium text-green-800">{priceData.polymarketEth.toFixed(6)} ETH</div>
+                <div className="text-sm font-medium text-green-800">{priceData.polymarketEth?.toFixed(6) || '0.000000'} ETH</div>
                 <div className="text-xs text-green-700">
                   {((adjustedPolymarketAllocation / budget) * 100).toFixed(1)}% of budget
                 </div>
@@ -465,7 +697,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               <div className="bg-purple-50 p-3 rounded-lg">
                 <div className="text-sm text-purple-600 font-medium">Omen</div>
                 <div className="text-lg font-bold text-purple-900">${adjustedOmenAllocation.toFixed(2)}</div>
-                <div className="text-sm font-medium text-purple-800">{priceData.omenEth.toFixed(6)} ETH</div>
+                <div className="text-sm font-medium text-purple-800">{priceData.omenEth?.toFixed(6) || '0.000000'} ETH</div>
                 <div className="text-xs text-purple-700">
                   {((adjustedOmenAllocation / budget) * 100).toFixed(1)}% of budget
                 </div>
@@ -476,27 +708,21 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           {/* Place Bet Button */}
           <div className="pt-4 border-t">
             <button 
-              className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
-              onClick={() => {
-                // This will be connected to your bet placement logic
-                console.log('Place bet with allocation:', {
-                  polymarket: {
-                    usd: adjustedPolymarketAllocation,
-                    eth: priceData.polymarketEth
-                  },
-                  omen: {
-                    usd: adjustedOmenAllocation,
-                    eth: priceData.omenEth
-                  },
-                  total: {
-                    usd: adjustedPolymarketAllocation + adjustedOmenAllocation,
-                    eth: priceData.totalEth
-                  }
-                });
-              }}
+              className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+              onClick={handlePlaceBet}
+              disabled={isPlacingBet || !isConnected || !betDescription.trim()}
             >
-              Place Bet with Current Allocation ({priceData.totalEth.toFixed(6)} ETH)
+              {isPlacingBet 
+                ? "Placing Bet..." 
+                : `Place ${betOutcome === 0 ? 'YES' : 'NO'} Bet (${priceData.totalEth?.toFixed(6) || '0.000000'} ETH)`
+              }
             </button>
+            {!isConnected && (
+              <p className="text-sm text-gray-500 text-center mt-2">Please connect your wallet to place a bet</p>
+            )}
+            {isOnSapphire && (
+              <p className="text-sm text-green-600 text-center mt-2">🔒 Encrypted transaction on Sapphire Network</p>
+            )}
           </div>
         </div>
       )}
