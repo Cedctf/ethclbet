@@ -1,5 +1,15 @@
 # Ethclbet
 
+Prediction markets are powerful tools for gauging public sentiment and making informed bets on real-world events.  
+However, today’s ecosystem is fragmented. Liquidity, pricing, and market opportunities are scattered across multiple platforms.  
+This makes it difficult for users to compare odds, split bets optimally, and keep their strategies private.
+
+Our platform solves this by acting as a **prediction market aggregator and optimizer**.  
+We aggregate market data from multiple platforms using **subgraphs**, use an **LLM** to identify and group equivalent events, and calculate the **optimal allocation** of funds to maximize potential returns.  
+All sensitive computations and bet storage are handled privately using **Oasis ROFL** and **Sapphire**, ensuring users maintain full control over their strategies.
+
+With seamless USD-to-crypto conversion via **Pyth Network**, automated bet execution, and private settlement tracking, we give users a one-stop solution for discovering, optimizing, and placing bets across the entire prediction market landscape all in a single, secure transaction.
+
 ---
 
 ## 🚧 Problems
@@ -65,4 +75,3 @@ That question sparked our project: the invisible layer connecting all major pred
    - User can withdraw winnings at any time to their connected wallet.  
 
  ---
-
