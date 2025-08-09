@@ -31,13 +31,12 @@ const wallets = [
 export const wagmiConnectors = connectorsForWallets(
   [
     {
-      groupName: "Supported Wallets",
+      groupName: "Recommended",
       wallets,
     },
   ],
-
   {
-    appName: "scaffold-eth-2",
+    appName: "ETHCLBET",
     projectId: scaffoldConfig.walletConnectProjectId,
   },
 );

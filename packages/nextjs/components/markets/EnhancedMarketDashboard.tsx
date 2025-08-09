@@ -57,6 +57,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
     searchQuery: ''
   });
 
+  // View mode state
+  const [viewMode, setViewMode] = useState<'combined' | 'individual'>('combined');
+
   const handleRefresh = async () => {
     await refetch();
   };
@@ -100,9 +103,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
           <p className="text-red-600 mb-4">{error}</p>
           <button
             onClick={handleRefresh}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
-            Try Again
+            Retry
           </button>
         </div>
       </div>
@@ -110,10 +113,12 @@ export const EnhancedMarketDashboard: React.FC = () => {
   }
 
   const filterMarkets = (markets: any[]) => {
+    if (!dashboardState.searchQuery) return markets;
+    const query = dashboardState.searchQuery.toLowerCase();
     return markets.filter(market => 
-      dashboardState.searchQuery === '' || 
-      market.title.toLowerCase().includes(dashboardState.searchQuery.toLowerCase()) ||
-      market.category?.toLowerCase().includes(dashboardState.searchQuery.toLowerCase())
+      market.title.toLowerCase().includes(query) ||
+      market.category?.toLowerCase().includes(query) ||
+      market.source?.toLowerCase().includes(query)
     );
   };
 
@@ -148,331 +153,226 @@ export const EnhancedMarketDashboard: React.FC = () => {
                 <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                 Refresh Data
               </button>
+              
+              <button
+                onClick={handleUpdateData}
+                disabled={loading}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+              >
+                <ArrowPathIcon className="w-4 h-4" />
+                Update from APIs
+              </button>
             </div>
 
-            <div className="relative flex-1 max-w-md">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search markets..."
-                value={dashboardState.searchQuery}
-                onChange={(e) => setDashboardState(prev => ({ ...prev, searchQuery: e.target.value }))}
-                className="w-full pl-10 pr-4 py-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg text-sm shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/20"
-              />
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('combined')}
+                className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'combined' 
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Combined
+              </button>
+              <button
+                onClick={() => setViewMode('individual')}
+                className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'individual' 
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Individual
+              </button>
             </div>
           </div>
 
           {/* Combined Markets Section */}
-          <div className="mb-12">
-            <div className="flex items-center gap-2 mb-6">
-              <Squares2X2Icon className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">Combined Markets ({stats.totalCombined})</h2>
-            </div>
-            
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {combinedMarkets.map((market) => (
+          {viewMode === 'combined' && (
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <ChartBarIcon className="w-5 h-5 text-primary" />
+                <h2 className="text-xl font-semibold">Combined Markets ({stats.totalCombined})</h2>
+              </div>
+              
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                {combinedMarkets.map((market) => (
+                  <motion.div
+                    key={market.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Expandable transitionDuration={0.3}>
+                      <ExpandableCard className="h-fit">
+                        <ExpandableTrigger className="w-full h-full flex flex-col">
+                          <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                {'combinedVolume' in market ? (
+                                  <div className="flex items-center gap-2">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
+                                      COMBINED
+                                    </span>
+                                    <span className="text-sm font-bold text-primary">
+                                      {Math.round((market.matchConfidence || 0) * 100)}% match
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
+                                    <div className={`w-2 h-2 rounded-full ${market.source === 'polymarket' ? 'bg-blue-500' : market.source === 'omen' ? 'bg-purple-500' : 'bg-gray-500'}`}></div>
+                                    {market.source.toUpperCase()}
+                                  </span>
+                                )}
+                                <div className="text-xs text-base-content/70">
+                                  {market.outcomes?.length || 2} outcomes
+                                </div>
+                              </div>
+                              <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
+                                {market.title}
+                              </h3>
+                            </div>
+                          </ExpandableCardHeader>
+
+                          <ExpandableCardContent>
+                            <div className="grid grid-cols-2 gap-4 text-xs">
+                              <div className="space-y-2">
+                                <div>
+                                  <span className="font-medium text-base-content/60">Volume:</span>
+                                  <div className="font-semibold text-base-content">
+                                    {formatVolume(market.combinedVolume || market.volume || 0)}
+                                  </div>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-base-content/60">Category:</span>
+                                  <div className="text-base-content">
+                                    {(market.category || 'General').charAt(0).toUpperCase() + (market.category || 'General').slice(1)}
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <span className="font-medium text-base-content/60">Type:</span>
+                                <div className="text-base-content">
+                                  Combined Market
+                                </div>
+                              </div>
+                            </div>
+                          </ExpandableCardContent>
+                        </ExpandableTrigger>
+                      </ExpandableCard>
+                    </Expandable>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {combinedMarkets.length === 0 && (
                 <motion.div
-                  key={market.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
+                  className="text-center py-12"
                 >
-                  <Expandable transitionDuration={0.3}>
-                    <ExpandableCard className="h-fit">
-                      <ExpandableTrigger className="w-full h-full flex flex-col">
-                        <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              {'combinedVolume' in market ? (
-                                <div className="flex items-center gap-2">
-                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
-                                    COMBINED
-                                  </span>
-                                  <span className="text-sm font-bold text-primary">
-                                    {Math.round(market.matchConfidence * 100)}% match
-                                  </span>
-                                </div>
-                              ) : (
+                  <div className="text-gray-500">
+                    No combined markets found
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          )}
+
+          {/* Individual Markets Section */}
+          {viewMode === 'individual' && (
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <RectangleStackIcon className="w-5 h-5 text-primary" />
+                <h2 className="text-xl font-semibold">Individual Markets ({stats.totalIndividual})</h2>
+              </div>
+              
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                {individualMarkets.map((market) => (
+                  <motion.div
+                    key={market.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Expandable transitionDuration={0.3}>
+                      <ExpandableCard className="h-fit">
+                        <ExpandableTrigger className="w-full h-full flex flex-col">
+                          <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
                                   <div className={`w-2 h-2 rounded-full ${market.source === 'polymarket' ? 'bg-blue-500' : market.source === 'omen' ? 'bg-purple-500' : 'bg-gray-500'}`}></div>
                                   {market.source.toUpperCase()}
                                 </span>
-                              )}
-                              <div className="text-xs text-base-content/70">
-                                {market.outcomes?.length || 2} outcomes
-                              </div>
-                            </div>
-                            <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
-                              {/* Show main title - smart extraction based on question type */}
-                              {(() => {
-                                const title = market.title;
-
-                                // For sports games (Team vs Team format)
-                                if (title.includes(' vs. ') || title.includes(' vs ')) {
-                                  // Extract just the matchup part
-                                  const vsMatch = title.match(/^([^:]+(?:\s+vs\.?\s+[^:]+))/i);
-                                  if (vsMatch) {
-                                    return vsMatch[1].trim();
-                                  }
-                                }
-
-                                // For regular questions, split at "?"
-                                if (title.includes('?')) {
-                                  return title.split('?')[0] + '?';
-                                }
-
-                                // For other formats, take first sentence or up to 60 characters
-                                const firstSentence = title.split('.')[0];
-                                if (firstSentence.length <= 60) {
-                                  return firstSentence + (title.includes('.') ? '.' : '');
-                                }
-
-                                // Fallback: truncate at 60 characters
-                                return title.length > 60 ? title.substring(0, 60) + '...' : title;
-                              })()}
-                            </h3>
-                          </div>
-                        </ExpandableCardHeader>
-
-                        <ExpandableCardContent>
-                          {/* Basic Info - Always Visible */}
-                          <div className="grid grid-cols-2 gap-4 text-xs">
-                            <div className="space-y-2">
-                              <div>
-                                <span className="font-medium text-base-content/60">Volume:</span>
-                                <div className="font-semibold text-base-content">
-                                  {'combinedVolume' in market
-                                    ? formatVolume(market.combinedVolume)
-                                    : formatVolume(market.volume || 0)
-                                  }
+                                <div className="text-xs text-base-content/70">
+                                  {market.outcomes?.length || 2} outcomes
                                 </div>
                               </div>
-                              <div>
-                                <span className="font-medium text-base-content/60">Category:</span>
-                                <div className="text-base-content">
-                                  {(market.category || 'General').charAt(0).toUpperCase() + (market.category || 'General').slice(1)}
-                                </div>
-                              </div>
+                              <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
+                                {market.title}
+                              </h3>
                             </div>
-                            <div className="space-y-2">
-                              {'combinedVolume' in market ? (
-                                <div>
-                                  <span className="font-medium text-base-content/60">Platforms:</span>
-                                  <div className="flex flex-wrap gap-1 mt-1">
-                                    {market.polymarketMarket && (
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700/50">
-                                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                                        Polymarket
-                                      </span>
-                                    )}
-                                    {market.omenMarket && (
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700/50">
-                                        <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                                        Omen
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              ) : (
-                                <div>
-                                  <span className="font-medium text-base-content/60">Source:</span>
-                                  <div className="mt-1">
-                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
-                                      <div className={`w-1.5 h-1.5 rounded-full ${market.source === 'polymarket' ? 'bg-blue-500' : market.source === 'omen' ? 'bg-purple-500' : 'bg-gray-500'}`}></div>
-                                      {market.source.charAt(0).toUpperCase() + market.source.slice(1)}
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </ExpandableCardContent>
-                      </ExpandableTrigger>
+                          </ExpandableCardHeader>
 
-                      <ExpandableCardContent>
-                        <div className="space-y-3">
-                          {/* Expandable Details */}
-                          <ExpandableContent preset="slide-up">
-                            <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                              {/* Complete Title - Only shown when expanded */}
+                          <ExpandableCardContent>
+                            <div className="grid grid-cols-2 gap-4 text-xs">
                               <div className="space-y-2">
-                                <h4 className="text-sm font-semibold text-base-content">Complete Question</h4>
-                                <p className="text-sm text-base-content/80 leading-relaxed">
-                                  {market.title}
-                                </p>
+                                <div>
+                                  <span className="font-medium text-base-content/60">Volume:</span>
+                                  <div className="font-semibold text-base-content">
+                                    {formatVolume(market.volume || 0)}
+                                  </div>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-base-content/60">Category:</span>
+                                  <div className="text-base-content">
+                                    {(market.category || 'General').charAt(0).toUpperCase() + (market.category || 'General').slice(1)}
+                                  </div>
+                                </div>
                               </div>
-
-                              <h4 className="text-sm font-semibold text-base-content">Market Details</h4>
-
-                              {/* Outcomes */}
-                              {market.outcomes && market.outcomes.length > 0 && (
-                                <div className="space-y-2">
-                                  <span className="text-xs font-medium text-base-content/70">Outcomes:</span>
-                                  <div className="space-y-2">
-                                    {market.outcomes.map((outcome: any, index: number) => {
-                                      const outcomeText = typeof outcome === 'string'
-                                        ? outcome
-                                        : (outcome as any)?.name || `Outcome ${index + 1}`;
-                                      const outcomePrice = typeof outcome === 'object' && (outcome as any)?.price
-                                        ? `${((outcome as any).price * 100).toFixed(1)}%`
-                                        : 'N/A';
-
-                                      return (
-                                        <div key={index} className="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                          <span className="text-xs text-base-content/80">{outcomeText}</span>
-                                          <span className="text-sm font-bold text-primary">{outcomePrice}</span>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
+                              <div>
+                                <span className="font-medium text-base-content/60">Source:</span>
+                                <div className="text-base-content">
+                                  {market.source.charAt(0).toUpperCase() + market.source.slice(1)}
                                 </div>
-                              )}
-
-                              {/* Additional Details for Combined Markets */}
-                              {'combinedVolume' in market && (
-                                <div className="space-y-3">
-                                  <span className="text-xs font-medium text-base-content/70">Platform Breakdown:</span>
-                                  <div className="grid grid-cols-1 gap-3">
-                                    {market.polymarketMarket && (
-                                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg p-3 border border-blue-200 dark:border-blue-700/50">
-                                        <div className="flex justify-between items-center">
-                                          <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                            <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Polymarket</span>
-                                          </div>
-                                          <span className="text-sm font-bold text-blue-600 dark:text-blue-400">{formatVolume(market.polymarketMarket.volume || 0)}</span>
-                                        </div>
-                                      </div>
-                                    )}
-                                    {market.omenMarket && (
-                                      <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-3 border border-purple-200 dark:border-purple-700/50">
-                                        <div className="flex justify-between items-center">
-                                          <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                                            <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">Omen</span>
-                                          </div>
-                                          <span className="text-sm font-bold text-purple-600 dark:text-purple-400">{formatVolume(market.omenMarket.volume || 0)}</span>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
+                              </div>
                             </div>
-                          </ExpandableContent>
-                        </div>
-                      </ExpandableCardContent>
-                    </ExpandableCard>
-                  </Expandable>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {combinedMarkets.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-                className="text-center py-12"
-              >
-                <div className="text-gray-500">
-                  No combined markets found
-                </div>
+                          </ExpandableCardContent>
+                        </ExpandableTrigger>
+                      </ExpandableCard>
+                    </Expandable>
+                  </motion.div>
+                ))}
               </motion.div>
-            )}
-          </div>
 
-          {/* Individual Markets Section */}
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <RectangleStackIcon className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold">Individual Markets ({stats.totalIndividual})</h2>
-            </div>
-            
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {individualMarkets.map((market) => (
+              {individualMarkets.length === 0 && (
                 <motion.div
-                  key={market.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
+                  className="text-center py-12"
                 >
-                  <Expandable transitionDuration={0.3}>
-                    <ExpandableCard className="h-fit">
-                      <ExpandableTrigger className="w-full h-full flex flex-col">
-                        <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
-                                <div className={`w-2 h-2 rounded-full ${market.source === 'polymarket' ? 'bg-blue-500' : market.source === 'omen' ? 'bg-purple-500' : 'bg-gray-500'}`}></div>
-                                {market.source.toUpperCase()}
-                              </span>
-                              <div className="text-xs text-base-content/70">
-                                {market.outcomes?.length || 2} outcomes
-                              </div>
-                            </div>
-                            <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
-                              {market.title}
-                            </h3>
-                          </div>
-                        </ExpandableCardHeader>
-
-                        <ExpandableCardContent>
-                          <div className="grid grid-cols-2 gap-4 text-xs">
-                            <div className="space-y-2">
-                              <div>
-                                <span className="font-medium text-base-content/60">Volume:</span>
-                                <div className="font-semibold text-base-content">
-                                  {formatVolume(market.volume || 0)}
-                                </div>
-                              </div>
-                              <div>
-                                <span className="font-medium text-base-content/60">Category:</span>
-                                <div className="text-base-content">
-                                  {(market.category || 'General').charAt(0).toUpperCase() + (market.category || 'General').slice(1)}
-                                </div>
-                              </div>
-                            </div>
-                            <div>
-                              <span className="font-medium text-base-content/60">Source:</span>
-                              <div className="text-base-content">
-                                {market.source.charAt(0).toUpperCase() + market.source.slice(1)}
-                              </div>
-                            </div>
-                          </div>
-                        </ExpandableCardContent>
-                      </ExpandableTrigger>
-                    </ExpandableCard>
-                  </Expandable>
+                  <div className="text-gray-500">
+                    No individual markets found
+                  </div>
                 </motion.div>
-              ))}
-            </motion.div>
-
-            {individualMarkets.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-                className="text-center py-12"
-              >
-                <div className="text-gray-500">
-                  No individual markets found
-                </div>
-              </motion.div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </MarketSection>
     </div>

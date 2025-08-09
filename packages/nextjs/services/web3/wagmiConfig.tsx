@@ -2,8 +2,10 @@ import { wagmiConnectors } from "./wagmiConnectors";
 import { Chain, createClient, fallback, http } from "viem";
 import { hardhat, mainnet } from "viem/chains";
 import { createConfig } from "wagmi";
+import { sapphireHttpTransport, injectedWithSapphire } from "@oasisprotocol/sapphire-wagmi-v2";
 import scaffoldConfig, { DEFAULT_ALCHEMY_API_KEY, ScaffoldConfig } from "~~/scaffold.config";
 import { getAlchemyHttpUrl } from "~~/utils/scaffold-eth";
+import { sapphireTestnet } from "~~/utils/scaffold-eth/customChains";
 
 const { targetNetworks } = scaffoldConfig;
 
@@ -12,26 +14,38 @@ export const enabledChains = targetNetworks.find((network: Chain) => network.id 
   ? targetNetworks
   : ([...targetNetworks, mainnet] as const);
 
-export const wagmiConfig = createConfig({
-  chains: enabledChains,
-  connectors: wagmiConnectors,
-  ssr: true,
-  client: ({ chain }) => {
-    let rpcFallbacks = [http()];
-    const rpcOverrideUrl = (scaffoldConfig.rpcOverrides as ScaffoldConfig["rpcOverrides"])?.[chain.id];
-    if (rpcOverrideUrl) {
-      rpcFallbacks = [http(rpcOverrideUrl), http()];
-    } else {
-      const alchemyHttpUrl = getAlchemyHttpUrl(chain.id);
-      if (alchemyHttpUrl) {
-        const isUsingDefaultKey = scaffoldConfig.alchemyApiKey === DEFAULT_ALCHEMY_API_KEY;
-        rpcFallbacks = isUsingDefaultKey ? [http(), http(alchemyHttpUrl)] : [http(alchemyHttpUrl), http()];
+// Create transports object following Sapphire docs pattern
+const createTransports = () => {
+  const transports: Record<number, any> = {};
+  
+  // Add Sapphire transport for Sapphire networks
+  transports[sapphireTestnet.id] = sapphireHttpTransport();
+  
+  // Add default transports for other networks
+  enabledChains.forEach((chain) => {
+    if (chain.id !== sapphireTestnet.id) {
+      let rpcFallbacks = [http()];
+      const rpcOverrideUrl = (scaffoldConfig.rpcOverrides as ScaffoldConfig["rpcOverrides"])?.[chain.id];
+      if (rpcOverrideUrl) {
+        rpcFallbacks = [http(rpcOverrideUrl), http()];
+      } else {
+        const alchemyHttpUrl = getAlchemyHttpUrl(chain.id);
+        if (alchemyHttpUrl) {
+          const isUsingDefaultKey = scaffoldConfig.alchemyApiKey === DEFAULT_ALCHEMY_API_KEY;
+          rpcFallbacks = isUsingDefaultKey ? [http(), http(alchemyHttpUrl)] : [http(alchemyHttpUrl), http()];
+        }
       }
+      transports[chain.id] = fallback(rpcFallbacks);
     }
-    return createClient({
-      chain,
-      transport: fallback(rpcFallbacks),
-      ...(chain.id !== (hardhat as Chain).id ? { pollingInterval: scaffoldConfig.pollingInterval } : {}),
-    });
-  },
+  });
+  
+  return transports;
+};
+
+export const wagmiConfig = createConfig({
+  multiInjectedProviderDiscovery: false,
+  chains: enabledChains,
+  connectors: [...wagmiConnectors, injectedWithSapphire()],
+  transports: createTransports(),
+  ssr: true,
 });
