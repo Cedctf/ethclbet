@@ -74,6 +74,21 @@ export default function SimpleBetPage() {
     return await tx.wait();
   };
 
+  const transferContractBalanceWithSapphire = async (to: string, amount: bigint, token: string) => {
+    if (!deployedContractData) throw new Error("Contract not deployed");
+    
+    // Use getSapphireProvider for encrypted transactions
+    const sapphireProvider = getSapphireProvider();
+    if (!sapphireProvider) throw new Error("Failed to get Sapphire provider");
+    
+    const signer = await getSapphireEthersSigner();
+    if (!signer) throw new Error("Failed to get Sapphire signer");
+    
+    const contract = new ethers.Contract(deployedContractData.address, deployedContractData.abi, signer);
+    const tx = await contract.transferContractBalance(to, amount, token);
+    return await tx.wait();
+  };
+
   // Form states
   const [betDescription, setBetDescription] = useState("");
   const [betOutcome, setBetOutcome] = useState(0); // Single outcome for all subbets
@@ -96,6 +111,11 @@ export default function SimpleBetPage() {
   // Cancel bet (owner only)
   const [cancelBetId, setCancelBetId] = useState("");
   const [loadingCancel, setLoadingCancel] = useState(false);
+
+  // Transfer contract balance (owner only)
+  const [transferAddress, setTransferAddress] = useState("");
+  const [transferAmount, setTransferAmount] = useState("");
+  const [loadingTransfer, setLoadingTransfer] = useState(false);
 
   // SubBet details
   const [subBetDetailsId, setSubBetDetailsId] = useState("");
@@ -595,6 +615,92 @@ export default function SimpleBetPage() {
     }
   };
 
+  // Transfer Contract Balance (owner only)
+  const handleTransferContractBalance = async () => {
+    if (!transferAddress || !ethers.isAddress(transferAddress)) {
+      notification.error("Please enter a valid Ethereum address");
+      return;
+    }
+
+    if (!transferAmount || isNaN(parseFloat(transferAmount)) || parseFloat(transferAmount) <= 0) {
+      notification.error("Please enter a valid transfer amount");
+      return;
+    }
+
+    if (!isTokenValid()) {
+      notification.error("Please authenticate with SIWE first");
+      return;
+    }
+
+    // Check if transfer amount exceeds contract balance
+    const transferAmountWei = parseEther(transferAmount);
+    if (contractBalance && transferAmountWei > contractBalance) {
+      notification.error("Transfer amount exceeds contract balance");
+      return;
+    }
+
+    setLoadingTransfer(true);
+    try {
+      const tokenBytes = siweToken as `0x${string}`;
+      let txHash: string;
+
+      if (isOnSapphire) {
+        // Use Sapphire encrypted transactions
+        notification.info("🔒 Processing encrypted transfer on Sapphire...", { duration: 0 });
+        const receipt = await transferContractBalanceWithSapphire(transferAddress, transferAmountWei, tokenBytes as string);
+        txHash = receipt.hash || receipt.transactionHash;
+        
+        notification.success(
+          <div>
+            <div>🔒 Transfer of {transferAmount} ETH to {transferAddress} successful!</div>
+            <div className="mt-2">
+              <a 
+                href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
+      } else {
+        // Fallback for non-Sapphire networks
+        const result = await writeContractAsync({
+          functionName: "transferContractBalance",
+          args: [transferAddress as `0x${string}`, transferAmountWei, tokenBytes],
+        });
+
+        notification.success(
+          <div>
+            <div>Transfer of {transferAmount} ETH to {transferAddress} successful!</div>
+            <div className="mt-2">
+              <a 
+                href={`https://etherscan.io/tx/${result}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>,
+          { duration: 8000 }
+        );
+      }
+
+      setTransferAddress("");
+      setTransferAmount("");
+    } catch (error) {
+      console.error("Error transferring contract balance:", error);
+      notification.error("Failed to transfer contract balance. Make sure you're the owner and have sufficient balance.");
+    } finally {
+      setLoadingTransfer(false);
+    }
+  };
+
   // Withdraw Balance
   const handleWithdraw = async () => {
     if (!userBalance || userBalance === 0n) {
@@ -972,7 +1078,7 @@ export default function SimpleBetPage() {
             </div>
 
             {/* Cancel Bet */}
-            <div className="space-y-4">
+            <div className="space-y-4 mb-6">
               <h3 className="text-lg font-medium">Cancel Bet</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -994,6 +1100,51 @@ export default function SimpleBetPage() {
                     {loadingCancel ? "Cancelling..." : "Cancel Bet"}
                   </button>
                 </div>
+              </div>
+            </div>
+
+            {/* Transfer Contract Balance */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Transfer Contract Balance</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="label">Recipient Address</label>
+                  <input
+                    type="text"
+                    value={transferAddress}
+                    onChange={e => setTransferAddress(e.target.value)}
+                    className="input input-bordered w-full"
+                    placeholder="0x..."
+                  />
+                </div>
+                <div>
+                  <label className="label">Amount (ETH)</label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    value={transferAmount}
+                    onChange={e => setTransferAmount(e.target.value)}
+                    className="input input-bordered w-full"
+                    placeholder="0.1"
+                  />
+                  <div className="label">
+                    <span className="label-text-alt text-info">
+                      Available: {contractBalance ? formatEther(contractBalance) : "0"} ETH
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-end">
+                  <button
+                    onClick={handleTransferContractBalance}
+                    disabled={loadingTransfer || !isAuthenticated || !contractBalance || contractBalance === 0n}
+                    className="btn btn-primary w-full"
+                  >
+                    {loadingTransfer ? "Transferring..." : "Transfer"}
+                  </button>
+                </div>
+              </div>
+              <div className="text-xs text-gray-500">
+                ℹ️ Transfer contract funds to any address. Only the contract owner can perform this action.
               </div>
             </div>
 

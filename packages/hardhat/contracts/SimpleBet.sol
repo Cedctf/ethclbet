@@ -392,6 +392,27 @@ contract SimpleBet is SiweAuth {
     }
     
     /**
+     * @dev Transfer contract funds to a specified address (only owner)
+     * @param to Address to transfer funds to
+     * @param amount Amount to transfer
+     * @param token SIWE authentication token for owner
+     */
+    function transferContractBalance(
+        address payable to,
+        uint256 amount,
+        bytes memory token
+    ) external onlyOwner(token) {
+        require(to != address(0), "Cannot transfer to zero address");
+        require(amount > 0, "Transfer amount must be greater than 0");
+        require(amount <= address(this).balance, "Insufficient contract balance");
+        
+        (bool success, ) = to.call{value: amount}("");
+        require(success, "Transfer failed");
+        
+        emit FundsWithdrawn(to, amount);
+    }
+    
+    /**
      * @dev Get all bet metadata (paginated) - requires SIWE authentication
      * @param token SIWE authentication token
      * @param offset Pagination offset
