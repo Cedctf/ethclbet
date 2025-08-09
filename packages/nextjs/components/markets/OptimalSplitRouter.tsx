@@ -48,6 +48,10 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   const [result, setResult] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Adjustable allocations (user can modify these)
+  const [adjustedPolymarketAllocation, setAdjustedPolymarketAllocation] = useState<number>(0);
+  const [adjustedOmenAllocation, setAdjustedOmenAllocation] = useState<number>(0);
 
   // Helper to check if market is combined
   const isCombinedMarket = (market: CombinedMarket | NormalizedMarket): market is CombinedMarket => {
@@ -157,6 +161,9 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
 
       if (data.result) {
         setResult(data.result);
+        // Initialize adjustable values with optimal split
+        setAdjustedPolymarketAllocation(data.result.orderBookAllocation);
+        setAdjustedOmenAllocation(data.result.lmsrAllocation);
         console.log('Optimal split result:', data.result);
       } else {
         throw new Error('No optimization result returned');
@@ -168,6 +175,52 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     } finally {
       setIsCalculating(false);
     }
+  };
+
+  // Generate JSON format for display
+  const generateOptimalSplitJSON = () => {
+    if (!result) return null;
+
+    return {
+      optimal_split: {
+        total_budget: budget,
+        allocations: {
+          polymarket: {
+            platform: "Polymarket",
+            type: "Order Book",
+            allocation_usd: result.orderBookAllocation,
+            allocation_percent: result.efficiency.allocationRatio.orderBookPercent,
+            shares: result.orderBookShares,
+            avg_price_per_share: result.orderBookAllocation / result.orderBookShares
+          },
+          omen: {
+            platform: "Omen",
+            type: "LMSR AMM",
+            allocation_usd: result.lmsrAllocation,
+            allocation_percent: result.efficiency.allocationRatio.lmsrPercent,
+            shares: result.lmsrShares,
+            avg_price_per_share: result.lmsrAllocation / result.lmsrShares
+          }
+        },
+        summary: {
+          total_shares: result.totalShares,
+          total_cost: result.totalCost,
+          cost_per_share: result.efficiency.costPerShare,
+          strategy: result.strategy
+        }
+      }
+    };
+  };
+
+  // Handle adjustment changes
+  const handlePolymarketChange = (value: number) => {
+    setAdjustedPolymarketAllocation(value);
+    setAdjustedOmenAllocation(budget - value);
+  };
+
+  const handleOmenChange = (value: number) => {
+    setAdjustedOmenAllocation(value);
+    setAdjustedPolymarketAllocation(budget - value);
   };
 
   // Check what data is available
@@ -192,29 +245,6 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           </div>
         </div>
       </div>
-
-      {/* Market Data Preview */}
-      {(hasPolymarket || hasOmen) && (
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-          <div className="text-sm text-blue-800 font-medium mb-2">Market Data Summary:</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-blue-700">
-            {hasPolymarket && (
-              <div>
-                <strong>Polymarket:</strong>
-                <div>Volume: ${extractMarketStats(market, 'polymarket')?.scaledCollateralVolume || '0'}</div>
-                <div>Trades: {extractMarketStats(market, 'polymarket')?.tradesQuantity || '0'}</div>
-              </div>
-            )}
-            {hasOmen && (
-              <div>
-                <strong>Omen:</strong>
-                <div>Volume: ${extractMarketStats(market, 'omen')?.scaledCollateralVolume || '0'}</div>
-                <div>Trades: {extractMarketStats(market, 'omen')?.tradesQuantity || '0'}</div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Budget Selector */}
       <div className="mb-4">
@@ -256,78 +286,95 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       {/* Results Display */}
       {result && (
         <div className="mt-6 space-y-4">
-          <h4 className="font-semibold text-gray-900">Optimization Results</h4>
+          <h4 className="font-semibold text-gray-900">Optimal Split Results (JSON)</h4>
           
-          {/* Summary Cards */}
+          {/* JSON Display */}
+          <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto">
+            <pre className="text-xs font-mono whitespace-pre-wrap">
+              {JSON.stringify(generateOptimalSplitJSON(), null, 2)}
+            </pre>
+          </div>
+
+          {/* Adjustment Controls */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h5 className="font-medium text-blue-900 mb-3">Adjust Allocations</h5>
+            
+            {hasPolymarket && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-blue-800 mb-2">
+                  Polymarket: ${adjustedPolymarketAllocation.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max={budget}
+                  step="10"
+                  value={adjustedPolymarketAllocation}
+                  onChange={(e) => handlePolymarketChange(Number(e.target.value))}
+                  className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+            )}
+
+            {hasOmen && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-blue-800 mb-2">
+                  Omen: ${adjustedOmenAllocation.toFixed(2)}
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max={budget}
+                  step="10"
+                  value={adjustedOmenAllocation}
+                  onChange={(e) => handleOmenChange(Number(e.target.value))}
+                  className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+            )}
+
+            <div className="text-sm text-blue-700">
+              Total: ${(adjustedPolymarketAllocation + adjustedOmenAllocation).toFixed(2)} / ${budget}
+            </div>
+          </div>
+
+          {/* Current Allocation Summary */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-sm text-blue-600 font-medium">Order Book Allocation</div>
-              <div className="text-xl font-bold text-blue-900">${result.orderBookAllocation.toFixed(2)}</div>
-              <div className="text-sm text-blue-700">{result.orderBookShares.toFixed(2)} shares</div>
-            </div>
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-sm text-green-600 font-medium">LMSR Allocation</div>
-              <div className="text-xl font-bold text-green-900">${result.lmsrAllocation.toFixed(2)}</div>
-              <div className="text-sm text-green-700">{result.lmsrShares.toFixed(2)} shares</div>
-            </div>
-          </div>
-
-          {/* Total Results */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-sm text-gray-600">Total Shares</div>
-                <div className="text-lg font-bold text-gray-900">{result.totalShares.toFixed(2)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-600">Total Cost</div>
-                <div className="text-lg font-bold text-gray-900">${result.totalCost.toFixed(2)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-600">Strategy</div>
-                <div className="text-lg font-bold text-gray-900">{result.strategy}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Efficiency Metrics */}
-          {result.efficiency && (
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <div className="text-sm text-yellow-800 font-medium mb-2">Efficiency Analysis</div>
-              <div className="text-sm text-yellow-700">
-                Cost per share: ${result.efficiency.costPerShare.toFixed(4)}
-              </div>
-              <div className="text-sm text-yellow-700">
-                Allocation ratio: {result.efficiency.allocationRatio.orderBookPercent.toFixed(1)}% OB / {result.efficiency.allocationRatio.lmsrPercent.toFixed(1)}% LMSR
-              </div>
-            </div>
-          )}
-
-          {/* Platform Data */}
-          {result.platformData && (
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-800 font-medium mb-2">Platform Analysis</div>
-              <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                <div>
-                  <strong>Order Book:</strong>
-                  <div>Levels: {result.platformData.orderBook.orderLevels}</div>
-                  <div>Liquidity: {result.platformData.orderBook.totalLiquidity} shares</div>
-                  <div>Price Range: ${result.platformData.orderBook.priceRange.min.toFixed(2)} - ${result.platformData.orderBook.priceRange.max.toFixed(2)}</div>
-                </div>
-                <div>
-                  <strong>LMSR:</strong>
-                  <div>YES Shares: {result.platformData.lmsr.yesShares}</div>
-                  <div>NO Shares: {result.platformData.lmsr.noShares}</div>
-                  <div>Liquidity Param: {result.platformData.lmsr.liquidityParameter}</div>
+            {hasPolymarket && (
+              <div className="bg-green-50 p-3 rounded-lg">
+                <div className="text-sm text-green-600 font-medium">Polymarket</div>
+                <div className="text-lg font-bold text-green-900">${adjustedPolymarketAllocation.toFixed(2)}</div>
+                <div className="text-xs text-green-700">
+                  {((adjustedPolymarketAllocation / budget) * 100).toFixed(1)}% of budget
                 </div>
               </div>
-            </div>
-          )}
+            )}
+            
+            {hasOmen && (
+              <div className="bg-purple-50 p-3 rounded-lg">
+                <div className="text-sm text-purple-600 font-medium">Omen</div>
+                <div className="text-lg font-bold text-purple-900">${adjustedOmenAllocation.toFixed(2)}</div>
+                <div className="text-xs text-purple-700">
+                  {((adjustedOmenAllocation / budget) * 100).toFixed(1)}% of budget
+                </div>
+              </div>
+            )}
+          </div>
 
-          {/* Action Button */}
+          {/* Place Bet Button */}
           <div className="pt-4 border-t">
-            <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-              Place Bet with Optimal Split
+            <button 
+              className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
+              onClick={() => {
+                // This will be connected to your bet placement logic
+                console.log('Place bet with allocation:', {
+                  polymarket: adjustedPolymarketAllocation,
+                  omen: adjustedOmenAllocation,
+                  total: adjustedPolymarketAllocation + adjustedOmenAllocation
+                });
+              }}
+            >
+              Place Bet with Current Allocation
             </button>
           </div>
         </div>
