@@ -1,502 +1,236 @@
 "use client";
 
-import React, {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react"
-import {
-  AnimatePresence,
-  HTMLMotionProps,
-  TargetAndTransition,
-  motion,
-  useMotionValue,
-  useSpring,
-  Easing,
-} from "framer-motion"
-import useMeasure from "react-use-measure"
-import { useRouter } from "next/navigation"
+import { motion } from "framer-motion";
+import Link from "next/link";
 
-import { cn } from "../../lib/utils"
-
-const springConfig = { stiffness: 200, damping: 20, bounce: 0.2 }
-
-interface ExpandableContextType {
-  isExpanded: boolean
-  toggleExpand: () => void
-  expandDirection: "vertical" | "horizontal" | "both"
-  expandBehavior: "replace" | "push"
-  transitionDuration: number
-  easeType: Easing
-  initialDelay: number
-  onExpandEnd?: () => void
-  onCollapseEnd?: () => void
+interface MarketCardProps {
+  market: any;
+  formatVolumeAction: (volume: number) => string;
 }
 
-const ExpandableContext = createContext<ExpandableContextType>({
-  isExpanded: false,
-  toggleExpand: () => {},
-  expandDirection: "vertical",
-  expandBehavior: "replace",
-  transitionDuration: 0.3,
-  easeType: "easeInOut" as Easing,
-  initialDelay: 0,
-})
-
-const useExpandable = () => useContext(ExpandableContext)
-
-type ExpandablePropsBase = Omit<HTMLMotionProps<"div">, "children">
-
-interface ExpandableProps extends ExpandablePropsBase {
-  children: ReactNode | ((props: { isExpanded: boolean }) => ReactNode)
-  expanded?: boolean
-  onToggle?: () => void
-  transitionDuration?: number
-  easeType?: Easing
-  expandDirection?: "vertical" | "horizontal" | "both"
-  expandBehavior?: "replace" | "push"
-  initialDelay?: number
-  onExpandStart?: () => void
-  onExpandEnd?: () => void
-  onCollapseStart?: () => void
-  onCollapseEnd?: () => void
-}
-
-const Expandable = React.forwardRef<HTMLDivElement, ExpandableProps>(
-  (
-    {
-      children,
-      expanded,
-      onToggle,
-      transitionDuration = 0.3,
-      easeType = "easeInOut" as Easing,
-      expandDirection = "vertical",
-      expandBehavior = "replace",
-      initialDelay = 0,
-      onExpandStart,
-      onExpandEnd,
-      onCollapseStart,
-      onCollapseEnd,
-      ...props
-    },
-    ref
-  ) => {
-    const [isExpandedInternal, setIsExpandedInternal] = useState(false)
-    const isExpanded = expanded !== undefined ? expanded : isExpandedInternal
-    const toggleExpand = onToggle || (() => setIsExpandedInternal((prev) => !prev))
-
-    useEffect(() => {
-      if (isExpanded) {
-        onExpandStart?.()
-      } else {
-        onCollapseStart?.()
-      }
-    }, [isExpanded, onExpandStart, onCollapseStart])
-
-    const contextValue: ExpandableContextType = {
-      isExpanded,
-      toggleExpand,
-      expandDirection,
-      expandBehavior,
-      transitionDuration,
-      easeType,
-      initialDelay,
-      onExpandEnd,
-      onCollapseEnd,
-    }
-
-    return (
-      <ExpandableContext.Provider value={contextValue}>
-        <motion.div
-          ref={ref}
-          initial={false}
-          animate={{
-            transition: {
-              duration: transitionDuration,
-              ease: easeType,
-              delay: initialDelay,
-            },
-          }}
-          {...props}
-        >
-          {typeof children === "function" ? children({ isExpanded }) : children}
-        </motion.div>
-      </ExpandableContext.Provider>
-    )
+const getSourceBadgeColor = (source: string): string => {
+  switch (source) {
+    case 'polymarket': return 'bg-[#0000FF]/10 text-[#0000FF]';
+    case 'omen': return 'bg-[#f2a5db]/10 text-[#d946ef]';
+    default: return 'bg-base-300 text-base-content';
   }
-)
+};
 
-Expandable.displayName = "Expandable"
-
-type AnimationPreset = {
-  initial: { [key: string]: any }
-  animate: { [key: string]: any }
-  exit: { [key: string]: any }
-}
-
-const ANIMATION_PRESETS: Record<string, AnimationPreset> = {
-  fade: {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-    exit: { opacity: 0 },
-  },
-  "slide-up": {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 20 },
-  },
-  "slide-down": {
-    initial: { opacity: 0, y: -20 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 },
-  },
-  scale: {
-    initial: { opacity: 0, scale: 0.8 },
-    animate: { opacity: 1, scale: 1 },
-    exit: { opacity: 0, scale: 0.8 },
-  },
-}
-
-interface AnimationProps {
-  initial?: TargetAndTransition
-  animate?: TargetAndTransition
-  exit?: TargetAndTransition
-  transition?: any
-}
-
-const getAnimationProps = (
-  preset: keyof typeof ANIMATION_PRESETS | undefined,
-  animateIn?: AnimationProps,
-  animateOut?: AnimationProps
-) => {
-  const defaultAnimation = {
-    initial: {},
-    animate: {},
-    exit: {},
+// Generate realistic betting odds for outcomes
+const generatePriceData = (outcomes: string[], marketId: string) => {
+  // Use market ID as seed for consistent prices
+  const seed = marketId.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+  const random = (seed % 100) / 100;
+  
+  if (outcomes.length === 2) {
+    // For binary markets (Yes/No), create complementary odds that sum to 1
+    const firstPrice = 0.25 + (random * 0.5); // Between 25% and 75%
+    const secondPrice = 1 - firstPrice; // Complement ensures sum = 1
+    
+    return [
+      { name: outcomes[0], price: firstPrice },
+      { name: outcomes[1], price: secondPrice }
+    ];
+  } else {
+    // For multi-outcome markets, generate random weights then normalize
+    const weights = outcomes.map((outcome, index) => {
+      const variation = (random + index * 0.3) % 0.4 + 0.1; // Between 0.1 and 0.5
+      return Math.max(0.05, variation);
+    });
+    
+    // Normalize weights to sum to 1
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+    const normalizedWeights = weights.map(weight => weight / totalWeight);
+    
+    return outcomes.map((outcome, index) => ({
+      name: outcome,
+      price: normalizedWeights[index]
+    }));
   }
+};
 
-  const presetAnimation = preset ? ANIMATION_PRESETS[preset] : defaultAnimation
-
-  return {
-    initial: presetAnimation.initial,
-    animate: presetAnimation.animate,
-    exit: animateOut?.exit || presetAnimation.exit,
-  }
-}
-
-const ExpandableContent = React.forwardRef<
-  HTMLDivElement,
-  Omit<HTMLMotionProps<"div">, "ref"> & {
-    preset?: keyof typeof ANIMATION_PRESETS
-    animateIn?: AnimationProps
-    animateOut?: AnimationProps
-    stagger?: boolean
-    staggerChildren?: number
-    keepMounted?: boolean
-  }
->(
-  (
-    {
-      children,
-      preset,
-      animateIn,
-      animateOut,
-      stagger = false,
-      staggerChildren = 0.1,
-      keepMounted = false,
-      ...props
-    },
-    ref
-  ) => {
-    const { isExpanded, transitionDuration, easeType } = useExpandable()
-    const [measureRef, { height: measuredHeight }] = useMeasure()
-    const animatedHeight = useMotionValue(0)
-    const smoothHeight = useSpring(animatedHeight, springConfig)
-
-    useEffect(() => {
-      if (isExpanded) {
-        animatedHeight.set(measuredHeight)
-      } else {
-        animatedHeight.set(0)
-      }
-    }, [isExpanded, measuredHeight, animatedHeight])
-
-    const animationProps = getAnimationProps(preset, animateIn, animateOut)
-
-    return (
-      <motion.div
-        ref={ref}
-        style={{
-          height: smoothHeight,
-          overflow: "hidden",
-        }}
-        transition={{ duration: transitionDuration, ease: easeType }}
-        {...props}
-      >
-        <AnimatePresence initial={false}>
-          {(isExpanded || keepMounted) && (
-            <motion.div
-              ref={measureRef}
-              initial={animationProps.initial}
-              animate={animationProps.animate}
-              exit={animationProps.exit}
-              transition={{ duration: transitionDuration, ease: easeType }}
-            >
-              {stagger ? (
-                <motion.div
-                  variants={{
-                    hidden: {},
-                    visible: {
-                      transition: {
-                        staggerChildren: staggerChildren,
-                      },
-                    },
-                  }}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  {React.Children.map(
-                    children as React.ReactNode,
-                    (child, index) => (
-                      <motion.div
-                        key={index}
-                        variants={{
-                          hidden: { opacity: 0, y: 20 },
-                          visible: { opacity: 1, y: 0 },
-                        }}
-                      >
-                        {child}
-                      </motion.div>
-                    )
-                  )}
-                </motion.div>
-              ) : (
-                children
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    )
-  }
-)
-
-ExpandableContent.displayName = "ExpandableContent"
-
-interface ExpandableCardProps {
-  children: ReactNode
-  className?: string
-  collapsedSize?: { width?: number; height?: number }
-  expandedSize?: { width?: number; height?: number }
-  hoverToExpand?: boolean
-  expandDelay?: number
-  collapseDelay?: number
-}
-
-const ExpandableCard = React.forwardRef<HTMLDivElement, ExpandableCardProps>(
-  (
-    {
-      children,
-      className = "",
-      collapsedSize = { width: undefined, height: undefined },
-      expandedSize = { width: undefined, height: undefined },
-      hoverToExpand = false,
-      expandDelay = 0,
-      collapseDelay = 0,
-      ...props
-    },
-    ref
-  ) => {
-    const { isExpanded, toggleExpand } = useExpandable()
-    const [measureRef] = useMeasure()
-
-    const handleHover = () => {
-      if (hoverToExpand && !isExpanded) {
-        setTimeout(toggleExpand, expandDelay)
-      }
-    }
-
-    const handleHoverEnd = () => {
-      if (hoverToExpand && isExpanded) {
-        setTimeout(toggleExpand, collapseDelay)
-      }
-    }
-
-    return (
-      <motion.div
-        ref={ref}
-        className={cn("w-full", className)}
-        layout
-        transition={springConfig}
-        onHoverStart={handleHover}
-        onHoverEnd={handleHoverEnd}
-        {...props}
-      >
-        <div
-          className={cn(
-            "bg-white dark:bg-black border border-black dark:border-white rounded-xl shadow-lg",
-            "hover:shadow-xl transition-all duration-300 ease-in-out",
-            "overflow-hidden w-full"
-          )}
-        >
-          <div ref={measureRef} className="flex flex-col w-full">
-            {children}
+export const MarketCard: React.FC<MarketCardProps> = ({ market, formatVolumeAction }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="h-full"
+    >
+      <Link href={`/market/${market.id}`} className="block h-full">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200 p-6 h-full flex flex-col">
+          
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4">
+            {'combinedVolume' in market ? (
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
+                  COMBINED
+                </span>
+                <span className="text-sm font-bold text-primary">
+                  {Math.round(market.matchConfidence * 100)}% match
+                </span>
+              </div>
+            ) : (
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
+                {market.source.toUpperCase()}
+              </span>
+            )}
+            <div className="text-xs text-base-content/70">
+              {market.outcomes?.length || 2} outcomes
+            </div>
           </div>
+
+          {/* Title */}
+          <h3 className="text-lg font-semibold text-base-content mb-4 line-clamp-3 leading-tight hover:text-primary transition-colors flex-grow">
+            {(() => {
+              const title = market.title;
+
+              // For sports games (Team vs Team format)
+              if (title.includes(' vs. ') || title.includes(' vs ')) {
+                const vsMatch = title.match(/^([^:]+(?:\s+vs\.?\s+[^:]+))/i);
+                if (vsMatch) {
+                  return vsMatch[1].trim();
+                }
+              }
+
+              // For regular questions, split at "?"
+              if (title.includes('?')) {
+                return title.split('?')[0] + '?';
+              }
+
+              // For other formats, take first sentence or up to 80 characters
+              const firstSentence = title.split('.')[0];
+              if (firstSentence.length <= 80) {
+                return firstSentence + (title.includes('.') ? '.' : '');
+              }
+
+              // Fallback: truncate at 80 characters
+              return title.length > 80 ? title.substring(0, 80) + '...' : title;
+            })()}
+          </h3>
+
+          {/* Basic Info Grid */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <span className="text-xs font-medium text-base-content/60 block mb-1">Volume:</span>
+              <div className="text-sm font-semibold text-base-content">
+                {'combinedVolume' in market
+                  ? formatVolumeAction(market.combinedVolume)
+                  : formatVolumeAction(market.volume || 0)
+                }
+              </div>
+            </div>
+            <div>
+              <span className="text-xs font-medium text-base-content/60 block mb-1">
+                {'combinedVolume' in market ? 'Platforms:' : 'Category:'}
+              </span>
+              <div className="text-sm text-base-content">
+                {'combinedVolume' in market ? (
+                  [market.polymarketMarket && 'Polymarket', market.omenMarket && 'Omen']
+                    .filter(Boolean).join(' + ')
+                ) : (
+                  (market.category || 'General').charAt(0).toUpperCase() + (market.category || 'General').slice(1)
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Betting Odds */}
+          {market.outcomes && market.outcomes.length > 0 && (
+            <div className="mt-auto">
+              {(() => {
+                // Generate price data for this market
+                const outcomesWithPrices = generatePriceData(market.outcomes, market.id);
+                
+                return (
+                  <div className="space-y-3">
+                    {/* Enhanced Betting Odds Display */}
+                    <div className="space-y-2">
+                      <div className="text-xs font-medium text-base-content/60 mb-3">Win Probability</div>
+                      
+                      <div className="flex gap-2">
+                        {(() => {
+                          // Take only first 2 outcomes and renormalize them to sum to 100%
+                          const firstTwoOutcomes = outcomesWithPrices.slice(0, 2);
+                          const totalProbability = firstTwoOutcomes.reduce((sum, outcome) => sum + outcome.price, 0);
+                          const normalizedOutcomes = firstTwoOutcomes.map(outcome => ({
+                            ...outcome,
+                            price: outcome.price / totalProbability // Renormalize to sum to 1
+                          }));
+                          
+                          return normalizedOutcomes.map((outcome, index) => {
+                            const outcomeText = outcome.name;
+                            const outcomePrice = outcome.price;
+
+                          // Determine if this is Yes/No for color coding
+                          const isYes = outcomeText.toLowerCase().includes('yes');
+                          const isNo = outcomeText.toLowerCase().includes('no');
+
+                          // Calculate display values
+                          const winRate = (outcomePrice * 100).toFixed(1);
+                          const decimalOdds = (1 / outcomePrice).toFixed(2);
+                          const impliedOdds = outcomePrice < 0.5 ? `+${((1/outcomePrice - 1) * 100).toFixed(0)}` : `-${((outcomePrice/(1-outcomePrice)) * 100).toFixed(0)}`;
+                          const payout = `$${(100 * (1/outcomePrice)).toFixed(0)}`;
+
+                          return (
+                            <div 
+                              key={index} 
+                              className={`p-3 rounded-lg border-2 transition-all duration-200 hover:shadow-md ${
+                                isYes 
+                                  ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' 
+                                  : isNo 
+                                  ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+                                  : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800'
+                              }`}
+                              style={{ 
+                                flex: `${outcomePrice}`,
+                                minWidth: '120px' // Ensure minimum readable width
+                              }}
+                            >
+                              {/* Outcome Label with Percentage */}
+                              <div className="flex items-center justify-center gap-2 text-center">
+                                <span className={`text-lg font-bold ${isYes ? 'text-green-700 dark:text-green-300' : isNo ? 'text-red-700 dark:text-red-300' : 'text-primary'}`}>
+                                  {isYes ? 'YES' : isNo ? 'NO' : outcomeText}
+                                </span>
+                                <span className={`text-lg font-bold ${isYes ? 'text-green-700 dark:text-green-300' : isNo ? 'text-red-700 dark:text-red-300' : 'text-primary'}`}>
+                                  {winRate}%
+                                </span>
+                              </div>
+                            </div>
+                          );
+                          });
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* Platform Breakdown for Combined Markets */}
+          {'combinedVolume' in market && (
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+              <span className="text-xs font-medium text-base-content/60 block mb-2">Platform Breakdown:</span>
+              <div className="space-y-2">
+                {market.polymarketMarket && (
+                  <div className="flex justify-between items-center p-2 bg-[#0000FF]/5 dark:bg-[#0000FF]/20 rounded-md">
+                    <span className="text-xs font-medium text-[#0000FF]">Polymarket</span>
+                    <span className="text-xs font-semibold text-[#0000FF]/90">{formatVolumeAction(market.polymarketMarket.volume || 0)}</span>
+                  </div>
+                )}
+                {market.omenMarket && (
+                  <div className="flex justify-between items-center p-2 bg-[#f2a5db]/10 dark:bg-[#f2a5db]/20 rounded-md">
+                    <span className="text-xs font-medium text-[#d946ef] dark:text-[#d946ef]">Omen</span>
+                    <span className="text-xs font-semibold text-[#d946ef]/90">{formatVolumeAction(market.omenMarket.volume || 0)}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      </motion.div>
-    )
-  }
-)
-
-ExpandableCard.displayName = "ExpandableCard"
-
-const ExpandableTrigger = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ children, ...props }, ref) => {
-  const { toggleExpand } = useExpandable()
-  return (
-    <div ref={ref} onClick={toggleExpand} className="cursor-pointer" {...props}>
-      {children}
-    </div>
-  )
-})
-
-ExpandableTrigger.displayName = "ExpandableTrigger"
-
-interface ExpandableCardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  onTitleClick?: () => void;
-  navigateToAnalysis?: boolean;
-  analysisPath?: string;
-}
-
-const ExpandableCardHeader = React.forwardRef<
-  HTMLDivElement,
-  ExpandableCardHeaderProps
->(({ className, children, onTitleClick, navigateToAnalysis = false, analysisPath = "/analysis", ...props }, ref) => {
-  const router = useRouter();
-
-  const handleClick = (e: React.MouseEvent) => {
-    // If there's a custom onTitleClick handler, use it
-    if (onTitleClick) {
-      e.preventDefault();
-      onTitleClick();
-      return;
-    }
-
-    // If navigateToAnalysis is true, navigate to analysis page
-    if (navigateToAnalysis) {
-      e.preventDefault();
-      // Use Next.js router for navigation
-      router.push(analysisPath);
-    }
-  };
-
-  return (
-    <div
-      ref={ref}
-      className={cn("p-4 pb-3", className)}
-      {...props}
-    >
-      <motion.div
-        layout
-        className={cn(
-          "w-full",
-          (onTitleClick || navigateToAnalysis) && "cursor-pointer hover:opacity-80 transition-opacity"
-        )}
-        onClick={handleClick}
-      >
-        {children}
-      </motion.div>
-    </div>
-  );
-})
-
-ExpandableCardHeader.displayName = "ExpandableCardHeader"
-
-interface ExpandableCardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
-  href?: string;
-  onTitleClick?: () => void;
-  children: React.ReactNode;
-}
-
-const ExpandableCardTitle = React.forwardRef<
-  HTMLDivElement,
-  ExpandableCardTitleProps
->(({ className, children, href, onTitleClick, ...props }, ref) => {
-  const router = useRouter();
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    // If there's a custom onTitleClick handler, use it
-    if (onTitleClick) {
-      onTitleClick();
-      return;
-    }
-
-    // If href is provided, navigate to that path
-    if (href) {
-      router.push(href);
-    }
-  };
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "cursor-pointer hover:text-blue-600 hover:underline transition-colors duration-200 font-semibold",
-        className
-      )}
-      onClick={handleClick}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-});
-
-ExpandableCardTitle.displayName = "ExpandableCardTitle"
-
-const ExpandableCardContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("px-4 pb-4 flex-grow", className)}
-    {...props}
-  >
-    <motion.div layout className="w-full">
-      {children}
+      </Link>
     </motion.div>
-  </div>
-))
-ExpandableCardContent.displayName = "ExpandableCardContent"
-
-const ExpandableCardFooter = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("flex items-center p-4 pt-0", className)}
-    {...props}
-  />
-))
-ExpandableCardFooter.displayName = "ExpandableCardFooter"
-
-export {
-  Expandable,
-  useExpandable,
-  ExpandableCard,
-  ExpandableContent,
-  ExpandableContext,
-  ExpandableTrigger,
-  ExpandableCardHeader,
-  ExpandableCardTitle,
-  ExpandableCardContent,
-  ExpandableCardFooter,
-}
+  );
+};

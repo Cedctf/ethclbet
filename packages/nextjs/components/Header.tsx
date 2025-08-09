@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { hardhat } from "viem/chains";
-import { HomeIcon, BugAntIcon, Bars3Icon } from "@heroicons/react/24/outline";
+import { HomeIcon, Bars3Icon, UserIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth";
 import { cn } from "~~/lib/utils";
@@ -24,13 +24,18 @@ const navItems: NavItem[] = [
     icon: HomeIcon,
   },
   {
-    name: "Debug Contracts",
-    url: "/debug",
-    icon: BugAntIcon,
+    name: "Profile",
+    url: "/profile",
+    icon: UserIcon,
   },
 ];
 
-export const NavBar = () => {
+/**
+ * Site header with white navbar containing navigation and wallet connection
+ */
+export const Header = () => {
+  const { targetNetwork } = useTargetNetwork();
+  const isLocalNetwork = targetNetwork.id === hardhat.id;
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState(() => {
     const currentItem = navItems.find(item => item.url === pathname);
@@ -45,80 +50,95 @@ export const NavBar = () => {
   }, [pathname]);
 
   return (
-    <div className="fixed bottom-0 sm:top-0 left-1/2 -translate-x-1/2 z-50 mb-2 sm:mb-0 sm:pt-2 pointer-events-none">
-      <div className="flex items-center gap-3 bg-base-100/5 border border-base-300 backdrop-blur-lg py-1 px-1 rounded-full shadow-lg pointer-events-auto w-fit mx-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.name;
-
-          return (
-            <Link
-              key={item.name}
-              href={item.url}
-              onClick={() => setActiveTab(item.name)}
-              className={cn(
-                "relative cursor-pointer text-sm font-semibold px-6 py-2 rounded-full transition-colors",
-                "text-base-content/80 hover:text-primary",
-                isActive && "bg-base-200 text-primary",
-              )}
-            >
-              <span className="hidden md:inline">{item.name}</span>
-              <span className="md:hidden">
-                <Icon className="h-[18px] w-[18px]" />
-              </span>
-              {isActive && (
-                <motion.div
-                  layoutId="lamp"
-                  className="absolute inset-0 w-full bg-primary/5 rounded-full -z-10"
-                  initial={false}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 30,
-                  }}
-                >
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-t-full">
-                    <div className="absolute w-12 h-6 bg-primary/20 rounded-full blur-md -top-2 -left-2" />
-                    <div className="absolute w-8 h-6 bg-primary/20 rounded-full blur-md -top-1" />
-                    <div className="absolute w-4 h-4 bg-primary/20 rounded-full blur-sm top-0 left-2" />
-                  </div>
-                </motion.div>
-              )}
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="w-full pl-16 pr-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Brand Logo - Far Left */}
+          <div className="flex-shrink-0">
+            <Link href="/" className="flex items-center">
+              <span className="font-bold text-xl text-gray-900 dark:text-white tracking-wider uppercase">ETHCLBET</span>
             </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
+          </div>
 
-/**
- * Site header with transparent navbar and wallet connection
- */
-export const Header = () => {
-  const { targetNetwork } = useTargetNetwork();
-  const isLocalNetwork = targetNetwork.id === hardhat.id;
-  const burgerMenuRef = useRef<HTMLDetailsElement>(null);
+          {/* Navigation Items - Absolute Center */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 hidden sm:flex items-center space-x-8">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.name;
 
-  return (
-    <>
-      {/* Brand Logo - Fixed top left */}
-      <div className="fixed top-6 left-8 z-50">
-        <Link href="/" className="flex items-center">
-          <span className="font-bold text-xl text-base-content tracking-wider uppercase">ETHCLBET</span>
-        </Link>
-      </div>
+              return (
+                <Link
+                  key={item.name}
+                  href={item.url}
+                  onClick={() => setActiveTab(item.name)}
+                  className={cn(
+                    "relative flex items-center gap-2 px-4 h-16 text-base font-semibold transition-colors duration-200",
+                    isActive 
+                      ? "text-primary" 
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  )}
+                >
+                  <span>{item.name}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-indicator"
+                      className="absolute bottom-0 left-0 right-0 h-1 bg-primary"
+                      initial={false}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                      }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
 
-      {/* Wallet Connection - Fixed top right */}
-      <div className="fixed top-6 right-8 z-50">
-        <div className="flex items-center gap-4">
-          <RainbowKitCustomConnectButton />
-          {isLocalNetwork && <FaucetButton />}
+          {/* Mobile Navigation Items - Center on mobile */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex sm:hidden items-center space-x-4">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.name;
+
+              return (
+                <Link
+                  key={item.name}
+                  href={item.url}
+                  onClick={() => setActiveTab(item.name)}
+                  className={cn(
+                    "relative px-3 h-16 flex items-center text-base font-semibold transition-colors duration-200",
+                    isActive 
+                      ? "text-primary" 
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  )}
+                >
+                  <span>{item.name}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-indicator-mobile"
+                      className="absolute bottom-0 left-0 right-0 h-1 bg-primary"
+                      initial={false}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                      }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Wallet Connection - Far Right */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <RainbowKitCustomConnectButton />
+            {isLocalNetwork && <FaucetButton />}
+          </div>
         </div>
       </div>
-
-      {/* Transparent Navigation Bar */}
-      <NavBar />
-    </>
+    </nav>
   );
 };

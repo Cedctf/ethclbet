@@ -197,7 +197,7 @@ export default function ProfilePage() {
   // Get status color class
   const getStatusColor = (status: number) => {
     switch (status) {
-      case 0: return "badge-info"; // Active
+      case 0: return "badge-ghost text-green-600"; // Active - no background, green text
       case 1: return "badge-success"; // Won
       case 2: return "badge-error"; // Lost
       case 3: return "badge-warning"; // Cancelled
@@ -241,7 +241,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-30">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Betting Profile</h1>
         <p className="text-gray-600">Address: {address}</p>
@@ -259,34 +259,34 @@ export default function ProfilePage() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-        <div className="bg-base-100 p-4 rounded-lg shadow text-center">
+        <div className="bg-base-100 p-4 rounded-xl shadow text-center">
           <div className="text-2xl font-bold text-primary">{stats.totalBets}</div>
           <div className="text-sm text-gray-600">Total Bets</div>
         </div>
-        <div className="bg-base-100 p-4 rounded-lg shadow text-center">
+        <div className="bg-base-100 p-4 rounded-xl shadow text-center">
           <div className="text-2xl font-bold text-info">{stats.activeBets}</div>
           <div className="text-sm text-gray-600">Active</div>
         </div>
-        <div className="bg-base-100 p-4 rounded-lg shadow text-center">
+        <div className="bg-base-100 p-4 rounded-xl shadow text-center">
           <div className="text-2xl font-bold text-success">{stats.wonBets}</div>
           <div className="text-sm text-gray-600">Won</div>
         </div>
-        <div className="bg-base-100 p-4 rounded-lg shadow text-center">
+        <div className="bg-base-100 p-4 rounded-xl shadow text-center">
           <div className="text-2xl font-bold text-error">{stats.lostBets}</div>
           <div className="text-sm text-gray-600">Lost</div>
         </div>
-        <div className="bg-base-100 p-4 rounded-lg shadow text-center">
+        <div className="bg-base-100 p-4 rounded-xl shadow text-center">
           <div className="text-2xl font-bold">{stats.totalWagered.toFixed(4)}</div>
           <div className="text-sm text-gray-600">Total Wagered (ETH)</div>
         </div>
-        <div className="bg-base-100 p-4 rounded-lg shadow text-center">
-          <div className="text-2xl font-bold text-accent">{userBalance ? formatEther(userBalance) : "0"}</div>
+        <div className="bg-base-100 p-4 rounded-xl shadow text-center">
+          <div className="text-2xl font-bold text-accent">{userBalance ? Number(formatEther(userBalance)).toFixed(4) : "0"}</div>
           <div className="text-sm text-gray-600">Available Balance (ETH)</div>
         </div>
       </div>
 
       {/* Filter Controls */}
-      <div className="bg-base-100 p-6 rounded-lg shadow mb-6">
+      <div className="bg-base-100 p-6 rounded-lg">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h2 className="text-xl font-semibold">Betting History</h2>
           
@@ -333,7 +333,7 @@ export default function ProfilePage() {
           <div className="overflow-x-auto">
             <table className="table table-zebra w-full">
               <thead>
-                <tr>
+                <tr className="text-center">
                   <th>ID</th>
                   <th>Description</th>
                   <th>Amount</th>
@@ -347,21 +347,21 @@ export default function ProfilePage() {
               <tbody>
                 {filteredBets.map((bet, index) => (
                   <tr key={index} className="hover">
-                    <td className="font-mono text-sm">{bet.id.toString()}</td>
-                    <td>
+                    <td className="font-mono text-sm text-center">{bet.id.toString()}</td>
+                    <td className="text-center">
                       <div className="max-w-xs truncate" title={bet.description}>
                         {bet.description}
                       </div>
                     </td>
-                    <td className="font-semibold">
+                    <td className="font-semibold text-center">
                       {formatEther(bet.amount)} ETH
                     </td>
-                    <td>
+                    <td className="text-center">
                       <span className={`badge ${bet.outcome === 0 ? 'badge-accent' : 'badge-secondary'}`}>
                         {bet.outcome === 0 ? 'YES' : 'NO'}
                       </span>
                     </td>
-                    <td>
+                    <td className="text-center">
                       <span className={`badge ${getStatusColor(bet.status)}`}>
                         {getStatusText(bet.status)}
                       </span>
@@ -369,7 +369,7 @@ export default function ProfilePage() {
                     <td className="text-center">
                       <span className="badge badge-ghost">{bet.subBetCount}</span>
                     </td>
-                    <td className="font-semibold">
+                    <td className="font-semibold text-center">
                       {bet.totalPayout > 0n ? (
                         <span className="text-success">
                           +{formatEther(bet.totalPayout)} ETH
@@ -378,7 +378,7 @@ export default function ProfilePage() {
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="text-sm text-gray-500">
+                    <td className="text-sm text-gray-500 text-center">
                       {bet.createdAt > 0 
                         ? new Date(bet.createdAt * 1000).toLocaleDateString()
                         : 'Unknown'
