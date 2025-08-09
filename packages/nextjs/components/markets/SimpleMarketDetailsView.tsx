@@ -276,16 +276,6 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
                     >
                       Overview
                     </button>
-                    <button
-                      onClick={() => setActiveTab('data')}
-                      className={`py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-                        activeTab === 'data'
-                          ? 'border-[#746097] text-[#746097]'
-                          : 'border-transparent text-base-content/70 hover:text-base-content'
-                      }`}
-                    >
-                      Raw Data
-                    </button>
                   </nav>
                 </div>
 

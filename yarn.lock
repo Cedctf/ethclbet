@@ -5403,24 +5403,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@web3icons/common@npm:0.11.15":
-  version: 0.11.15
-  resolution: "@web3icons/common@npm:0.11.15"
+"@web3icons/common@npm:0.11.16":
+  version: 0.11.16
+  resolution: "@web3icons/common@npm:0.11.16"
   peerDependencies:
     typescript: ^5.0.0
-  checksum: 05cf6e0685bbe64d60ffdaf690fb4a3922f8ae28076708b3670ba75b0696880cae3949ad23585bfcba70c5e5ad0261bf7404f3f300537fc01f6c9db7d3061643
+  checksum: 67e690e3c138ef5fa29753c5e29aa413259448e82becb7f10b3d81921ba8fd34d073e742a423a45fe92aad749c68e526f1a802f41e7e9410f56056d8fca58405
   languageName: node
   linkType: hard
 
-"@web3icons/react@npm:^4.0.19":
-  version: 4.0.19
-  resolution: "@web3icons/react@npm:4.0.19"
+"@web3icons/react@npm:^4.0.20":
+  version: 4.0.20
+  resolution: "@web3icons/react@npm:4.0.20"
   dependencies:
-    "@web3icons/common": 0.11.15
+    "@web3icons/common": 0.11.16
     react: ^18.2.0
   peerDependencies:
     react: ^18.2.0
-  checksum: 9b901f642972e8ead50014810e2c4d37fe632b7baec4d6a864384917fd5718989a49c2fe1b794acdd9330f9ce67083cb9ea2ea51d6ab0ab118555bc7380d6ca7
+  checksum: 385c30705780f299f02a6870ea6cc60c7f6c4ec176a944fb0cbd52d75e04682a792803c3b294e922113c1a67cb88d7b01a0c1a2969e3b671818ff29e398e3442
   languageName: node
   linkType: hard
 
@@ -14931,7 +14931,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "se-2@workspace:."
   dependencies:
-    "@web3icons/react": ^4.0.19
+    "@web3icons/react": ^4.0.20
     husky: ~9.1.6
     lint-staged: ~13.2.2
     lucide-react: ^0.539.0
