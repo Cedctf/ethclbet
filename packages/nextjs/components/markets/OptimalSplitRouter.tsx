@@ -43,6 +43,12 @@ interface OptimalSplitResponse {
   error?: string;
 }
 
+interface PriceConversion {
+  usdAmount: number;
+  ethUsdPrice: number;
+  ethEquivalent: number;
+}
+
 export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) {
   const [budget, setBudget] = useState(1000);
   const [result, setResult] = useState<any>(null);
@@ -52,6 +58,15 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   // Adjustable allocations (user can modify these)
   const [adjustedPolymarketAllocation, setAdjustedPolymarketAllocation] = useState<number>(0);
   const [adjustedOmenAllocation, setAdjustedOmenAllocation] = useState<number>(0);
+
+  // Price conversion data
+  const [priceData, setPriceData] = useState<{
+    polymarketEth: number;
+    omenEth: number;
+    totalEth: number;
+    ethUsdPrice: number;
+  } | null>(null);
+  const [isLoadingPrice, setIsLoadingPrice] = useState(false);
 
   // Helper to check if market is combined
   const isCombinedMarket = (market: CombinedMarket | NormalizedMarket): market is CombinedMarket => {
@@ -105,10 +120,57 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     return null;
   };
 
+  // Convert USD to ETH using Pyth price feed
+  const convertToEth = async (polymarketUsd: number, omenUsd: number) => {
+    setIsLoadingPrice(true);
+    try {
+      // Get price for Polymarket allocation
+      const polymarketResponse = await fetch('/api/pyth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usdAmount: polymarketUsd })
+      });
+      
+      if (!polymarketResponse.ok) {
+        throw new Error('Failed to get Polymarket ETH conversion');
+      }
+      
+      const polymarketData: PriceConversion = await polymarketResponse.json();
+
+      // Get price for Omen allocation
+      const omenResponse = await fetch('/api/pyth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usdAmount: omenUsd })
+      });
+      
+      if (!omenResponse.ok) {
+        throw new Error('Failed to get Omen ETH conversion');
+      }
+      
+      const omenData: PriceConversion = await omenResponse.json();
+
+      // Set price data
+      setPriceData({
+        polymarketEth: polymarketData.ethEquivalent,
+        omenEth: omenData.ethEquivalent,
+        totalEth: polymarketData.ethEquivalent + omenData.ethEquivalent,
+        ethUsdPrice: polymarketData.ethUsdPrice // Should be the same for both
+      });
+
+    } catch (err) {
+      console.error('Price conversion error:', err);
+      setError('Failed to convert USD to ETH. Please try again.');
+    } finally {
+      setIsLoadingPrice(false);
+    }
+  };
+
   const handleOptimalSplit = async () => {
     setIsCalculating(true);
     setError(null);
     setResult(null);
+    setPriceData(null);
 
     try {
       // Extract market statistics for both platforms
@@ -164,6 +226,10 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         // Initialize adjustable values with optimal split
         setAdjustedPolymarketAllocation(data.result.orderBookAllocation);
         setAdjustedOmenAllocation(data.result.lmsrAllocation);
+        
+        // Convert to ETH
+        await convertToEth(data.result.orderBookAllocation, data.result.lmsrAllocation);
+        
         console.log('Optimal split result:', data.result);
       } else {
         throw new Error('No optimization result returned');
@@ -179,48 +245,66 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
 
   // Generate JSON format for display
   const generateOptimalSplitJSON = () => {
-    if (!result) return null;
+    if (!result || !priceData) return null;
 
     return {
       optimal_split: {
-        total_budget: budget,
+        total_budget_usd: budget,
+        total_budget_eth: priceData.totalEth,
+        eth_usd_price: priceData.ethUsdPrice,
         allocations: {
           polymarket: {
             platform: "Polymarket",
             type: "Order Book",
             allocation_usd: result.orderBookAllocation,
+            allocation_eth: priceData.polymarketEth,
             allocation_percent: result.efficiency.allocationRatio.orderBookPercent,
             shares: result.orderBookShares,
-            avg_price_per_share: result.orderBookAllocation / result.orderBookShares
+            avg_price_per_share_usd: result.orderBookAllocation / result.orderBookShares,
+            avg_price_per_share_eth: priceData.polymarketEth / result.orderBookShares
           },
           omen: {
             platform: "Omen",
             type: "LMSR AMM",
             allocation_usd: result.lmsrAllocation,
+            allocation_eth: priceData.omenEth,
             allocation_percent: result.efficiency.allocationRatio.lmsrPercent,
             shares: result.lmsrShares,
-            avg_price_per_share: result.lmsrAllocation / result.lmsrShares
+            avg_price_per_share_usd: result.lmsrAllocation / result.lmsrShares,
+            avg_price_per_share_eth: priceData.omenEth / result.lmsrShares
           }
         },
         summary: {
           total_shares: result.totalShares,
-          total_cost: result.totalCost,
-          cost_per_share: result.efficiency.costPerShare,
+          total_cost_usd: result.totalCost,
+          total_cost_eth: priceData.totalEth,
+          cost_per_share_usd: result.efficiency.costPerShare,
+          cost_per_share_eth: priceData.totalEth / result.totalShares,
           strategy: result.strategy
         }
       }
     };
   };
 
-  // Handle adjustment changes
-  const handlePolymarketChange = (value: number) => {
+  // Handle adjustment changes and recalculate ETH
+  const handlePolymarketChange = async (value: number) => {
     setAdjustedPolymarketAllocation(value);
     setAdjustedOmenAllocation(budget - value);
+    
+    // Recalculate ETH conversion for adjusted amounts
+    if (priceData) {
+      await convertToEth(value, budget - value);
+    }
   };
 
-  const handleOmenChange = (value: number) => {
+  const handleOmenChange = async (value: number) => {
     setAdjustedOmenAllocation(value);
     setAdjustedPolymarketAllocation(budget - value);
+    
+    // Recalculate ETH conversion for adjusted amounts
+    if (priceData) {
+      await convertToEth(budget - value, value);
+    }
   };
 
   // Check what data is available
@@ -250,6 +334,11 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Budget: ${budget}
+          {priceData && (
+            <span className="text-sm text-gray-500 ml-2">
+              (≈ {priceData.totalEth.toFixed(6)} ETH @ ${priceData.ethUsdPrice.toFixed(2)}/ETH)
+            </span>
+          )}
         </label>
         <input
           type="range"
@@ -269,10 +358,12 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       {/* Calculate Button */}
       <button
         onClick={handleOptimalSplit}
-        disabled={isCalculating || (!hasPolymarket && !hasOmen)}
+        disabled={isCalculating || isLoadingPrice || (!hasPolymarket && !hasOmen)}
         className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
       >
-        {isCalculating ? 'Calculating optimal split...' : 'Calculate Optimal Split'}
+        {isCalculating ? 'Calculating optimal split...' : 
+         isLoadingPrice ? 'Converting to ETH...' : 
+         'Calculate Optimal Split'}
       </button>
 
       {/* Error Display */}
@@ -284,7 +375,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       )}
 
       {/* Results Display */}
-      {result && (
+      {result && priceData && (
         <div className="mt-6 space-y-4">
           <h4 className="font-semibold text-gray-900">Optimal Split Results (JSON)</h4>
           
@@ -295,6 +386,14 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             </pre>
           </div>
 
+          {/* ETH Price Info */}
+          <div className="bg-yellow-50 p-3 rounded-lg">
+            <div className="text-sm text-yellow-800 font-medium mb-1">Live ETH Price</div>
+            <div className="text-yellow-700 text-sm">
+              1 ETH = ${priceData.ethUsdPrice.toFixed(2)} USD (via Pyth Network)
+            </div>
+          </div>
+
           {/* Adjustment Controls */}
           <div className="bg-blue-50 p-4 rounded-lg">
             <h5 className="font-medium text-blue-900 mb-3">Adjust Allocations</h5>
@@ -302,7 +401,10 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             {hasPolymarket && (
               <div className="mb-4">
                 <label className="block text-sm font-medium text-blue-800 mb-2">
-                  Polymarket: ${adjustedPolymarketAllocation.toFixed(2)}
+                  Polymarket: ${adjustedPolymarketAllocation.toFixed(2)} 
+                  <span className="text-xs text-blue-600 ml-2">
+                    (≈ {priceData.polymarketEth.toFixed(6)} ETH)
+                  </span>
                 </label>
                 <input
                   type="range"
@@ -312,6 +414,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                   value={adjustedPolymarketAllocation}
                   onChange={(e) => handlePolymarketChange(Number(e.target.value))}
                   className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                  disabled={isLoadingPrice}
                 />
               </div>
             )}
@@ -320,6 +423,9 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               <div className="mb-4">
                 <label className="block text-sm font-medium text-blue-800 mb-2">
                   Omen: ${adjustedOmenAllocation.toFixed(2)}
+                  <span className="text-xs text-blue-600 ml-2">
+                    (≈ {priceData.omenEth.toFixed(6)} ETH)
+                  </span>
                 </label>
                 <input
                   type="range"
@@ -329,21 +435,26 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                   value={adjustedOmenAllocation}
                   onChange={(e) => handleOmenChange(Number(e.target.value))}
                   className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                  disabled={isLoadingPrice}
                 />
               </div>
             )}
 
             <div className="text-sm text-blue-700">
               Total: ${(adjustedPolymarketAllocation + adjustedOmenAllocation).toFixed(2)} / ${budget}
+              <span className="block text-xs">
+                (≈ {priceData.totalEth.toFixed(6)} ETH total)
+              </span>
             </div>
           </div>
 
-          {/* Current Allocation Summary */}
+          {/* Current Allocation Summary with ETH */}
           <div className="grid grid-cols-2 gap-4">
             {hasPolymarket && (
               <div className="bg-green-50 p-3 rounded-lg">
                 <div className="text-sm text-green-600 font-medium">Polymarket</div>
                 <div className="text-lg font-bold text-green-900">${adjustedPolymarketAllocation.toFixed(2)}</div>
+                <div className="text-sm font-medium text-green-800">{priceData.polymarketEth.toFixed(6)} ETH</div>
                 <div className="text-xs text-green-700">
                   {((adjustedPolymarketAllocation / budget) * 100).toFixed(1)}% of budget
                 </div>
@@ -354,6 +465,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               <div className="bg-purple-50 p-3 rounded-lg">
                 <div className="text-sm text-purple-600 font-medium">Omen</div>
                 <div className="text-lg font-bold text-purple-900">${adjustedOmenAllocation.toFixed(2)}</div>
+                <div className="text-sm font-medium text-purple-800">{priceData.omenEth.toFixed(6)} ETH</div>
                 <div className="text-xs text-purple-700">
                   {((adjustedOmenAllocation / budget) * 100).toFixed(1)}% of budget
                 </div>
@@ -368,13 +480,22 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               onClick={() => {
                 // This will be connected to your bet placement logic
                 console.log('Place bet with allocation:', {
-                  polymarket: adjustedPolymarketAllocation,
-                  omen: adjustedOmenAllocation,
-                  total: adjustedPolymarketAllocation + adjustedOmenAllocation
+                  polymarket: {
+                    usd: adjustedPolymarketAllocation,
+                    eth: priceData.polymarketEth
+                  },
+                  omen: {
+                    usd: adjustedOmenAllocation,
+                    eth: priceData.omenEth
+                  },
+                  total: {
+                    usd: adjustedPolymarketAllocation + adjustedOmenAllocation,
+                    eth: priceData.totalEth
+                  }
                 });
               }}
             >
-              Place Bet with Current Allocation
+              Place Bet with Current Allocation ({priceData.totalEth.toFixed(6)} ETH)
             </button>
           </div>
         </div>
