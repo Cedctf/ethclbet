@@ -59,6 +59,7 @@
   },
   "dependencies": {
     "@web3icons/react": "^4.0.20",
-    "lucide-react": "^0.539.0"
+    "lucide-react": "^0.539.0",
+    "siwe": "^3.0.0"
   }
 }

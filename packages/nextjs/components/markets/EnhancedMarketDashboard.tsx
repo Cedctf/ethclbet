@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+
 import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
-import { useCombinedMarkets } from '../../hooks/useCombinedMarkets';
 import { Hero } from '../ui/Hero';
 import {
   Expandable,
@@ -41,6 +40,20 @@ const MarketSection: React.FC<MarketSectionProps & { children: React.ReactNode }
     </div>
   );
 };
+import React, { useState, useEffect, useCallback } from 'react';
+import { useCombinedMarkets, CombinedMarket, NormalizedMarket } from '../../hooks/useCombinedMarkets';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { ethers } from "ethers";
+import { SiweMessage } from "siwe";
+import { useAccount, useSignMessage, useChainId } from "wagmi";
+import { usePublicClient } from "wagmi";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
+
+// Generate random nonce
+const generateNonce = () => Math.random().toString(36).substring(2, 15);
 
 /**
  * Enhanced dashboard component that displays both individual and combined markets
@@ -59,6 +72,126 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   // View mode state
   const [viewMode, setViewMode] = useState<'combined' | 'individual'>('combined');
+
+  // SIWE Authentication
+  const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
+  const publicClient = usePublicClient();
+  const chainId = useChainId();
+  const { data: deployedContractData } = useDeployedContractInfo("SimpleBet");
+
+  // SIWE Authentication state
+  const [siweToken, setSiweToken] = useState<string>("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Get domain from contract
+  const { data: contractDomain } = useScaffoldReadContract({
+    contractName: "SimpleBet",
+    functionName: "domain",
+  });
+
+  // Check if token is valid
+  const isTokenValid = useCallback(() => {
+    if (!siweToken) return false;
+    const storedExpiry = localStorage.getItem("siwe-token-expiry");
+    if (!storedExpiry) return false;
+    const now = new Date().getTime();
+    return now < parseInt(storedExpiry);
+  }, [siweToken]);
+
+  // Load SIWE token from localStorage on mount
+  useEffect(() => {
+    const storedToken = localStorage.getItem("siwe-token");
+    const storedExpiry = localStorage.getItem("siwe-token-expiry");
+
+    if (storedToken && storedExpiry) {
+      const now = new Date().getTime();
+      if (now < parseInt(storedExpiry)) {
+        setSiweToken(storedToken);
+        setIsAuthenticated(true);
+      } else {
+        // Token expired
+        localStorage.removeItem("siwe-token");
+        localStorage.removeItem("siwe-token-expiry");
+        setIsAuthenticated(false);
+      }
+    }
+  }, []);
+
+  // Update authentication state when token changes
+  useEffect(() => {
+    setIsAuthenticated(isTokenValid());
+  }, [siweToken, isTokenValid]);
+
+  // SIWE Login
+  const handleSiweLogin = async () => {
+    if (!address || !deployedContractData || !publicClient || !contractDomain) {
+      notification.error("Please connect your wallet and ensure contract is deployed");
+      return;
+    }
+
+    try {
+      // Get chain ID from the public client
+      const chainId = await publicClient.getChainId();
+
+      // Create SIWE message using the siwe library - matching Sapphire docs exactly
+      const siweMessage = new SiweMessage({
+        domain: contractDomain,
+        address: address,
+        uri: `http://${contractDomain}`, // Use http:// as shown in docs
+        version: "1",
+        chainId: chainId,
+        nonce: generateNonce(),
+        statement: "I accept the Terms of Service: https://service.invalid/", // Add statement as shown in docs
+      });
+
+      const message = siweMessage.toMessage();
+      const signature = await signMessageAsync({ message });
+
+      // Parse signature using ethers.Signature.from as shown in Sapphire docs
+      const sig = ethers.Signature.from(signature);
+
+      // Convert to SignatureRSV format expected by the contract
+      const signatureRSV = {
+        r: sig.r,
+        s: sig.s,
+        v: BigInt(sig.v),
+      };
+
+      // Call the contract's login method to get the proper SIWE token
+      const loginResult = await publicClient.readContract({
+        address: deployedContractData.address,
+        abi: deployedContractData.abi,
+        functionName: "login",
+        args: [message, signatureRSV], // Pass signatureRSV as expected by contract
+      });
+
+      // The login method returns a bytes token that we can use for authenticated calls
+      const token = loginResult as string;
+      const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours
+
+      // Store in localStorage
+      localStorage.setItem("siwe-token", token);
+      localStorage.setItem("siwe-token-expiry", expiryTime.toString());
+
+      setSiweToken(token);
+      setIsAuthenticated(true);
+
+      notification.success("Successfully authenticated with SIWE!");
+    } catch (error) {
+      console.error("SIWE login failed:", error);
+      notification.error("SIWE login failed");
+    }
+  };
+
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem("siwe-token");
+    localStorage.removeItem("siwe-token-expiry");
+    setSiweToken("");
+    setIsAuthenticated(false);
+    notification.success("Logged out successfully");
+  };
 
   const handleRefresh = async () => {
     await refetch();
@@ -126,19 +259,114 @@ export const EnhancedMarketDashboard: React.FC = () => {
   const individualMarkets = filterMarkets(data.individualMarkets);
 
   return (
-    <div className="relative">
-      {/* Hero Section - Normal document flow */}
-      <Hero
-        description="Discover and analyze prediction markets across multiple platforms. Compare odds, track performance, and make data-driven decisions."
-        primaryCTA={{
-          text: "View Markets",
-          href: "#market-section"
-        }}
-        secondaryCTA={{
-          text: "How it Works",
-          href: "/about"
-        }}
-      />
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          🎯 Enhanced Prediction Markets Hub
+        </h1>
+        <p className="text-gray-600 mb-4">
+          Unified market data with intelligent combination and real volume tracking
+        </p>
+
+        {/* SIWE Authentication Section */}
+        {isConnected && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">🔐 SIWE Authentication</h2>
+            <div className="flex items-center gap-4">
+              {isAuthenticated ? (
+                <>
+                  <span className="flex items-center gap-2 text-green-600">
+                    <span className="text-lg">✓</span>
+                    <span>Authenticated</span>
+                  </span>
+                  <button 
+                    onClick={handleLogout} 
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="flex items-center gap-2 text-red-600">
+                    <span className="text-lg">✗</span>
+                    <span>Not authenticated</span>
+                  </span>
+                  <button 
+                    onClick={handleSiweLogin} 
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Sign-In with Ethereum
+                  </button>
+                </>
+              )}
+            </div>
+            {isAuthenticated && (
+              <div className="mt-2 text-xs text-gray-500">
+                Token stored securely (expires in 24h) • Required for private market interactions
+              </div>
+            )}
+            {!isAuthenticated && (
+              <div className="mt-2 text-xs text-gray-500">
+                Sign with your wallet to access authenticated features and private market data
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Controls */}
+        <div className="flex items-center gap-4 mb-4 flex-wrap">
+          <button
+            onClick={handleRefresh}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </button>
+          
+          <button
+            onClick={handleUpdateData}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+          >
+            <ArrowPathIcon className="w-4 h-4" />
+            Update from APIs
+          </button>
+          
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('combined')}
+              className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'combined' 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Squares2X2Icon className="w-4 h-4" />
+              Combined ({stats.totalCombined})
+            </button>
+            <button
+              onClick={() => setViewMode('individual')}
+              className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'individual' 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <RectangleStackIcon className="w-4 h-4" />
+              Individual ({stats.totalIndividual})
+            </button>
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <ClockIcon className="w-4 h-4" />
+            Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Unknown'}
+          </div>
+        </div>
+      </div>
 
       {/* Market Section - Normal document flow, positioned below hero section */}
       <MarketSection className="relative !bg-white dark:!bg-black min-h-screen" id="market-section">

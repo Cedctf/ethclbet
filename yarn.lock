@@ -15529,10 +15529,10 @@ __metadata:
   resolution: "se-2@workspace:."
   dependencies:
     "@web3icons/react": ^4.0.20
-    ethers: ^6.15.0
     husky: ~9.1.6
     lint-staged: ~13.2.2
     lucide-react: ^0.539.0
+    siwe: ^3.0.0
   languageName: unknown
   linkType: soft
 
