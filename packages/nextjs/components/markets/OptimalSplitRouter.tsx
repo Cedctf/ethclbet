@@ -64,6 +64,7 @@ interface PriceConversion {
   usdAmount: number;
   ethUsdPrice: number;
   ethEquivalent: number;
+  usingFallback?: boolean;
 }
 
 export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) {
@@ -75,10 +76,6 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   const { data: userBalance } = useBalance({
     address: address,
   });
-  
-  // SIWE Authentication state
-  const [siweToken, setSiweToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   const [budget, setBudget] = useState(1000);
   const [result, setResult] = useState<any>(null);
@@ -99,6 +96,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     omenEth: number;
     totalEth: number;
     ethUsdPrice: number;
+    usingFallback?: boolean;
   } | null>(null);
   const [isLoadingPrice, setIsLoadingPrice] = useState(false);
 
@@ -109,58 +107,6 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   const { writeContractAsync: placeBet, isMining: isPlacingBet } = useScaffoldWriteContract({
     contractName: "SimpleBet",
   });
-
-  // Auto-prompt for SIWE authentication when user connects
-  useEffect(() => {
-    const promptSiweAuth = async () => {
-      if (isConnected && address && !isAuthenticated && !siweToken) {
-        // Small delay to ensure wallet connection is fully established
-        setTimeout(() => {
-          notification.info("Please sign the message to authenticate with SIWE for contract interactions", {
-            duration: 5000,
-          });
-          handleSiweAuth();
-        }, 1000);
-      }
-    };
-
-    promptSiweAuth();
-  }, [isConnected, address, isAuthenticated, siweToken]);
-
-  // SIWE Authentication functions
-  const isTokenValid = () => {
-    return siweToken && isAuthenticated;
-  };
-
-  const handleSiweAuth = async () => {
-    if (!address) {
-      notification.error("Please connect your wallet first");
-      return;
-    }
-
-    try {
-      const domain = window.location.host;
-      const origin = window.location.origin;
-      const statement = "Sign in to SimpleBet with Ethereum";
-
-      const message = `${domain} wants you to sign in with your Ethereum account:\n${address}\n\n${statement}\n\nURI: ${origin}\nVersion: 1\nChain ID: ${chainId}\nNonce: ${Math.random().toString(36).substring(7)}\nIssued At: ${new Date().toISOString()}`;
-
-      if (window.ethereum) {
-        const signature = await window.ethereum.request({
-          method: 'personal_sign',
-          params: [message, address],
-        });
-
-        const token = ethers.hexlify(ethers.toUtf8Bytes(signature));
-        setSiweToken(token);
-        setIsAuthenticated(true);
-        notification.success("Successfully authenticated with SIWE!");
-      }
-    } catch (error) {
-      console.error("SIWE authentication failed:", error);
-      notification.error("Authentication failed. Please try again.");
-    }
-  };
 
   // Sapphire-specific contract interaction function
   const placeBetWithSapphire = async (description: string, outcome: number, platforms: string[], amounts: bigint[], marketIds: string[], totalValue: bigint) => {
@@ -230,52 +176,47 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     return null;
   };
 
-  // Convert USD to ETH using Pyth price feed
+  // Convert USD to ETH using Pyth price feed with robust fallback handling
   const convertToEth = async (polymarketUsd: number, omenUsd: number) => {
     setIsLoadingPrice(true);
     try {
-      // Get price for Polymarket allocation
-      const polymarketResponse = await fetch('/api/pyth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usdAmount: polymarketUsd })
-      });
-      
-      if (!polymarketResponse.ok) {
-        throw new Error('Failed to get Polymarket ETH conversion');
-      }
-      
-      const polymarketData: PriceConversion = await polymarketResponse.json();
+      // Helper function to get price data with fallback
+      const getPriceData = async (usdAmount: number, platform: string): Promise<PriceConversion> => {
+        const response = await fetch('/api/pyth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usdAmount })
+        });
+        
+        const data = await response.json();
+        
+        // Check if we got valid data structure
+        if (data && typeof data.ethUsdPrice === 'number' && typeof data.ethEquivalent === 'number') {
+          return data;
+        }
+        
+        // If data is invalid, throw to trigger manual fallback
+        throw new Error(`Invalid data structure from API for ${platform}`);
+      };
 
-      // Validate the response data
-      if (!polymarketData.ethUsdPrice || !polymarketData.ethEquivalent) {
-        throw new Error('Invalid price data received from Pyth API');
-      }
+      // Get price data for both platforms with fallback handling
+      const [polymarketData, omenData] = await Promise.all([
+        getPriceData(polymarketUsd, 'Polymarket'),
+        getPriceData(omenUsd, 'Omen')
+      ]);
 
-      // Get price for Omen allocation
-      const omenResponse = await fetch('/api/pyth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usdAmount: omenUsd })
-      });
-      
-      if (!omenResponse.ok) {
-        throw new Error('Failed to get Omen ETH conversion');
-      }
-      
-      const omenData: PriceConversion = await omenResponse.json();
-
-      // Validate the response data
-      if (!omenData.ethUsdPrice || !omenData.ethEquivalent) {
-        throw new Error('Invalid price data received from Pyth API');
+      // Log if fallback price is being used
+      if (polymarketData.usingFallback || omenData.usingFallback) {
+        console.log(`Using fallback ETH price: $${polymarketData.ethUsdPrice.toLocaleString()}`);
       }
 
-      // Set price data with validation
+      // Set price data - values are guaranteed to be valid numbers at this point
       setPriceData({
-        polymarketEth: polymarketData.ethEquivalent || 0,
-        omenEth: omenData.ethEquivalent || 0,
-        totalEth: (polymarketData.ethEquivalent || 0) + (omenData.ethEquivalent || 0),
-        ethUsdPrice: polymarketData.ethUsdPrice || 0
+        polymarketEth: polymarketData.ethEquivalent,
+        omenEth: omenData.ethEquivalent,
+        totalEth: polymarketData.ethEquivalent + omenData.ethEquivalent,
+        ethUsdPrice: polymarketData.ethUsdPrice,
+        usingFallback: polymarketData.usingFallback || omenData.usingFallback
       });
 
     } catch (err) {
@@ -453,11 +394,6 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       return;
     }
 
-    if (!isTokenValid()) {
-      notification.error("Please authenticate with SIWE first");
-      return;
-    }
-
     if (!betDescription.trim()) {
       notification.error("Please enter a bet description");
       return;
@@ -515,7 +451,6 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       }
 
       const totalValue = parseEther(priceData.totalEth.toString());
-      const tokenBytes = siweToken as `0x${string}`;
 
       let txHash: string;
 
@@ -603,33 +538,6 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
       <h3 className="text-lg font-semibold mb-4">Optimal Split Calculator</h3>
       
-      {/* Authentication Status */}
-      {isConnected && (
-        <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isAuthenticated ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span className="text-sm font-medium">
-                SIWE Authentication: {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
-              </span>
-            </div>
-            {!isAuthenticated && (
-              <button
-                onClick={handleSiweAuth}
-                className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-              >
-                Sign In
-              </button>
-            )}
-          </div>
-          {userBalance && (
-            <div className="text-sm text-gray-600 mt-1">
-              Balance: {formatEther(userBalance.value)} TEST
-            </div>
-          )}
-        </div>
-      )}
-      
       {/* Data Availability Status */}
       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
         <div className="text-sm text-gray-600 mb-2">Available Platforms:</div>
@@ -643,6 +551,11 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             Omen (LMSR)
           </div>
         </div>
+        {isConnected && userBalance && (
+          <div className="text-sm text-gray-600 mt-2">
+            Balance: {formatEther(userBalance.value)} TEST
+          </div>
+        )}
       </div>
 
       {/* Budget Selector */}
@@ -705,7 +618,12 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           <div className="bg-yellow-50 p-3 rounded-lg">
             <div className="text-sm text-yellow-800 font-medium mb-1">Live ETH Price</div>
             <div className="text-yellow-700 text-sm">
-              1 ETH = ${priceData.ethUsdPrice?.toFixed(2) || 'N/A'} USD (via Pyth Network)
+              1 ETH = ${priceData.ethUsdPrice?.toFixed(2) || 'N/A'} USD 
+              {priceData.usingFallback ? (
+                <span className="text-red-600 ml-2">(Fallback Price)</span>
+              ) : (
+                <span className="text-green-600 ml-2">(via Pyth Network)</span>
+              )}
             </div>
           </div>
 
