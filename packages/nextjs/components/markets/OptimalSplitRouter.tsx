@@ -7,18 +7,40 @@ interface OptimalSplitRouterProps {
   market: CombinedMarket | NormalizedMarket;
 }
 
-interface AIResponse {
-  message: {
-    role: string;
-    content: string;
+interface OptimalSplitResponse {
+  success: boolean;
+  result?: {
+    orderBookAllocation: number;
+    lmsrAllocation: number;
+    orderBookShares: number;
+    lmsrShares: number;
+    totalShares: number;
+    totalCost: number;
+    strategy: string;
+    efficiency: {
+      costPerShare: number;
+      allocationRatio: {
+        orderBookPercent: number;
+        lmsrPercent: number;
+      };
+    };
+    platformData: {
+      orderBook: {
+        orderLevels: number;
+        totalLiquidity: number;
+        priceRange: {
+          min: number;
+          max: number;
+        };
+      };
+      lmsr: {
+        yesShares: number;
+        noShares: number;
+        liquidityParameter: number;
+      };
+    };
   };
-  actionResults?: Array<{
-    actionName: string;
-    success: boolean;
-    result?: any;
-    error?: string;
-  }>;
-  executedActions?: boolean;
+  error?: string;
 }
 
 export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) {
@@ -26,7 +48,6 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   const [result, setResult] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [aiResponse, setAiResponse] = useState<string>('');
 
   // Helper to check if market is combined
   const isCombinedMarket = (market: CombinedMarket | NormalizedMarket): market is CombinedMarket => {
@@ -80,11 +101,10 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     return null;
   };
 
-  const handlePlaceBet = async () => {
+  const handleOptimalSplit = async () => {
     setIsCalculating(true);
     setError(null);
     setResult(null);
-    setAiResponse('');
 
     try {
       // Extract market statistics for both platforms
@@ -95,41 +115,17 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         throw new Error('No market data available for optimization');
       }
 
-      // Prepare the request for the AI agent
+      // Prepare the request body for the optimal split API
       const requestBody = {
-        messages: [
-          {
-            role: 'user',
-            content: `I want to place a bet with a budget of $${budget}. Please analyze the market data and calculate the optimal split between platforms. Here's the market data:
-
-${polymarketStats ? `Polymarket Data:
-- Trades: ${polymarketStats.tradesQuantity}
-- Buys: ${polymarketStats.buysQuantity}
-- Sells: ${polymarketStats.sellsQuantity}
-- Volume: $${polymarketStats.scaledCollateralVolume}
-- Buy Volume: $${polymarketStats.scaledCollateralBuyVolume}
-- Sell Volume: $${polymarketStats.scaledCollateralSellVolume}` : ''}
-
-${omenStats ? `Omen Data:
-- Trades: ${omenStats.tradesQuantity}
-- Buys: ${omenStats.buysQuantity}
-- Sells: ${omenStats.sellsQuantity}
-- Volume: $${omenStats.scaledCollateralVolume}
-- Buy Volume: $${omenStats.scaledCollateralBuyVolume}
-- Sell Volume: $${omenStats.scaledCollateralSellVolume}` : ''}
-
-Please execute the optimization and provide detailed recommendations.`
-          }
-        ],
-        options: {
-          executeActions: true,
-          temperature: 0.3,
-          maxTokens: 1500
-        }
+        budget,
+        polymarketStats,
+        omenStats
       };
 
-      // Call the AI agent API
-      const response = await fetch('/api/rofl', {
+      console.log('Calling optimal split API with:', requestBody);
+
+      // Call the optimal split API from the server (port 3001)
+      const response = await fetch('http://localhost:3001/api/optimal-split', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,28 +134,36 @@ Please execute the optimization and provide detailed recommendations.`
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get AI response');
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
+        
+        // Try to parse as JSON, fallback to text error
+        let errorMessage;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || 'Failed to calculate optimal split';
+        } catch {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      const aiData: AIResponse = await response.json();
-      setAiResponse(aiData.message.content);
+      const data: OptimalSplitResponse = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Optimization failed');
+      }
 
-      // Extract the optimization result from action results
-      if (aiData.actionResults && aiData.actionResults.length > 0) {
-        const optimizationResult = aiData.actionResults.find(
-          action => action.actionName === 'optimizeBettingSplit' && action.success
-        );
-
-        if (optimizationResult && optimizationResult.result) {
-          setResult(optimizationResult.result);
-        } else {
-          const errorAction = aiData.actionResults.find(action => !action.success);
-          throw new Error(errorAction?.error || 'Optimization failed');
-        }
+      if (data.result) {
+        setResult(data.result);
+        console.log('Optimal split result:', data.result);
+      } else {
+        throw new Error('No optimization result returned');
       }
 
     } catch (err) {
+      console.error('Optimization error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred during optimization');
     } finally {
       setIsCalculating(false);
@@ -172,7 +176,7 @@ Please execute the optimization and provide detailed recommendations.`
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
-      <h3 className="text-lg font-semibold mb-4">AI-Powered Betting Optimizer</h3>
+      <h3 className="text-lg font-semibold mb-4">Optimal Split Calculator</h3>
       
       {/* Data Availability Status */}
       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
@@ -188,6 +192,29 @@ Please execute the optimization and provide detailed recommendations.`
           </div>
         </div>
       </div>
+
+      {/* Market Data Preview */}
+      {(hasPolymarket || hasOmen) && (
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+          <div className="text-sm text-blue-800 font-medium mb-2">Market Data Summary:</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-blue-700">
+            {hasPolymarket && (
+              <div>
+                <strong>Polymarket:</strong>
+                <div>Volume: ${extractMarketStats(market, 'polymarket')?.scaledCollateralVolume || '0'}</div>
+                <div>Trades: {extractMarketStats(market, 'polymarket')?.tradesQuantity || '0'}</div>
+              </div>
+            )}
+            {hasOmen && (
+              <div>
+                <strong>Omen:</strong>
+                <div>Volume: ${extractMarketStats(market, 'omen')?.scaledCollateralVolume || '0'}</div>
+                <div>Trades: {extractMarketStats(market, 'omen')?.tradesQuantity || '0'}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Budget Selector */}
       <div className="mb-4">
@@ -209,27 +236,20 @@ Please execute the optimization and provide detailed recommendations.`
         </div>
       </div>
 
-      {/* Place Bet Button */}
+      {/* Calculate Button */}
       <button
-        onClick={handlePlaceBet}
+        onClick={handleOptimalSplit}
         disabled={isCalculating || (!hasPolymarket && !hasOmen)}
         className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
       >
-        {isCalculating ? 'AI is calculating...' : 'Place Bet'}
+        {isCalculating ? 'Calculating optimal split...' : 'Calculate Optimal Split'}
       </button>
-
-      {/* AI Response */}
-      {aiResponse && (
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="text-sm text-blue-800 font-medium mb-2">AI Analysis:</div>
-          <div className="text-sm text-blue-700 whitespace-pre-wrap">{aiResponse}</div>
-        </div>
-      )}
 
       {/* Error Display */}
       {error && (
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <div className="text-red-800 text-sm">{error}</div>
+          <div className="text-red-800 text-sm font-medium">Error:</div>
+          <div className="text-red-700 text-sm">{error}</div>
         </div>
       )}
 
@@ -292,15 +312,24 @@ Please execute the optimization and provide detailed recommendations.`
                   <strong>Order Book:</strong>
                   <div>Levels: {result.platformData.orderBook.orderLevels}</div>
                   <div>Liquidity: {result.platformData.orderBook.totalLiquidity} shares</div>
+                  <div>Price Range: ${result.platformData.orderBook.priceRange.min.toFixed(2)} - ${result.platformData.orderBook.priceRange.max.toFixed(2)}</div>
                 </div>
                 <div>
                   <strong>LMSR:</strong>
                   <div>YES Shares: {result.platformData.lmsr.yesShares}</div>
+                  <div>NO Shares: {result.platformData.lmsr.noShares}</div>
                   <div>Liquidity Param: {result.platformData.lmsr.liquidityParameter}</div>
                 </div>
               </div>
             </div>
           )}
+
+          {/* Action Button */}
+          <div className="pt-4 border-t">
+            <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+              Place Bet with Optimal Split
+            </button>
+          </div>
         </div>
       )}
     </div>
