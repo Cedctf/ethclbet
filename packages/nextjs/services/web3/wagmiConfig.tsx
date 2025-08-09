@@ -45,7 +45,7 @@ const createTransports = () => {
 export const wagmiConfig = createConfig({
   multiInjectedProviderDiscovery: false,
   chains: enabledChains,
-  connectors: [injectedWithSapphire(), ...wagmiConnectors],
+  connectors: [...wagmiConnectors, injectedWithSapphire()],
   transports: createTransports(),
   ssr: true,
 });

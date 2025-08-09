@@ -1,6 +1,16 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { CombinedMarket, NormalizedMarket } from '~~/hooks/useCombinedMarkets';
+import { 
+  findOptimalSplit, 
+  generateOrderBookFromStats, 
+  generateLMSRFromStats,
+  type MarketStatistics,
+  type OrderBookData,
+  type LMSRData,
+  type SplitResult
+} from '~~/optimal-split-router';
 import { parseEther, formatEther } from "viem";
 import { useAccount, useChainId, useBalance } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
@@ -8,7 +18,7 @@ import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 import { getSapphireProvider, getSapphireEthersSigner, isSapphireNetwork } from "~~/utils/scaffold-eth/sapphireProviders";
 import { ethers } from "ethers";
-import { CombinedMarket, NormalizedMarket } from '~~/hooks/useCombinedMarkets';
+
 
 interface OptimalSplitRouterProps {
   market: CombinedMarket | NormalizedMarket;
@@ -399,13 +409,6 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       return;
     }
 
-    // Check if user has sufficient balance
-    const totalValue = parseEther(priceData.totalEth.toString());
-    if (userBalance && userBalance.value < totalValue) {
-      notification.error(`Insufficient balance. You need ${formatEther(totalValue)} TEST but only have ${formatEther(userBalance.value)} TEST`);
-      return;
-    }
-
     try {
       // Prepare subbet data
       const platforms: string[] = [];
@@ -415,7 +418,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       // Add Polymarket subbet if allocation > 0
       if (adjustedPolymarketAllocation > 0) {
         platforms.push("Polymarket");
-        amounts.push(parseEther(priceData.polymarketEth.toString()));
+        const polymarketAmount = parseEther(priceData.polymarketEth.toString());
+        amounts.push(polymarketAmount);
         
         // Get market ID from the market data
         const polymarketStats = extractMarketStats(market, 'polymarket');
@@ -429,7 +433,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       // Add Omen subbet if allocation > 0
       if (adjustedOmenAllocation > 0) {
         platforms.push("Omen");
-        amounts.push(parseEther(priceData.omenEth.toString()));
+        const omenAmount = parseEther(priceData.omenEth.toString());
+        amounts.push(omenAmount);
         
         // Get market ID from the market data
         const omenStats = extractMarketStats(market, 'omen');
@@ -440,7 +445,14 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         marketIds.push(marketId);
       }
 
-      const totalValue = parseEther(priceData.totalEth.toString());
+      // Calculate totalValue as the sum of all amounts to avoid precision issues
+      const totalValue = amounts.reduce((sum, amount) => sum + amount, 0n);
+
+      // Check if user has sufficient balance
+      if (userBalance && userBalance.value < totalValue) {
+        notification.error(`Insufficient balance. You need ${formatEther(totalValue)} TEST but only have ${formatEther(userBalance.value)} TEST`);
+        return;
+      }
 
       let txHash: string;
 
@@ -454,11 +466,11 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           <div>
             <div>🔒 Encrypted optimal split bet placed successfully!</div>
             <div className="text-sm mt-1">
-              Outcome: {betOutcome === 0 ? 'YES' : 'NO'} | Total: {priceData.totalEth.toFixed(6)} ETH
+              Outcome: {betOutcome === 0 ? 'YES' : 'NO'} | Total: {formatEther(totalValue)} ETH
             </div>
             <div className="mt-2">
               <a 
-                href={`https://explorer.sapphire.oasis.io/tx/${txHash}`}
+                href={`https://explorer.oasis.io/testnet/sapphire/tx/${txHash}`}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:text-blue-700 underline"
@@ -482,7 +494,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           <div>
             <div>Optimal split bet placed successfully!</div>
             <div className="text-sm mt-1">
-              Outcome: {betOutcome === 0 ? 'YES' : 'NO'} | Total: {priceData.totalEth.toFixed(6)} ETH
+              Outcome: {betOutcome === 0 ? 'YES' : 'NO'} | Total: {formatEther(totalValue)} ETH
             </div>
             <div className="mt-2">
               <a 
@@ -504,19 +516,19 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         description: betDescription,
         outcome: betOutcome === 0 ? 'YES' : 'NO',
         platforms,
-        amounts: amounts.map(a => a.toString()),
+        amounts: amounts.map(a => formatEther(a)),
         marketIds,
-        totalValue: totalValue.toString(),
+        totalValue: formatEther(totalValue),
         ethAmounts: {
           polymarket: priceData.polymarketEth,
           omen: priceData.omenEth,
-          total: priceData.totalEth
+          total: formatEther(totalValue)
         }
       });
 
     } catch (error) {
       console.error("Error placing optimal split bet:", error);
-      notification.error("Failed to place bet");
+      notification.error(`Failed to place bet: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -532,12 +544,12 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
         <div className="text-sm text-gray-600 mb-2">Available Platforms:</div>
         <div className="flex gap-4">
-          <div className={`flex items-center gap-2 ${hasPolymarket ? 'text-green-600' : 'text-gray-400'}`}>
-            <div className={`w-2 h-2 rounded-full ${hasPolymarket ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+          <div className={`flex items-center gap-2 ${hasPolymarket ? '' : 'text-gray-400'}`} style={hasPolymarket ? { color: '#4c56ab' } : {}}>
+            <div className={`w-2 h-2 rounded-full ${hasPolymarket ? '' : 'bg-gray-300'}`} style={hasPolymarket ? { backgroundColor: '#4c56ab' } : {}}></div>
             Polymarket (Order Book)
           </div>
-          <div className={`flex items-center gap-2 ${hasOmen ? 'text-blue-600' : 'text-gray-400'}`}>
-            <div className={`w-2 h-2 rounded-full ${hasOmen ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+          <div className={`flex items-center gap-2 ${hasOmen ? '' : 'text-gray-400'}`} style={hasOmen ? { color: '#f2a5db' } : {}}>
+            <div className={`w-2 h-2 rounded-full ${hasOmen ? '' : 'bg-gray-300'}`} style={hasOmen ? { backgroundColor: '#f2a5db' } : {}}></div>
             Omen (LMSR)
           </div>
         </div>
@@ -558,18 +570,21 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             </span>
           )}
         </label>
-        <input
-          type="range"
-          min="50"
-          max="5000"
-          step="50"
-          value={budget}
-          onChange={(e) => setBudget(Number(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-        />
+          <input
+            type="range"
+            min="50"
+            max="5000"
+            step="50"
+            value={budget}
+            onChange={(e) => setBudget(Number(e.target.value))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            style={{
+              background: `linear-gradient(to right, #746097 0%, #746097 ${(budget - 50) / (5000 - 50) * 100}%, #e5e7eb ${(budget - 50) / (5000 - 50) * 100}%, #e5e7eb 100%)`
+            }}
+          />
         <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>$50</span>
-          <span>$5,000</span>
+            <span>$50</span>
+            <span>$5,000</span>
         </div>
       </div>
 
@@ -577,7 +592,20 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       <button
         onClick={handleOptimalSplit}
         disabled={isCalculating || isLoadingPrice || (!hasPolymarket && !hasOmen)}
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        className="w-full text-white py-2 px-4 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        style={{
+          backgroundColor: isCalculating || isLoadingPrice || (!hasPolymarket && !hasOmen) ? '#9ca3af' : '#746097'
+        }}
+        onMouseEnter={(e) => {
+          if (!isCalculating && !isLoadingPrice && (hasPolymarket || hasOmen)) {
+            e.currentTarget.style.backgroundColor = '#5a4b7a';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isCalculating && !isLoadingPrice && (hasPolymarket || hasOmen)) {
+            e.currentTarget.style.backgroundColor = '#746097';
+          }
+        }}
       >
         {isCalculating ? 'Calculating optimal split...' : 
          isLoadingPrice ? 'Converting to ETH...' : 
@@ -604,40 +632,29 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             </pre>
             </div>
 
-          {/* ETH Price Info */}
-          <div className="bg-yellow-50 p-3 rounded-lg">
-            <div className="text-sm text-yellow-800 font-medium mb-1">Live ETH Price</div>
-            <div className="text-yellow-700 text-sm">
-              1 ETH = ${priceData.ethUsdPrice?.toFixed(2) || 'N/A'} USD 
-              {priceData.usingFallback ? (
-                <span className="text-red-600 ml-2">(Fallback Price)</span>
-              ) : (
-                <span className="text-green-600 ml-2">(via Pyth Network)</span>
-              )}
-            </div>
-          </div>
+          
 
           {/* Bet Configuration */}
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <h5 className="font-medium text-purple-900 mb-3">Bet Configuration</h5>
+          <div className="p-4 rounded-lg border border-gray-300">
+            <h5 className="font-medium text-black mb-3">Bet Configuration</h5>
             
             {/* Bet Description */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-purple-800 mb-2">
+                    <div className="mb-4">
+              <label className="block text-sm font-medium text-black mb-2">
                 Bet Description
               </label>
-              <input
+                        <input
                 type="text"
                 value={betDescription}
                 onChange={(e) => setBetDescription(e.target.value)}
-                className="w-full p-2 border border-purple-200 rounded-lg text-sm"
+                className="w-full p-2 border border-gray-300 rounded-lg text-sm text-black"
                 placeholder="Enter bet description..."
               />
-              </div>
+                    </div>
 
             {/* Outcome Selection */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-purple-800 mb-2">
+              <label className="block text-sm font-medium text-black mb-2">
                 Betting Outcome
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -661,95 +678,114 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                 >
                   NO
                 </button>
-              </div>
-            </div>
-          </div>
+                    </div>
+                  </div>
+                </div>
 
-          {/* Adjustment Controls */}
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h5 className="font-medium text-blue-900 mb-3">Adjust Allocations</h5>
-            
-            {hasPolymarket && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-blue-800 mb-2">
-                  Polymarket: ${adjustedPolymarketAllocation.toFixed(2)} 
-                  <span className="text-xs text-blue-600 ml-2">
-                    (≈ {priceData.polymarketEth?.toFixed(6) || '0.000000'} ETH)
+                                    {/* Adjustment Controls */}
+              <div className="p-4 rounded-lg" style={{ backgroundColor: '#746097' + '10' }}>
+                <h5 className="font-medium mb-3 text-black">Adjust Allocations</h5>
+              
+              {hasPolymarket && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-black">
+                    <span className="text-black">Polymarket: ${adjustedPolymarketAllocation.toFixed(2)}</span>
+                    <span className="text-xs ml-2 text-black">
+                      (≈ {priceData.polymarketEth?.toFixed(6) || '0.000000'} ETH)
+                    </span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max={budget}
+                    step="10"
+                    value={adjustedPolymarketAllocation}
+                    onChange={(e) => handlePolymarketChange(Number(e.target.value))}
+                    className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #4c56ab 0%, #4c56ab ${(adjustedPolymarketAllocation / budget) * 100}%, #e5e7eb ${(adjustedPolymarketAllocation / budget) * 100}%, #e5e7eb 100%)`
+                    }}
+                    disabled={isLoadingPrice}
+                  />
+                    </div>
+                  )}
+
+              {hasOmen && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-2 text-black">
+                    <span className="text-black">Omen: ${adjustedOmenAllocation.toFixed(2)}</span>
+                    <span className="text-xs ml-2 text-black">
+                      (≈ {priceData.omenEth?.toFixed(6) || '0.000000'} ETH)
+                    </span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max={budget}
+                    step="10"
+                    value={adjustedOmenAllocation}
+                    onChange={(e) => handleOmenChange(Number(e.target.value))}
+                    className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #f2a5db 0%, #f2a5db ${(adjustedOmenAllocation / budget) * 100}%, #e5e7eb ${(adjustedOmenAllocation / budget) * 100}%, #e5e7eb 100%)`
+                    }}
+                    disabled={isLoadingPrice}
+                  />
+                        </div>
+              )}
+
+                              <div className="text-sm text-black">
+                  Total: ${(adjustedPolymarketAllocation + adjustedOmenAllocation).toFixed(2)} / ${budget}
+                  <span className="block text-xs">
+                    (≈ {priceData.totalEth?.toFixed(6) || '0.000000'} ETH total)
                   </span>
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max={budget}
-                  step="10"
-                  value={adjustedPolymarketAllocation}
-                  onChange={(e) => handlePolymarketChange(Number(e.target.value))}
-                  className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-                  disabled={isLoadingPrice}
-                />
-              </div>
-            )}
-
-            {hasOmen && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-blue-800 mb-2">
-                  Omen: ${adjustedOmenAllocation.toFixed(2)}
-                  <span className="text-xs text-blue-600 ml-2">
-                    (≈ {priceData.omenEth?.toFixed(6) || '0.000000'} ETH)
-                  </span>
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max={budget}
-                  step="10"
-                  value={adjustedOmenAllocation}
-                  onChange={(e) => handleOmenChange(Number(e.target.value))}
-                  className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-                  disabled={isLoadingPrice}
-                />
-              </div>
-            )}
-
-            <div className="text-sm text-blue-700">
-              Total: ${(adjustedPolymarketAllocation + adjustedOmenAllocation).toFixed(2)} / ${budget}
-              <span className="block text-xs">
-                (≈ {priceData.totalEth?.toFixed(6) || '0.000000'} ETH total)
-              </span>
-            </div>
-          </div>
+                    </div>
+                  </div>
 
           {/* Current Allocation Summary with ETH */}
           <div className="grid grid-cols-2 gap-4">
-            {hasPolymarket && (
-              <div className="bg-green-50 p-3 rounded-lg">
-                <div className="text-sm text-green-600 font-medium">Polymarket</div>
-                <div className="text-lg font-bold text-green-900">${adjustedPolymarketAllocation.toFixed(2)}</div>
-                <div className="text-sm font-medium text-green-800">{priceData.polymarketEth?.toFixed(6) || '0.000000'} ETH</div>
-                <div className="text-xs text-green-700">
+                        {hasPolymarket && (
+              <div className="p-3 rounded-lg" style={{ backgroundColor: '#4c56ab' + '10' }}>
+                <div className="text-sm font-medium" style={{ color: '#4c56ab' }}>Polymarket</div>
+                <div className="text-lg font-bold" style={{ color: '#4c56ab' }}>${adjustedPolymarketAllocation.toFixed(2)}</div>
+                <div className="text-sm font-medium" style={{ color: '#4c56ab' }}>{priceData.polymarketEth?.toFixed(6) || '0.000000'} ETH</div>
+                <div className="text-xs" style={{ color: '#4c56ab' }}>
                   {((adjustedPolymarketAllocation / budget) * 100).toFixed(1)}% of budget
-                </div>
-              </div>
+                          </div>
+                        </div>
             )}
             
-            {hasOmen && (
-              <div className="bg-purple-50 p-3 rounded-lg">
-                <div className="text-sm text-purple-600 font-medium">Omen</div>
-                <div className="text-lg font-bold text-purple-900">${adjustedOmenAllocation.toFixed(2)}</div>
-                <div className="text-sm font-medium text-purple-800">{priceData.omenEth?.toFixed(6) || '0.000000'} ETH</div>
-                <div className="text-xs text-purple-700">
+                        {hasOmen && (
+              <div className="p-3 rounded-lg" style={{ backgroundColor: '#f2a5db' + '10' }}>
+                <div className="text-sm font-medium" style={{ color: '#f2a5db' }}>Omen</div>
+                <div className="text-lg font-bold" style={{ color: '#f2a5db' }}>${adjustedOmenAllocation.toFixed(2)}</div>
+                <div className="text-sm font-medium" style={{ color: '#f2a5db' }}>{priceData.omenEth?.toFixed(6) || '0.000000'} ETH</div>
+                <div className="text-xs" style={{ color: '#f2a5db' }}>
                   {((adjustedOmenAllocation / budget) * 100).toFixed(1)}% of budget
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
-            </div>
 
           {/* Place Bet Button */}
           <div className="pt-4 border-t">
             <button 
-              className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full text-white py-3 px-4 rounded-lg transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
               onClick={handlePlaceBet}
               disabled={isPlacingBet || !isConnected || !betDescription.trim()}
+              style={{
+                backgroundColor: isPlacingBet || !isConnected || !betDescription.trim() ? '#9ca3af' : '#746097'
+              }}
+              onMouseEnter={(e) => {
+                if (!isPlacingBet && isConnected && betDescription.trim()) {
+                  e.currentTarget.style.backgroundColor = '#5a4b7a';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isPlacingBet && isConnected && betDescription.trim()) {
+                  e.currentTarget.style.backgroundColor = '#746097';
+                }
+              }}
             >
               {isPlacingBet 
                 ? "Placing Bet..." 
@@ -759,11 +795,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             {!isConnected && (
               <p className="text-sm text-gray-500 text-center mt-2">Please connect your wallet to place a bet</p>
             )}
-            {isOnSapphire && (
-              <p className="text-sm text-green-600 text-center mt-2">🔒 Encrypted transaction on Sapphire Network</p>
-            )}
-          </div>
-        </div>
+                    </div>
+                  </div>
       )}
     </div>
   );

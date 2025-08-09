@@ -8,6 +8,7 @@ import { RevealBurnerPKModal } from "./RevealBurnerPKModal";
 import { WrongNetworkDropdown } from "./WrongNetworkDropdown";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Address } from "viem";
+import { WalletIcon } from "@heroicons/react/24/outline";
 import { useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
@@ -32,7 +33,8 @@ export const RainbowKitCustomConnectButton = () => {
             {(() => {
               if (!connected) {
                 return (
-                  <button className="btn btn-primary btn-sm" onClick={openConnectModal} type="button">
+                  <button className="btn btn-primary btn-sm gap-2 uppercase px-4 py-4.5" onClick={openConnectModal} type="button">
+                    <WalletIcon className="h-4 w-4" />
                     Connect Wallet
                   </button>
                 );

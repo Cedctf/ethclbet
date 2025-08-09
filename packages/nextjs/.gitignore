@@ -35,4 +35,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-ipfs-upload.config.json*.orc
+ipfs-upload.config.json
+
+# AI embeddings cache
+.cache/
