@@ -28,6 +28,54 @@ export default function SimpleBetPage() {
   // Check if we're on a Sapphire network for encrypted transactions
   const isOnSapphire = chainId ? isSapphireNetwork(chainId) : false;
 
+  // Auto-prompt for SIWE authentication when user connects
+  useEffect(() => {
+    const promptSiweAuth = async () => {
+      if (isConnected && address && !isAuthenticated && !siweToken) {
+        // Small delay to ensure wallet connection is fully established
+        setTimeout(() => {
+          notification.info("Please sign the message to authenticate with SIWE for contract interactions", {
+            duration: 5000,
+          });
+          handleSiweAuth();
+        }, 1000);
+      }
+    };
+
+    promptSiweAuth();
+  }, [isConnected, address, isAuthenticated, siweToken]);
+
+  // SIWE Authentication function
+  const handleSiweAuth = async () => {
+    if (!address) {
+      notification.error("Please connect your wallet first");
+      return;
+    }
+
+    try {
+      const domain = window.location.host;
+      const origin = window.location.origin;
+      const statement = "Sign in to SimpleBet with Ethereum";
+
+      const message = `${domain} wants you to sign in with your Ethereum account:\n${address}\n\n${statement}\n\nURI: ${origin}\nVersion: 1\nChain ID: ${chainId}\nNonce: ${Math.random().toString(36).substring(7)}\nIssued At: ${new Date().toISOString()}`;
+
+      if (window.ethereum) {
+        const signature = await window.ethereum.request({
+          method: 'personal_sign',
+          params: [message, address],
+        });
+
+        const token = ethers.hexlify(ethers.toUtf8Bytes(signature));
+        setSiweToken(token);
+        setIsAuthenticated(true);
+        notification.success("Successfully authenticated with SIWE!");
+      }
+    } catch (error) {
+      console.error("SIWE authentication failed:", error);
+      notification.error("Authentication failed. Please try again.");
+    }
+  };
+
   // Sapphire-specific contract interaction functions
   const placeBetWithSapphire = async (description: string, outcome: number, platforms: string[], amounts: bigint[], marketIds: string[], totalValue: bigint) => {
     if (!deployedContractData) throw new Error("Contract not deployed");

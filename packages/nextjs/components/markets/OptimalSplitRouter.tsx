@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
-import { parseEther } from "viem";
-import { useAccount, useChainId } from "wagmi";
+import React, { useState, useEffect } from 'react';
+import { parseEther, formatEther } from "viem";
+import { useAccount, useChainId, useBalance } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
@@ -61,6 +61,15 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   const chainId = useChainId();
   const { data: deployedContractData } = useDeployedContractInfo("SimpleBet");
   
+  // Get user balance
+  const { data: userBalance } = useBalance({
+    address: address,
+  });
+  
+  // SIWE Authentication state
+  const [siweToken, setSiweToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
   const [budget, setBudget] = useState(1000);
   const [result, setResult] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -90,6 +99,58 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   const { writeContractAsync: placeBet, isMining: isPlacingBet } = useScaffoldWriteContract({
     contractName: "SimpleBet",
   });
+
+  // Auto-prompt for SIWE authentication when user connects
+  useEffect(() => {
+    const promptSiweAuth = async () => {
+      if (isConnected && address && !isAuthenticated && !siweToken) {
+        // Small delay to ensure wallet connection is fully established
+        setTimeout(() => {
+          notification.info("Please sign the message to authenticate with SIWE for contract interactions", {
+            duration: 5000,
+          });
+          handleSiweAuth();
+        }, 1000);
+      }
+    };
+
+    promptSiweAuth();
+  }, [isConnected, address, isAuthenticated, siweToken]);
+
+  // SIWE Authentication functions
+  const isTokenValid = () => {
+    return siweToken && isAuthenticated;
+  };
+
+  const handleSiweAuth = async () => {
+    if (!address) {
+      notification.error("Please connect your wallet first");
+      return;
+    }
+
+    try {
+      const domain = window.location.host;
+      const origin = window.location.origin;
+      const statement = "Sign in to SimpleBet with Ethereum";
+
+      const message = `${domain} wants you to sign in with your Ethereum account:\n${address}\n\n${statement}\n\nURI: ${origin}\nVersion: 1\nChain ID: ${chainId}\nNonce: ${Math.random().toString(36).substring(7)}\nIssued At: ${new Date().toISOString()}`;
+
+      if (window.ethereum) {
+        const signature = await window.ethereum.request({
+          method: 'personal_sign',
+          params: [message, address],
+        });
+
+        const token = ethers.hexlify(ethers.toUtf8Bytes(signature));
+        setSiweToken(token);
+        setIsAuthenticated(true);
+        notification.success("Successfully authenticated with SIWE!");
+      }
+    } catch (error) {
+      console.error("SIWE authentication failed:", error);
+      notification.error("Authentication failed. Please try again.");
+    }
+  };
 
   // Sapphire-specific contract interaction function
   const placeBetWithSapphire = async (description: string, outcome: number, platforms: string[], amounts: bigint[], marketIds: string[], totalValue: bigint) => {
@@ -290,7 +351,9 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           marketTitle = market.title || market.question || 'Market Bet';
         }
         
-        setBetDescription(marketTitle);
+        // Extract only the first part before "-" if it exists
+        const titleBeforeDash = marketTitle.split('-')[0].trim();
+        setBetDescription(titleBeforeDash);
         
         // Convert to ETH
         await convertToEth(data.result.orderBookAllocation, data.result.lmsrAllocation);
@@ -380,6 +443,11 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       return;
     }
 
+    if (!isTokenValid()) {
+      notification.error("Please authenticate with SIWE first");
+      return;
+    }
+
     if (!betDescription.trim()) {
       notification.error("Please enter a bet description");
       return;
@@ -392,6 +460,13 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
 
     if (adjustedPolymarketAllocation <= 0 && adjustedOmenAllocation <= 0) {
       notification.error("Please allocate funds to at least one platform");
+      return;
+    }
+
+    // Check if user has sufficient balance
+    const totalValue = parseEther(priceData.totalEth.toString());
+    if (userBalance && userBalance.value < totalValue) {
+      notification.error(`Insufficient balance. You need ${formatEther(totalValue)} TEST but only have ${formatEther(userBalance.value)} TEST`);
       return;
     }
 
@@ -408,7 +483,11 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         
         // Get market ID from the market data
         const polymarketStats = extractMarketStats(market, 'polymarket');
-        marketIds.push(polymarketStats?.id || 'polymarket_optimal_split');
+        const marketId = polymarketStats?.id;
+        if (!marketId) {
+          throw new Error("Polymarket market ID not found");
+        }
+        marketIds.push(marketId);
       }
 
       // Add Omen subbet if allocation > 0
@@ -418,10 +497,15 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         
         // Get market ID from the market data
         const omenStats = extractMarketStats(market, 'omen');
-        marketIds.push(omenStats?.id || 'omen_optimal_split');
+        const marketId = omenStats?.id;
+        if (!marketId) {
+          throw new Error("Omen market ID not found");
+        }
+        marketIds.push(marketId);
       }
 
       const totalValue = parseEther(priceData.totalEth.toString());
+      const tokenBytes = siweToken as `0x${string}`;
 
       let txHash: string;
 
@@ -508,6 +592,33 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mt-6">
       <h3 className="text-lg font-semibold mb-4">Optimal Split Calculator</h3>
+      
+      {/* Authentication Status */}
+      {isConnected && (
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${isAuthenticated ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className="text-sm font-medium">
+                SIWE Authentication: {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
+              </span>
+            </div>
+            {!isAuthenticated && (
+              <button
+                onClick={handleSiweAuth}
+                className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+              >
+                Sign In
+              </button>
+            )}
+          </div>
+          {userBalance && (
+            <div className="text-sm text-gray-600 mt-1">
+              Balance: {formatEther(userBalance.value)} TEST
+            </div>
+          )}
+        </div>
+      )}
       
       {/* Data Availability Status */}
       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
