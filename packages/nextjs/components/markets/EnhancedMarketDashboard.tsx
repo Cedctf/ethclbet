@@ -198,8 +198,8 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   const getSourceBadgeColor = (source: string): string => {
     switch (source) {
-      case 'polymarket': return 'bg-[#0000FF]/10 text-[#0000FF]';
-      case 'omen': return 'bg-success/20 text-success';
+      case 'polymarket': return 'bg-[#4c56ab]/10 text-[#4c56ab]';
+      case 'omen': return 'bg-[#f2a5db]/10 text-[#f2a5db]';
       default: return 'bg-base-300 text-base-content';
     }
   };
@@ -277,20 +277,44 @@ export const EnhancedMarketDashboard: React.FC = () => {
   return (
     <div className="relative">
       {/* Hero Section - Normal document flow */}
-      <Hero
-        description="Discover and analyze prediction markets across multiple platforms. Compare odds, track performance, and make data-driven decisions."
-        primaryCTA={{
-          text: "View Markets",
-          href: "#market-section"
-        }}
-        secondaryCTA={{
-          text: "How it Works",
-          href: "/about"
-        }}
-      />
+      <div className="relative w-full py-40 overflow-hidden">
+        {/* Background gradient and blur effect */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-br from-primary/5 via-base-100/50 to-primary/5 backdrop-blur-xl" 
+          style={{
+            backgroundImage: 'url(/lightbg.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        
+        {/* Glass card container */}
+        <div className="relative max-w-[1200px] mx-auto px-6 sm:px-8">
+          <div className="bg-white/[0.37] dark:bg-black/[0.37] backdrop-blur-[13.8px] rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] p-6 sm:p-8">
+            <div className="relative z-10 flex flex-col items-center justify-center min-h-[240px] sm:min-h-[280px]">
+              <Hero
+                description="Discover and analyze prediction markets across multiple platforms. Compare odds, track performance, and make data-driven decisions."
+                primaryCTA={{
+                  text: "View Markets",
+                  href: "#market-section"
+                }}
+                secondaryCTA={{
+                  text: "How it Works",
+                  href: "/about"
+                }}
+              />
+            </div>
+            
+            {/* Decorative elements */}
+            <div className="absolute -top-8 -right-8 w-48 h-32 bg-primary/10 rounded-full blur-2xl transform rotate-12" />
+            <div className="absolute -bottom-12 -left-12 w-64 h-40 bg-primary/5 rounded-full blur-3xl transform -rotate-12" />
+          </div>
+        </div>
+      </div>
 
       {/* Market Section - Normal document flow, positioned below hero section */}
-      <MarketSection className="relative !bg-white dark:!bg-black min-h-screen" id="market-section">
+      <MarketSection className="relative !bg-white dark:!bg-black min-h-screen pt-30" id="market-section">
         <div className="mb-6 pt-0">
           {/* First Row - Search and Refresh */}
           <div className="flex items-center gap-4 mb-4">
@@ -321,26 +345,26 @@ export const EnhancedMarketDashboard: React.FC = () => {
             </div>
 
             {/* Refresh Button - Icon only */}
-            <button
-              onClick={handleRefresh}
-              disabled={loading}
+          <button
+            onClick={handleRefresh}
+            disabled={loading}
               className="flex items-center justify-center w-10 h-10 bg-primary text-primary-content rounded-lg hover:bg-primary/80 disabled:opacity-50 transition-colors"
               title="Refresh Data"
             >
               <ArrowPathIcon className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-            </button>
+          </button>
           </div>
 
           {/* Second Row - Filter, Active Filters, and Combined/Individual Toggle */}
           <div className="flex items-center gap-4 mb-4">
             {/* Filter Dropdown */}
             <div className="relative" ref={filterDropdownRef}>
-              <button
+            <button
                 onClick={toggleFilterDropdown}
                 className="flex items-center justify-center w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none"
               >
                 <FunnelIcon className="w-4 h-4" />
-              </button>
+            </button>
 
               {/* Filter Dropdown Menu */}
               {dashboardState.showFilterDropdown && (
@@ -348,14 +372,14 @@ export const EnhancedMarketDashboard: React.FC = () => {
                   {/* Header */}
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Filters</h3>
-                    <button
+            <button
                       onClick={clearAllFilters}
                       className="text-sm text-primary hover:text-primary/80"
                     >
                       Clear All
-                    </button>
-                  </div>
-
+            </button>
+          </div>
+          
                   {/* Three Column Layout with Vertical Separators */}
                   <div className="flex">
                     {/* Source Filter */}
@@ -373,8 +397,8 @@ export const EnhancedMarketDashboard: React.FC = () => {
                             <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">{source}</span>
                           </label>
                         ))}
-                      </div>
-                    </div>
+          </div>
+        </div>
 
                     {/* Vertical Line */}
                     <div className="w-px bg-gray-300 dark:bg-gray-600 mx-3"></div>
@@ -399,10 +423,10 @@ export const EnhancedMarketDashboard: React.FC = () => {
                               />
                               <span className="text-sm text-gray-600 dark:text-gray-400">{category.label}</span>
                             </label>
-                          </div>
+              </div>
                         ))}
-                      </div>
-                    </div>
+            </div>
+          </div>
 
                     {/* Vertical Line */}
                     <div className="w-px bg-gray-300 dark:bg-gray-600 mx-3"></div>
@@ -428,12 +452,12 @@ export const EnhancedMarketDashboard: React.FC = () => {
                             <span className="text-sm text-gray-600 dark:text-gray-400">{option.label}</span>
                           </label>
                         ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
+          </div>
+              </div>
+              )}
+          </div>
 
             {/* Active Filter Tags */}
             {(dashboardState.filters.source.length > 0 ||
@@ -488,9 +512,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
                     >
                       <XMarkIcon className="w-3 h-3" />
                     </button>
-                  </div>
-                )}
               </div>
+                )}
+            </div>
             )}
 
             <div className="flex items-center flex-1 gap-4">
@@ -535,113 +559,113 @@ export const EnhancedMarketDashboard: React.FC = () => {
                 <RectangleStackIcon className="w-4 h-4" />
                 Individual {dashboardState.viewMode === 'individual' && `(${stats.totalIndividual})`}
               </button>
-            </div>
+          </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {displayMarkets.map((market) => (
+        {displayMarkets.map((market) => (
               <motion.div
-                key={market.id}
+            key={market.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
               >
-                <Expandable transitionDuration={0.3}>
+                <Expandable transitionDuration={0.15}>
                   <ExpandableCard className="h-fit">
                     <ExpandableTrigger className="w-full h-full flex flex-col">
                       <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            {'combinedVolume' in market ? (
-                              <div className="flex items-center gap-2">
+                {'combinedVolume' in market ? (
+                  <div className="flex items-center gap-2">
                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary">
-                                  COMBINED
-                                </span>
+                      COMBINED
+                    </span>
                                 <span className="text-sm font-bold text-primary">
-                                  {Math.round(market.matchConfidence * 100)}% match
-                                </span>
-                              </div>
-                            ) : (
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
-                                {market.source}
-                              </span>
-                            )}
-                            <div className="text-xs text-base-content/70">
-                              {market.outcomes?.length || 2} outcomes
-                            </div>
-                          </div>
+                      {Math.round(market.matchConfidence * 100)}% match
+                    </span>
+                  </div>
+                ) : (
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
+                    {market.source}
+                  </span>
+                )}
+                <div className="text-xs text-base-content/70">
+                  {market.outcomes?.length || 2} outcomes
+                </div>
+              </div>
                           <h3 className="text-sm font-medium text-base-content text-left line-clamp-2 leading-tight hover:text-primary transition-colors">
-                            {/* Show main title - smart extraction based on question type */}
-                            {(() => {
-                              const title = market.title;
+                {/* Show main title - smart extraction based on question type */}
+                {(() => {
+                  const title = market.title;
 
-                              // For sports games (Team vs Team format)
-                              if (title.includes(' vs. ') || title.includes(' vs ')) {
-                                // Extract just the matchup part
-                                const vsMatch = title.match(/^([^:]+(?:\s+vs\.?\s+[^:]+))/i);
-                                if (vsMatch) {
-                                  return vsMatch[1].trim();
-                                }
-                              }
+                  // For sports games (Team vs Team format)
+                  if (title.includes(' vs. ') || title.includes(' vs ')) {
+                    // Extract just the matchup part
+                    const vsMatch = title.match(/^([^:]+(?:\s+vs\.?\s+[^:]+))/i);
+                    if (vsMatch) {
+                      return vsMatch[1].trim();
+                    }
+                  }
 
-                              // For regular questions, split at "?"
-                              if (title.includes('?')) {
-                                return title.split('?')[0] + '?';
-                              }
+                  // For regular questions, split at "?"
+                  if (title.includes('?')) {
+                    return title.split('?')[0] + '?';
+                  }
 
-                              // For other formats, take first sentence or up to 60 characters
-                              const firstSentence = title.split('.')[0];
-                              if (firstSentence.length <= 60) {
-                                return firstSentence + (title.includes('.') ? '.' : '');
-                              }
+                  // For other formats, take first sentence or up to 60 characters
+                  const firstSentence = title.split('.')[0];
+                  if (firstSentence.length <= 60) {
+                    return firstSentence + (title.includes('.') ? '.' : '');
+                  }
 
-                              // Fallback: truncate at 60 characters
-                              return title.length > 60 ? title.substring(0, 60) + '...' : title;
-                            })()}
-                          </h3>
-                        </div>
+                  // Fallback: truncate at 60 characters
+                  return title.length > 60 ? title.substring(0, 60) + '...' : title;
+                })()}
+              </h3>
+            </div>
                       </ExpandableCardHeader>
 
                       <ExpandableCardContent>
                         {/* Basic Info - Always Visible */}
                         <div className="grid grid-cols-2 gap-4 text-xs">
                           <div className="space-y-2">
-                            <div>
+                <div>
                               <span className="font-medium text-base-content/60">Volume:</span>
                               <div className="font-semibold text-base-content">
                                 {'combinedVolume' in market
-                                  ? formatVolume(market.combinedVolume)
-                                  : formatVolume(market.volume || 0)
-                                }
+                      ? formatVolume(market.combinedVolume)
+                      : formatVolume(market.volume || 0)
+                  }
                               </div>
-                            </div>
-                            <div>
+                </div>
+                <div>
                               <span className="font-medium text-base-content/60">Category:</span>
                               <div className="text-base-content">
                                 {(market.category || 'General').charAt(0).toUpperCase() + (market.category || 'General').slice(1)}
                               </div>
                             </div>
-                          </div>
+                </div>
                           <div className="space-y-2">
-                            {'combinedVolume' in market ? (
-                              <div>
+                {'combinedVolume' in market ? (
+                  <div>
                                 <span className="font-medium text-base-content/60">Platforms:</span>
                                 <div className="text-base-content">
                                   {[market.polymarketMarket && 'Polymarket', market.omenMarket && 'Omen']
-                                    .filter(Boolean).join(' + ')
-                                  }
+                        .filter(Boolean).join(' + ')
+                    }
                                 </div>
-                              </div>
-                            ) : (
-                              <div>
+                  </div>
+                ) : (
+                  <div>
                                 <span className="font-medium text-base-content/60">Source:</span>
                                 <div className="text-base-content">
                                   {market.source.charAt(0).toUpperCase() + market.source.slice(1)}
                                 </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                  </div>
+                )}
+              </div>
+            </div>
                       </ExpandableCardContent>
                     </ExpandableTrigger>
 
@@ -701,25 +725,30 @@ export const EnhancedMarketDashboard: React.FC = () => {
                                       <span className="text-xs font-semibold">{formatVolume(market.omenMarket.volume || 0)}</span>
                                     </div>
                                   )}
-                                </div>
-                              </div>
+              </div>
+            </div>
                             )}
                           </div>
                         </ExpandableContent>
-                      </div>
+          </div>
                     </ExpandableCardContent>
                   </ExpandableCard>
                 </Expandable>
               </motion.div>
-            ))}
-          </div>
+        ))}
+      </div>
 
           {displayMarkets.length === 0 && (
-            <div className="text-center py-12">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="text-center py-12"
+            >
               <div className="text-gray-500">
                 No {dashboardState.viewMode} markets found
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
       </MarketSection>
