@@ -14,7 +14,7 @@ interface SimpleMarketDetailsViewProps {
  * Simplified MarketDetailsView that works with unified data structure
  */
 export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsViewProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'data'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview'>('overview');
 
   // Helper functions
   const isCombinedMarket = (market: CombinedMarket | NormalizedMarket): market is CombinedMarket => {
@@ -255,16 +255,7 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
                     </div>
                   )}
 
-                  {activeTab === 'data' && (
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold mb-4 text-base-content">Raw Market Data</h3>
-                      <div className="bg-base-300 rounded-lg p-4">
-                        <pre className="text-sm overflow-auto text-base-content max-h-96">
-                          {JSON.stringify(market, null, 2)}
-                        </pre>
-                      </div>
-                    </div>
-                  )}
+
                 </div>
               </div>
             </div>
@@ -297,10 +288,10 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
                             {polymarketVolume > 0 && (
                               <div className="text-right">
                                 <div className="flex items-center justify-end gap-2 mb-2">
-                                  <span className="text-base font-medium text-base-content">Polymarket</span>
-                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#358FC6' }}></div>
+                                  <span className="text-base font-medium text-black dark:text-black">Polymarket</span>
+                                  <div className="w-3 h-3 rounded-full bg-[#4c56ab]"></div>
                                 </div>
-                                <div className="text-2xl font-bold mb-1" style={{ color: '#358FC6' }}>{polymarketPercentage.toFixed(1)}%</div>
+                                <div className="text-2xl font-bold mb-1 text-[#4c56ab] dark:text-[#4c56ab]">{polymarketPercentage.toFixed(1)}%</div>
                                 <div className="text-sm text-base-content/70">{formatVolume(polymarketVolume)}</div>
                               </div>
                             )}
@@ -323,7 +314,7 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
                                     <path
                                       d="M 30 100 A 70 70 0 0 1 170 100"
                                       fill="none"
-                                      stroke="#358FC6"
+                                      stroke="#4c56ab"
                                       strokeWidth="16"
                                       strokeDasharray={`${(polymarketPercentage / 100) * 219.9} 219.9`}
                                       strokeLinecap="round"
@@ -336,7 +327,7 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
                                     <path
                                       d="M 30 100 A 70 70 0 0 1 170 100"
                                       fill="none"
-                                      stroke="#746097"
+                                      stroke="#f2a5db"
                                       strokeWidth="16"
                                       strokeDasharray={`${(omenPercentage / 100) * 219.9} 219.9`}
                                       strokeDashoffset={`-${(polymarketPercentage / 100) * 219.9}`}
@@ -360,10 +351,10 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
                             {omenVolume > 0 && (
                               <div className="text-left">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#746097' }}></div>
-                                  <span className="text-base font-medium text-base-content">Omen</span>
+                                  <div className="w-3 h-3 rounded-full bg-[#f2a5db]"></div>
+                                  <span className="text-base font-medium text-black dark:text-black">Omen</span>
                                 </div>
-                                <div className="text-2xl font-bold mb-1" style={{ color: '#746097' }}>{omenPercentage.toFixed(1)}%</div>
+                                <div className="text-2xl font-bold mb-1 text-[#f2a5db] dark:text-[#f2a5db]">{omenPercentage.toFixed(1)}%</div>
                                 <div className="text-sm text-base-content/70">{formatVolume(omenVolume)}</div>
                               </div>
                             )}
@@ -374,20 +365,76 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
 
                     {/* Platform Details */}
                     <div>
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         {/* Polymarket */}
                         {market.polymarketMarket && (
-                          <div className="py-4">
-                            <div className="flex items-center justify-between mb-4">
-                              <span className="text-lg font-semibold text-gray-900 dark:text-white">Polymarket</span>
-                              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                {formatVolume(market.polymarketMarket.volume || 0)}
-                              </span>
+                          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+                            {/* Header with dot and platform name */}
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-3 h-3 rounded-full bg-[#4c56ab]"></div>
+                              <span className="text-lg font-semibold text-gray-900">Polymarket</span>
                             </div>
-                            <div className="space-y-3">
-                              <div>
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Title:</span>
-                                <div className="font-medium text-gray-900 dark:text-white mt-1">{market.polymarketMarket.title}</div>
+                            
+                            {/* Title */}
+                            <div className="mb-6">
+                              <div className="font-semibold text-gray-900 leading-relaxed">
+                                {market.polymarketMarket.title}
+                              </div>
+                            </div>
+
+                            {/* Community Sentiment */}
+                            <div className="mb-4">
+                              <div className="flex items-center justify-between mb-3">
+                                <span className="text-sm font-medium text-gray-700">Community sentiment</span>
+                                <span className="text-sm text-gray-500">4.5M votes</span>
+                              </div>
+                              
+                              {/* Sentiment Progress Bar */}
+                              <div className="w-full rounded-full h-3 mb-4" style={{ backgroundColor: '#FF6962' }}>
+                                <div className="h-3 rounded-full" style={{ width: '82%', backgroundColor: '#77DD78' }}></div>
+                              </div>
+                              
+                              {/* Sentiment Labels */}
+                              <div className="flex justify-between text-sm mb-4">
+                                <div className="flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#77DD78' }}>
+                                    <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="font-medium" style={{ color: '#77DD78' }}>82%</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="font-medium" style={{ color: '#FF6962' }}>18%</span>
+                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#FF6962' }}>
+                                    <path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex gap-3">
+                                {getDisplayOutcomes().map((outcome, index) => (
+                                  <button
+                                    key={outcome}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition-colors`}
+                                    style={{
+                                      backgroundColor: index === 0 ? 'transparent' : 'white',
+                                      color: index === 0 ? '#77DD78' : '#FF6962',
+                                      border: index === 0 ? '1px solid #77DD78' : '1px solid #FF6962'
+                                    }}
+                                  >
+                                    {index === 0 && (
+                                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    )}
+                                    {index === 1 && (
+                                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    )}
+                                    {outcome}
+                                  </button>
+                                ))}
                               </div>
                             </div>
                           </div>
@@ -395,17 +442,73 @@ export default function SimpleMarketDetailsView({ market }: SimpleMarketDetailsV
 
                         {/* Omen */}
                         {market.omenMarket && (
-                          <div className="py-4">
-                            <div className="flex items-center justify-between mb-4">
-                              <span className="text-lg font-semibold text-gray-900 dark:text-white">Omen</span>
-                              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                {formatVolume(market.omenMarket.volume || 0)}
-                              </span>
+                          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
+                            {/* Header with dot and platform name */}
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-3 h-3 rounded-full bg-[#f2a5db]"></div>
+                              <span className="text-lg font-semibold text-gray-900">Omen</span>
                             </div>
-                            <div className="space-y-3">
-                              <div>
-                                <span className="text-sm text-gray-600 dark:text-gray-400">Title:</span>
-                                <div className="font-medium text-gray-900 dark:text-white mt-1">{market.omenMarket.title}</div>
+                            
+                            {/* Title */}
+                            <div className="mb-6">
+                              <div className="font-semibold text-gray-900 leading-relaxed">
+                                {market.omenMarket.title}
+                              </div>
+                            </div>
+
+                            {/* Community Sentiment */}
+                            <div className="mb-4">
+                              <div className="flex items-center justify-between mb-3">
+                                <span className="text-sm font-medium text-gray-700">Community sentiment</span>
+                                <span className="text-sm text-gray-500">4.5M votes</span>
+                              </div>
+                              
+                              {/* Sentiment Progress Bar */}
+                              <div className="w-full rounded-full h-3 mb-4" style={{ backgroundColor: '#FF6962' }}>
+                                <div className="h-3 rounded-full" style={{ width: '82%', backgroundColor: '#77DD78' }}></div>
+                              </div>
+                              
+                              {/* Sentiment Labels */}
+                              <div className="flex justify-between text-sm mb-4">
+                                <div className="flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#77DD78' }}>
+                                    <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                  <span className="font-medium" style={{ color: '#77DD78' }}>82%</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="font-medium" style={{ color: '#FF6962' }}>18%</span>
+                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#FF6962' }}>
+                                    <path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex gap-3">
+                                {getDisplayOutcomes().map((outcome, index) => (
+                                  <button
+                                    key={outcome}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition-colors`}
+                                    style={{
+                                      backgroundColor: index === 0 ? 'transparent' : 'white',
+                                      color: index === 0 ? '#77DD78' : '#FF6962',
+                                      border: index === 0 ? '1px solid #77DD78' : '1px solid #FF6962'
+                                    }}
+                                  >
+                                    {index === 0 && (
+                                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    )}
+                                    {index === 1 && (
+                                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                      </svg>
+                                    )}
+                                    {outcome}
+                                  </button>
+                                ))}
                               </div>
                             </div>
                           </div>

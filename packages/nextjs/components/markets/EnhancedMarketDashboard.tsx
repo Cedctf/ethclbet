@@ -76,8 +76,8 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   const getSourceBadgeColor = (source: string): string => {
     switch (source) {
-      case 'polymarket': return 'bg-[#0000FF]/10 text-[#0000FF]';
-      case 'omen': return 'bg-success/20 text-success';
+      case 'polymarket': return 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700/50';
+      case 'omen': return 'bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700/50';
       default: return 'bg-base-300 text-base-content';
     }
   };
@@ -200,8 +200,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
                                   </span>
                                 </div>
                               ) : (
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
-                                  {market.source}
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
+                                  <div className={`w-2 h-2 rounded-full ${market.source === 'polymarket' ? 'bg-blue-500' : market.source === 'omen' ? 'bg-purple-500' : 'bg-gray-500'}`}></div>
+                                  {market.source.toUpperCase()}
                                 </span>
                               )}
                               <div className="text-xs text-base-content/70">
@@ -264,17 +265,29 @@ export const EnhancedMarketDashboard: React.FC = () => {
                               {'combinedVolume' in market ? (
                                 <div>
                                   <span className="font-medium text-base-content/60">Platforms:</span>
-                                  <div className="text-base-content">
-                                    {[market.polymarketMarket && 'Polymarket', market.omenMarket && 'Omen']
-                                      .filter(Boolean).join(' + ')
-                                    }
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {market.polymarketMarket && (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700/50">
+                                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                                        Polymarket
+                                      </span>
+                                    )}
+                                    {market.omenMarket && (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700/50">
+                                        <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                        Omen
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
                               ) : (
                                 <div>
                                   <span className="font-medium text-base-content/60">Source:</span>
-                                  <div className="text-base-content">
-                                    {market.source.charAt(0).toUpperCase() + market.source.slice(1)}
+                                  <div className="mt-1">
+                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
+                                      <div className={`w-1.5 h-1.5 rounded-full ${market.source === 'polymarket' ? 'bg-blue-500' : market.source === 'omen' ? 'bg-purple-500' : 'bg-gray-500'}`}></div>
+                                      {market.source.charAt(0).toUpperCase() + market.source.slice(1)}
+                                    </span>
                                   </div>
                                 </div>
                               )}
@@ -326,17 +339,27 @@ export const EnhancedMarketDashboard: React.FC = () => {
                               {'combinedVolume' in market && (
                                 <div className="space-y-3">
                                   <span className="text-xs font-medium text-base-content/70">Platform Breakdown:</span>
-                                  <div className="grid grid-cols-1 gap-2">
+                                  <div className="grid grid-cols-1 gap-3">
                                     {market.polymarketMarket && (
-                                      <div className="flex justify-between items-center p-2 bg-[#0000FF]/5 dark:bg-[#0000FF]/20 rounded-md">
-                                        <span className="text-xs font-medium text-[#0000FF] dark:text-[#0000FF]">Polymarket</span>
-                                        <span className="text-xs font-semibold text-[#0000FF]/90">{formatVolume(market.polymarketMarket.volume || 0)}</span>
+                                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg p-3 border border-blue-200 dark:border-blue-700/50">
+                                        <div className="flex justify-between items-center">
+                                          <div className="flex items-center gap-2">
+                                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                            <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">Polymarket</span>
+                                          </div>
+                                          <span className="text-sm font-bold text-blue-600 dark:text-blue-400">{formatVolume(market.polymarketMarket.volume || 0)}</span>
+                                        </div>
                                       </div>
                                     )}
                                     {market.omenMarket && (
-                                      <div className="flex justify-between items-center p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
-                                        <span className="text-xs font-medium text-green-700 dark:text-green-300">Omen</span>
-                                        <span className="text-xs font-semibold">{formatVolume(market.omenMarket.volume || 0)}</span>
+                                      <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg p-3 border border-purple-200 dark:border-purple-700/50">
+                                        <div className="flex justify-between items-center">
+                                          <div className="flex items-center gap-2">
+                                            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                                            <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">Omen</span>
+                                          </div>
+                                          <span className="text-sm font-bold text-purple-600 dark:text-purple-400">{formatVolume(market.omenMarket.volume || 0)}</span>
+                                        </div>
                                       </div>
                                     )}
                                   </div>
@@ -392,8 +415,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
                         <ExpandableCardHeader navigateToAnalysis={true} analysisPath={`/market/${market.id}`}>
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
-                                {market.source}
+                              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
+                                <div className={`w-2 h-2 rounded-full ${market.source === 'polymarket' ? 'bg-blue-500' : market.source === 'omen' ? 'bg-purple-500' : 'bg-gray-500'}`}></div>
+                                {market.source.toUpperCase()}
                               </span>
                               <div className="text-xs text-base-content/70">
                                 {market.outcomes?.length || 2} outcomes

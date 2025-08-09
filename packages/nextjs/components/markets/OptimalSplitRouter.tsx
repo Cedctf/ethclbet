@@ -230,11 +230,11 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         <div className="text-sm text-base-content/70 mb-3">Available Platforms:</div>
         <div className="flex gap-6">
           <div className={`flex items-center gap-2 ${hasPolymarket ? 'text-base-content' : 'text-base-content/40'}`}>
-            <div className={`w-3 h-3 rounded-full ${hasPolymarket ? '' : 'bg-base-content/30'}`} style={hasPolymarket ? { backgroundColor: '#358FC6' } : {}}></div>
+            <div className={`w-3 h-3 rounded-full ${hasPolymarket ? '' : 'bg-base-content/30'}`} style={hasPolymarket ? { backgroundColor: '#4c56ab' } : {}}></div>
             <span className="text-sm">Polymarket (Order Book)</span>
           </div>
           <div className={`flex items-center gap-2 ${hasOmen ? 'text-base-content' : 'text-base-content/40'}`}>
-            <div className={`w-3 h-3 rounded-full ${hasOmen ? '' : 'bg-base-content/30'}`} style={hasOmen ? { backgroundColor: '#746097' } : {}}></div>
+            <div className={`w-3 h-3 rounded-full ${hasOmen ? '' : 'bg-base-content/30'}`} style={hasOmen ? { backgroundColor: '#f2a5db' } : {}}></div>
             <span className="text-sm">Omen (LMSR)</span>
           </div>
         </div>
@@ -405,7 +405,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                     <div className="flex-1 space-y-4">
                       <div className="text-left">
                         <div className="flex items-center gap-2 mb-3">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#746097' }}></div>
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#f2a5db' }}></div>
                           <span className="text-lg font-medium text-base-content">Omen</span>
                         </div>
                         <div className="text-3xl font-bold text-base-content mb-2 text-right">
@@ -444,7 +444,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                           cy="50"
                           r="40"
                           fill="none"
-                          stroke="#358FC6"
+                          stroke="#4c56ab"
                           strokeWidth="8"
                           strokeDasharray={`${((result.orderBookAllocation / popupBudget) * 251.2).toFixed(1)} 251.2`}
                           strokeDashoffset="0"
@@ -456,7 +456,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                           cy="50"
                           r="40"
                           fill="none"
-                          stroke="#746097"
+                          stroke="#f2a5db"
                           strokeWidth="8"
                           strokeDasharray={`${((result.lmsrAllocation / popupBudget) * 251.2).toFixed(1)} 251.2`}
                           strokeDashoffset={`-${((result.orderBookAllocation / popupBudget) * 251.2).toFixed(1)}`}
@@ -478,7 +478,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                     <div className="flex-1 space-y-4">
                       <div className="text-left">
                         <div className="flex items-center gap-2 mb-3">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#358FC6' }}></div>
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#4c56ab' }}></div>
                           <span className="text-lg font-medium text-base-content">Polymarket</span>
                         </div>
                         <div className="text-3xl font-bold text-base-content mb-2 text-right">
