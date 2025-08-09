@@ -1,7 +1,12 @@
 "use client";
 
+<<<<<<< HEAD
 import React, { useState } from 'react';
 import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+=======
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon, MagnifyingGlassIcon, XMarkIcon, FunnelIcon, ViewColumnsIcon } from "@heroicons/react/24/outline";
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
 import { motion } from "framer-motion";
 import { useCombinedMarkets } from '../../hooks/useCombinedMarkets';
 import { Hero } from '../ui/Hero';
@@ -14,10 +19,23 @@ interface MarketSectionProps {
 }
 
 interface DashboardState {
+<<<<<<< HEAD
+=======
+  viewMode: 'combined' | 'individual' | 'all';
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
   autoRefresh: boolean;
   loading: boolean;
   error: string | null;
   searchQuery: string;
+<<<<<<< HEAD
+=======
+  showFilterDropdown: boolean;
+  filters: {
+    source: string[];
+    category: string[];
+    volumeRange: string;
+  };
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
 }
 
 // Market Section with clean layout
@@ -45,6 +63,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
   // Typed dashboard state
   const [dashboardState, setDashboardState] = useState<DashboardState>({
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     viewMode: 'combined',
 >>>>>>> 24c291f (Market Card Display type change)
@@ -53,6 +72,128 @@ export const EnhancedMarketDashboard: React.FC = () => {
     error: null,
     searchQuery: ''
   });
+=======
+    viewMode: 'combined',
+    autoRefresh: false,
+    loading: false,
+    error: null,
+    searchQuery: '',
+    showFilterDropdown: false,
+    filters: {
+      source: [],
+      category: [],
+      volumeRange: 'all'
+    }
+  });
+  
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Update view mode with type safety
+  const updateViewMode = (mode: 'combined' | 'individual' | 'all'): void => {
+    setDashboardState(prev => ({ ...prev, viewMode: mode }));
+  };
+
+  // Search functionality
+  const handleSearchChange = (value: string) => {
+    setDashboardState(prev => ({ ...prev, searchQuery: value }));
+  };
+
+  const clearSearch = () => {
+    setDashboardState(prev => ({ ...prev, searchQuery: '' }));
+  };
+
+  // Filter functionality
+  const toggleFilterDropdown = () => {
+    setDashboardState(prev => ({ ...prev, showFilterDropdown: !prev.showFilterDropdown }));
+  };
+
+  const toggleSourceFilter = (source: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        source: prev.filters.source.includes(source)
+          ? prev.filters.source.filter(s => s !== source)
+          : [...prev.filters.source, source]
+      }
+    }));
+  };
+
+  const toggleCategoryFilter = (category: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        category: prev.filters.category.includes(category)
+          ? prev.filters.category.filter(c => c !== category)
+          : [...prev.filters.category, category]
+      }
+    }));
+  };
+
+  const setVolumeFilter = (range: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: { ...prev.filters, volumeRange: range }
+    }));
+  };
+
+  const clearAllFilters = () => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        source: [],
+        category: [],
+        volumeRange: 'all'
+      }
+    }));
+  };
+
+  // Remove individual filters
+  const removeSourceFilter = (source: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        source: prev.filters.source.filter(s => s !== source)
+      }
+    }));
+  };
+
+  const removeCategoryFilter = (category: string) => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        category: prev.filters.category.filter(c => c !== category)
+      }
+    }));
+  };
+
+  const removeVolumeFilter = () => {
+    setDashboardState(prev => ({
+      ...prev,
+      filters: { ...prev.filters, volumeRange: 'all' }
+    }));
+  };
+
+  // Close filter dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setDashboardState(prev => ({ ...prev, showFilterDropdown: false }));
+      }
+    };
+
+    if (dashboardState.showFilterDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dashboardState.showFilterDropdown]);
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
 
   const handleRefresh = async () => {
     await refetch();
@@ -100,6 +241,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
     );
   }
 
+<<<<<<< HEAD
   const filterMarkets = (markets: any[]) => {
     return markets.filter(market => 
       dashboardState.searchQuery === '' || 
@@ -110,6 +252,50 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   const combinedMarkets = filterMarkets(data.combinedMarkets);
   const individualMarkets = filterMarkets(data.individualMarkets);
+=======
+  // Filter markets based on search query, view mode, and filters
+  const allMarkets = dashboardState.viewMode === 'combined'
+    ? data.combinedMarkets
+    : dashboardState.viewMode === 'individual'
+    ? data.individualMarkets
+    : [...data.combinedMarkets, ...data.individualMarkets]; // 'all' mode shows both
+
+  // Apply search filter
+  let filteredMarkets = dashboardState.searchQuery.trim()
+    ? allMarkets.filter(market =>
+        market.title.toLowerCase().includes(dashboardState.searchQuery.toLowerCase()) ||
+        market.category?.toLowerCase().includes(dashboardState.searchQuery.toLowerCase())
+      )
+    : allMarkets;
+
+  // Apply additional filters
+  if (dashboardState.filters.source.length > 0) {
+    filteredMarkets = filteredMarkets.filter(market =>
+      'source' in market && dashboardState.filters.source.includes(market.source.toLowerCase())
+    );
+  }
+
+  if (dashboardState.filters.category.length > 0) {
+    filteredMarkets = filteredMarkets.filter(market =>
+      market.category && dashboardState.filters.category.includes(market.category.toLowerCase())
+    );
+  }
+
+  // Apply volume filter
+  if (dashboardState.filters.volumeRange !== 'all') {
+    filteredMarkets = filteredMarkets.filter(market => {
+      const volume = 'combinedVolume' in market ? market.combinedVolume : (market.volume || 0);
+      switch (dashboardState.filters.volumeRange) {
+        case 'low': return volume < 1000;
+        case 'medium': return volume >= 1000 && volume < 10000;
+        case 'high': return volume >= 10000;
+        default: return true;
+      }
+    });
+  }
+
+  const displayMarkets = filteredMarkets;
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
 
   return (
     <div className="relative">
@@ -147,6 +333,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
       {/* Market Section - Normal document flow, positioned below hero section */}
       <MarketSection className="relative !bg-white dark:!bg-black min-h-screen pt-30" id="market-section">
         <div className="mb-6 pt-0">
+<<<<<<< HEAD
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
             <div className="flex items-center gap-4">
               <button
@@ -266,6 +453,36 @@ export const EnhancedMarketDashboard: React.FC = () => {
                               <div>
                                 <span className="font-medium text-base-content/60">Category:</span>
 =======
+=======
+          {/* First Row - Search and Refresh */}
+          <div className="flex items-center gap-4 mb-4">
+            {/* Search Component - Takes all available space */}
+            <div className="relative flex-1">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={dashboardState.searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder="Search markets by title, description, or source..."
+                  className="w-full pl-12 pr-12 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
+                />
+                {/* Search icon - Left side */}
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <MagnifyingGlassIcon className="w-4 h-4" />
+                </div>
+                {/* Clear button (X icon) - Right side */}
+                {dashboardState.searchQuery && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  >
+                    <XMarkIcon className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
             {/* Refresh Button - Icon only */}
           <button
             onClick={handleRefresh}
@@ -488,6 +705,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
         {displayMarkets.map((market) => (
           <MarketCard 
             key={market.id}
+<<<<<<< HEAD
 <<<<<<< HEAD
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -857,6 +1075,11 @@ export const EnhancedMarketDashboard: React.FC = () => {
             formatVolumeAction={formatVolume}
           />
 >>>>>>> 24c291f (Market Card Display type change)
+=======
+            market={market}
+            formatVolumeAction={formatVolume}
+          />
+>>>>>>> 24c291f2b9e7c559903347e8fb4777c432f2632a
         ))}
       </div>
 
