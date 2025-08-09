@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon } from "@heroicons/react/24/outline";
 import { useCombinedMarkets } from '../../hooks/useCombinedMarkets';
-import { HeroSection } from './HeroSection';
+import { Hero } from '../ui/Hero';
 import {
   Expandable,
   ExpandableCard,
@@ -119,7 +119,7 @@ export const EnhancedMarketDashboard: React.FC = () => {
   return (
     <div className="relative">
       {/* Hero Section - Normal document flow */}
-      <HeroSection />
+      <Hero />
 
       {/* Market Section - Normal document flow, positioned below hero section */}
       <MarketSection className="relative !bg-white dark:!bg-black min-h-screen" id="market-section">
