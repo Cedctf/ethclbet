@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
-import { OasisIcon, PolygonIcon, GraphIcon, EthereumIcon } from "~~/components/ui/TokenIcons";
+import { OasisIcon, PolygonIcon, GraphIcon, EthereumIcon } from "./TokenIcons";
 
 interface TokenInfo {
   symbol: string;

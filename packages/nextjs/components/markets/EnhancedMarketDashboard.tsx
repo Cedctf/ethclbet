@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2Icon, RectangleStackIcon, MagnifyingGlassIcon, XMarkIcon, FunnelIcon, ViewColumnsIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
 import { useCombinedMarkets } from '../../hooks/useCombinedMarkets';
-import { Hero } from '~~/components/ui/Hero';
+import { Hero } from '../ui/Hero';
 import {
   Expandable,
   ExpandableCard,
@@ -512,9 +512,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
                     >
                       <XMarkIcon className="w-3 h-3" />
                     </button>
-              </div>
+                  </div>
                 )}
-            </div>
+              </div>
             )}
 
             <div className="flex items-center flex-1 gap-4">
@@ -586,11 +586,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
                     </span>
                   </div>
                 ) : (
-                  'source' in market ? (
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source)}`}>
-                      {market.source}
-                    </span>
-                  ) : null
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceBadgeColor(market.source || 'combined')}`}>
+                    {market.source || 'Combined'}
+                  </span>
                 )}
                 <div className="text-xs text-base-content/70">
                   {market.outcomes?.length || 2} outcomes

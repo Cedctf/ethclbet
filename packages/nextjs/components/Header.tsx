@@ -45,8 +45,8 @@ export const NavBar = () => {
   }, [pathname]);
 
   return (
-    <div className="fixed bottom-0 sm:top-0 left-1/2 -translate-x-1/2 z-50 mb-6 sm:pt-6">
-      <div className="flex items-center gap-3 bg-base-100/5 border border-base-300 backdrop-blur-lg py-1 px-1 rounded-full shadow-lg">
+    <div className="fixed bottom-0 sm:top-0 left-1/2 -translate-x-1/2 z-50 mb-2 sm:mb-0 sm:pt-2 pointer-events-none">
+      <div className="flex items-center gap-3 bg-base-100/5 border border-base-300 backdrop-blur-lg py-1 px-1 rounded-full shadow-lg pointer-events-auto w-fit mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.name;
