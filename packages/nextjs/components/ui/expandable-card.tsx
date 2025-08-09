@@ -208,27 +208,6 @@ export const MarketCard: React.FC<MarketCardProps> = ({ market, formatVolumeActi
               })()}
             </div>
           )}
-
-          {/* Platform Breakdown for Combined Markets */}
-          {'combinedVolume' in market && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-              <span className="text-xs font-medium text-base-content/60 block mb-2">Platform Breakdown:</span>
-              <div className="space-y-2">
-                {market.polymarketMarket && (
-                  <div className="flex justify-between items-center p-2 bg-[#0000FF]/5 dark:bg-[#0000FF]/20 rounded-md">
-                    <span className="text-xs font-medium text-[#0000FF]">Polymarket</span>
-                    <span className="text-xs font-semibold text-[#0000FF]/90">{formatVolumeAction(market.polymarketMarket.volume || 0)}</span>
-                  </div>
-                )}
-                {market.omenMarket && (
-                  <div className="flex justify-between items-center p-2 bg-[#f2a5db]/10 dark:bg-[#f2a5db]/20 rounded-md">
-                    <span className="text-xs font-medium text-[#d946ef] dark:text-[#d946ef]">Omen</span>
-                    <span className="text-xs font-semibold text-[#d946ef]/90">{formatVolumeAction(market.omenMarket.volume || 0)}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </Link>
     </motion.div>
