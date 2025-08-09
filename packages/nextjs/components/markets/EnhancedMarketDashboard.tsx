@@ -5,6 +5,8 @@ import { ArrowPathIcon, ChartBarIcon, CurrencyDollarIcon, ClockIcon, Squares2X2I
 import { useCombinedMarkets, CombinedMarket, NormalizedMarket } from '../../hooks/useCombinedMarkets';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { HeroSection } from './HeroSection';
+
 
 /**
  * Enhanced dashboard component that displays both individual and combined markets
@@ -35,9 +37,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
 
   const getSourceBadgeColor = (source: string): string => {
     switch (source) {
-      case 'polymarket': return 'bg-purple-100 text-purple-800';
-      case 'omen': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'polymarket': return 'badge-polymarket';
+      case 'omen': return 'badge-omen';
+      default: return 'bg-base-300 text-base-content';
     }
   };
 
@@ -82,44 +84,50 @@ export const EnhancedMarketDashboard: React.FC = () => {
   const displayMarkets = viewMode === 'combined' ? data.combinedMarkets : data.individualMarkets;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          🎯 Enhanced Prediction Markets Hub
-        </h1>
-        <p className="text-gray-600 mb-4">
-          Unified market data with intelligent combination and real volume tracking
-        </p>
-        
-        {/* Controls */}
-        <div className="flex items-center gap-4 mb-4 flex-wrap">
+    <div className="relative">
+      <HeroSection />
+
+      <div
+        id="market-section"
+        className="relative z-20 bg-base-200 min-h-screen"
+      >
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8 pt-8">
+            <h2 className="text-3xl font-bold text-base-content mb-4">
+              Market Dashboard
+            </h2>
+            <p className="text-base-content/70 mb-6">
+              Real-time prediction market data and analytics
+            </p>
+
+            {/* Controls */}
+            <div className="flex items-center gap-4 mb-4 flex-wrap">
           <button
             onClick={handleRefresh}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-content rounded-lg hover:bg-primary/80 disabled:opacity-50"
           >
             <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh Data
           </button>
-          
+
           <button
             onClick={handleUpdateData}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-success text-success-content rounded-lg hover:bg-success/80 disabled:opacity-50"
           >
             <ArrowPathIcon className="w-4 h-4" />
             Update from APIs
           </button>
-          
+          </div>
           {/* View Mode Toggle */}
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center gap-2 bg-base-300 rounded-lg p-1">
             <button
               onClick={() => setViewMode('combined')}
               className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'combined' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+                viewMode === 'combined'
+                  ? 'bg-base-100 text-primary shadow-sm'
+                  : 'text-base-content/70 hover:text-base-content'
               }`}
             >
               <Squares2X2Icon className="w-4 h-4" />
@@ -128,9 +136,9 @@ export const EnhancedMarketDashboard: React.FC = () => {
             <button
               onClick={() => setViewMode('individual')}
               className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'individual' 
-                  ? 'bg-white text-blue-600 shadow-sm' 
-                  : 'text-gray-600 hover:text-gray-900'
+                viewMode === 'individual'
+                  ? 'bg-base-100 text-primary shadow-sm'
+                  : 'text-base-content/70 hover:text-base-content'
               }`}
             >
               <RectangleStackIcon className="w-4 h-4" />
@@ -144,51 +152,51 @@ export const EnhancedMarketDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats */}
+          {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="bg-base-100 rounded-lg shadow-sm p-4">
             <div className="flex items-center">
-              <Squares2X2Icon className="w-8 h-8 text-blue-600" />
+              <Squares2X2Icon className="w-8 h-8 text-primary" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Combined Markets</p>
-                <p className="text-2xl font-semibold text-blue-600">{stats.totalCombined}</p>
+                <p className="text-sm font-medium text-base-content/70">Combined Markets</p>
+                <p className="text-2xl font-semibold text-primary">{stats.totalCombined}</p>
               </div>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg shadow-sm p-4">
+
+          <div className="bg-base-100 rounded-lg shadow-sm p-4">
             <div className="flex items-center">
-              <RectangleStackIcon className="w-8 h-8 text-gray-600" />
+              <RectangleStackIcon className="w-8 h-8 text-base-content/70" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Individual Markets</p>
-                <p className="text-2xl font-semibold text-gray-600">{stats.totalIndividual}</p>
+                <p className="text-sm font-medium text-base-content/70">Individual Markets</p>
+                <p className="text-2xl font-semibold text-base-content">{stats.totalIndividual}</p>
               </div>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg shadow-sm p-4">
+
+          <div className="bg-base-100 rounded-lg shadow-sm p-4">
             <div className="flex items-center">
-              <CurrencyDollarIcon className="w-8 h-8 text-green-600" />
+              <CurrencyDollarIcon className="w-8 h-8 text-success" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-sm font-medium text-base-content/70">
                   {viewMode === 'combined' ? 'Combined Volume' : 'Individual Volume'}
                 </p>
-                <p className="text-2xl font-semibold text-green-600">
+                <p className="text-2xl font-semibold text-success">
                   {formatVolume(viewMode === 'combined' ? stats.totalVolumeCombined : stats.totalVolumeIndividual)}
                 </p>
               </div>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg shadow-sm p-4">
+
+          <div className="bg-base-100 rounded-lg shadow-sm p-4">
             <div className="flex items-center">
-              <ChartBarIcon className="w-8 h-8 text-purple-600" />
+              <ChartBarIcon className="w-8 h-8 text-primary" />
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-sm font-medium text-base-content/70">
                   {viewMode === 'combined' ? 'Avg Match Confidence' : 'Platform Sources'}
                 </p>
-                <p className="text-2xl font-semibold text-purple-600">
-                  {viewMode === 'combined' 
+                <p className="text-2xl font-semibold text-primary">
+                  {viewMode === 'combined'
                     ? `${Math.round(stats.averageMatchConfidence * 100)}%`
                     : `${stats.polymarket + stats.omen}`
                   }
@@ -196,27 +204,26 @@ export const EnhancedMarketDashboard: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+          </div>
 
-      {/* Markets Grid */}
+          {/* Markets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayMarkets.map((market) => (
           <div
             key={market.id}
             onClick={() => handleMarketClick(market)}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden"
+            className="bg-base-100 rounded-lg shadow-sm border border-base-300 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden"
           >
             {/* Header */}
-            <div className="p-4 border-b border-gray-100">
+            <div className="p-4 border-b border-base-300">
               <div className="flex items-center justify-between mb-2">
                 {'combinedVolume' in market ? (
                   // Combined market badges
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium gd-combined-tag">
                       COMBINED
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-base-content/70">
                       {Math.round(market.matchConfidence * 100)}% match
                     </span>
                   </div>
@@ -226,21 +233,47 @@ export const EnhancedMarketDashboard: React.FC = () => {
                     {market.source}
                   </span>
                 )}
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-base-content/70">
                   {market.outcomes?.length || 2} outcomes
                 </div>
               </div>
-              <h3 className="text-sm font-medium text-gray-900 line-clamp-2 leading-tight">
-                {market.title}
+              <h3 className="text-sm font-medium text-base-content line-clamp-2 leading-tight">
+                {/* Show main title - smart extraction based on question type */}
+                {(() => {
+                  const title = market.title;
+
+                  // For sports games (Team vs Team format)
+                  if (title.includes(' vs. ') || title.includes(' vs ')) {
+                    // Extract just the matchup part
+                    const vsMatch = title.match(/^([^:]+(?:\s+vs\.?\s+[^:]+))/i);
+                    if (vsMatch) {
+                      return vsMatch[1].trim();
+                    }
+                  }
+
+                  // For regular questions, split at "?"
+                  if (title.includes('?')) {
+                    return title.split('?')[0] + '?';
+                  }
+
+                  // For other formats, take first sentence or up to 60 characters
+                  const firstSentence = title.split('.')[0];
+                  if (firstSentence.length <= 60) {
+                    return firstSentence + (title.includes('.') ? '.' : '');
+                  }
+
+                  // Fallback: truncate at 60 characters
+                  return title.length > 60 ? title.substring(0, 60) + '...' : title;
+                })()}
               </h3>
             </div>
 
             {/* Content */}
             <div className="p-4">
-              <div className="space-y-2 text-xs text-gray-600">
+              <div className="space-y-2 text-xs text-base-content/70">
                 <div>
                   <span className="font-medium">Volume:</span> {
-                    'combinedVolume' in market 
+                    'combinedVolume' in market
                       ? formatVolume(market.combinedVolume)
                       : formatVolume(market.volume || 0)
                   }
@@ -276,13 +309,18 @@ export const EnhancedMarketDashboard: React.FC = () => {
         ))}
       </div>
 
-      {displayMarkets.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-500">
-            No {viewMode} markets found
-          </div>
+          {displayMarkets.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-gray-500">
+                No {viewMode} markets found
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
+    </div>
     </div>
   );
 };
+
+
