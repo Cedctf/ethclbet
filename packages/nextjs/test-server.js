@@ -9,7 +9,7 @@
 const fetch = require('node-fetch');
 
 const SERVER_URL = 'http://localhost:3001';
-const TEST_USER_ADDRESS = '0x742d35Cc6634C0532925a3b8C17067df4a0bb11B'; // Example address
+const TEST_USER_ADDRESS = '0x8fdd8FF672BEf99e33A1F821ECDC57571391e9B5'; // Example address
 
 async function runCompleteWorkflow() {
   console.log('🚀 Starting Complete Betting Workflow Test\n');

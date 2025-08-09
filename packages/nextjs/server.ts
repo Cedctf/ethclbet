@@ -195,6 +195,165 @@ function generateBetId(): string {
   return Date.now().toString() + Math.random().toString(36).substr(2, 9);
 }
 
+// Generate random nonce
+const generateNonce = () => Math.random().toString(36).substring(2, 15);
+
+// SIWE Login endpoint
+app.post('/api/siwe-login', async (req: Request, res: Response) => {
+  try {
+    const { userAddress, contractDomain } = req.body;
+
+    if (!userAddress || !ethers.isAddress(userAddress)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid user address'
+      });
+    }
+
+    if (!contractDomain) {
+      return res.status(400).json({
+        success: false,
+        error: 'Contract domain is required'
+      });
+    }
+
+    if (!signer) {
+      return res.status(500).json({
+        success: false,
+        error: 'Server signer not configured (PRIVATE_KEY missing)'
+      });
+    }
+
+    // Get chain ID from provider
+    const network = await provider.getNetwork();
+    const chainId = Number(network.chainId);
+
+    // Create SIWE message using the siwe library - matching the frontend pattern
+    const siweMessage = new SiweMessage({
+      domain: contractDomain,
+      address: userAddress,
+      uri: `http://${contractDomain}`,
+      version: "1",
+      chainId: chainId,
+      nonce: generateNonce(),
+      statement: "I accept the Terms of Service: https://service.invalid/",
+    });
+
+    const message = siweMessage.toMessage();
+    
+    // Server signs the message (simulating user signature for demo)
+    const signature = await signer.signMessage(message);
+    
+    // Parse signature using ethers.Signature.from
+    const sig = ethers.Signature.from(signature);
+
+    // Convert to SignatureRSV format expected by the contract
+    const signatureRSV = {
+      r: sig.r,
+      s: sig.s,
+      v: BigInt(sig.v),
+    };
+
+    // Create contract instance
+    const contract = new ethers.Contract(SIMPLE_BET_CONTRACT_ADDRESS, SIMPLE_BET_ABI, signer);
+
+    // Call the contract's login method to get the proper SIWE token
+    const loginResult = await contract.login(message, signatureRSV);
+    
+    // The login method returns a bytes token
+    const token = loginResult as string;
+    const expiryTime = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
+    // Store session
+    userSessions.set(userAddress.toLowerCase(), {
+      address: userAddress,
+      siweToken: token,
+      expiresAt: expiryTime
+    });
+
+    console.log(`\n=== SIWE LOGIN ===`);
+    console.log(`User: ${userAddress}`);
+    console.log(`Domain: ${contractDomain}`);
+    console.log(`Chain ID: ${chainId}`);
+    console.log(`Token: ${token.substring(0, 20)}...`);
+    console.log(`Expires: ${new Date(expiryTime).toISOString()}`);
+    console.log(`==================\n`);
+
+    res.json({
+      success: true,
+      siweToken: token,
+      expiresAt: expiryTime,
+      message: 'SIWE authentication successful'
+    });
+  } catch (error) {
+    console.error('SIWE login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'SIWE login failed'
+    });
+  }
+});
+
+// SIWE logout endpoint
+app.post('/api/siwe-logout', (req: Request, res: Response) => {
+  try {
+    const { userAddress } = req.body;
+
+    if (!userAddress || !ethers.isAddress(userAddress)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid user address'
+      });
+    }
+
+    // Remove session
+    userSessions.delete(userAddress.toLowerCase());
+
+    console.log(`\n=== SIWE LOGOUT ===`);
+    console.log(`User: ${userAddress}`);
+    console.log(`===================\n`);
+
+    res.json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (error) {
+    console.error('SIWE logout error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Logout failed'
+    });
+  }
+});
+
+// Verify SIWE token endpoint
+app.post('/api/siwe-verify', (req: Request, res: Response) => {
+  try {
+    const { siweToken, userAddress } = req.body;
+
+    if (!validateSiweToken(siweToken, userAddress)) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid or expired SIWE token'
+      });
+    }
+
+    const session = userSessions.get(userAddress.toLowerCase());
+    
+    res.json({
+      success: true,
+      valid: true,
+      expiresAt: session?.expiresAt,
+      message: 'Token is valid'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Token verification failed'
+    });
+  }
+});
+
 // 1. OPTIMAL SPLIT ROUTER API
 app.post('/api/optimal-split', async (req: Request, res: Response) => {
   try {
@@ -552,23 +711,23 @@ app.post('/api/mock-login', (req: Request, res: Response) => {
 // Demo workflow endpoint
 app.post('/api/demo-workflow', async (req: Request, res: Response) => {
   try {
-    const { userAddress, budget = 1000 } = req.body;
+    const { userAddress, budget = 1000, contractDomain = 'localhost:3001' } = req.body;
 
     console.log('\n=== STARTING DEMO WORKFLOW ===');
     console.log(`User: ${userAddress}`);
     console.log(`Budget: $${budget}`);
     console.log('================================\n');
 
-    // Step 1: Mock login
-    const loginResponse = await fetch(`http://localhost:${PORT}/api/mock-login`, {
+    // Step 1: SIWE login (instead of mock login)
+    const loginResponse = await fetch(`http://localhost:${PORT}/api/siwe-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userAddress })
+      body: JSON.stringify({ userAddress, contractDomain })
     });
     const loginData = await loginResponse.json() as any;
 
     if (!loginData.success) {
-      throw new Error('Login failed');
+      throw new Error('SIWE login failed');
     }
 
     const { siweToken } = loginData;
@@ -611,12 +770,12 @@ app.post('/api/demo-workflow', async (req: Request, res: Response) => {
     const subBets = [
       {
         platform: 'Polymarket',
-        amount: (splitResult.orderBookAllocation / 1000).toFixed(6), // Convert to ETH
+        amount: (splitResult.orderBookAllocation / 1000).toFixed(6),
         marketId: 'polymarket_demo_123'
       },
       {
         platform: 'Omen',
-        amount: (splitResult.lmsrAllocation / 1000).toFixed(6), // Convert to ETH
+        amount: (splitResult.lmsrAllocation / 1000).toFixed(6),
         marketId: 'omen_demo_456'
       }
     ].filter(bet => parseFloat(bet.amount) > 0);
@@ -626,7 +785,7 @@ app.post('/api/demo-workflow', async (req: Request, res: Response) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         description: `Demo aggregated bet - Optimal split strategy`,
-        outcome: 0, // YES
+        outcome: 0,
         subBets,
         siweToken,
         userAddress
@@ -639,7 +798,7 @@ app.post('/api/demo-workflow', async (req: Request, res: Response) => {
     }
 
     // Step 4: Simulate bet win and set user balance
-    const winnings = parseFloat(betData.totalAmount) * 1.8; // 80% profit
+    const winnings = parseFloat(betData.totalAmount) * 1.8;
     userBalances.set(userAddress.toLowerCase(), ethers.parseEther(winnings.toString()).toString());
 
     // Step 5: Withdraw balance
@@ -659,7 +818,7 @@ app.post('/api/demo-workflow', async (req: Request, res: Response) => {
     res.json({
       success: true,
       workflow: {
-        step1_login: loginData,
+        step1_siwe_login: loginData,
         step2_optimization: splitData,
         step3_bet_placement: betData,
         step4_withdrawal: withdrawData
@@ -709,11 +868,14 @@ app.get('/health', (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`\n🚀 Betting Server started on port ${PORT}`);
   console.log(`📊 Optimal Split API: POST http://localhost:${PORT}/api/optimal-split`);
+  console.log(`🔐 SIWE Login API: POST http://localhost:${PORT}/api/siwe-login`);
+  console.log(`🔓 SIWE Logout API: POST http://localhost:${PORT}/api/siwe-logout`);
+  console.log(`✅ SIWE Verify API: POST http://localhost:${PORT}/api/siwe-verify`);
   console.log(`🎯 Place Bet API: POST http://localhost:${PORT}/api/place-bet`);
   console.log(`💰 Withdraw API: POST http://localhost:${PORT}/api/withdraw`);
   console.log(`🎮 Demo Workflow: POST http://localhost:${PORT}/api/demo-workflow`);
   console.log(`🔍 Health Check: GET http://localhost:${PORT}/health`);
-  console.log(`\n=== Ready to process betting operations ===\n`);
+  console.log(`\n=== Ready to process betting operations with SIWE ===\n`);
 });
 
 export default app;
