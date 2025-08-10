@@ -1,10 +1,15 @@
-# Ethclbet
 
+# Customized subgraph : https://github.com/Cedctf/ethclbet/tree/qunjie/packages/subgraph/orderbook-subgraph 
+# Subgraphs in use via web socket: https://github.com/Cedctf/ethclbet/tree/qunjie/packages/nextjs/app/api/subgraph
+
+# Ethclbet
 Prediction markets are powerful tools for gauging public sentiment and making informed bets on real-world events. However, today’s ecosystem is fragmented. Liquidity, pricing, and market opportunities are scattered across multiple platforms. This makes it difficult for users to compare odds, split bets optimally, and keep their strategies private.
 
 Our platform solves this by acting as a **prediction market aggregator and optimizer**. We query events and statistics from multiple prediction market platforms via **subgraphs**, and calculate the **optimal allocation** of funds to maximize potential returns. All sensitive computations and bet storage are handled privately using **Oasis ROFL** and **Sapphire**, ensuring users maintain full control over their strategies.
 
 With seamless USD-to-crypto conversion via **Pyth Network**, automated bet execution, and private settlement tracking, we give users a one-stop solution for discovering, optimizing, and placing bets across the entire prediction market landscape all in a single, secure transaction.
+
+
 
 ---
 
