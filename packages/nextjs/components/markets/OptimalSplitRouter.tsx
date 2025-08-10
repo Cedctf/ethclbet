@@ -89,6 +89,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   // Cross-chain bet results
   const [crossChainResults, setCrossChainResults] = useState<any[]>([]);
   const [isPlacingCrossChainBet, setIsPlacingCrossChainBet] = useState(false);
+  const [sapphireResult, setSapphireResult] = useState<any>(null);
   
   // Adjustable allocations (user can modify these)
   const [adjustedPolymarketAllocation, setAdjustedPolymarketAllocation] = useState<number>(0);
@@ -763,20 +764,104 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     setCrossChainResults([]);
 
     try {
-      notification.info("🚀 Placing cross-chain bets...", { duration: 0 });
+      notification.info("🚀 Placing cross-chain bets and Sapphire aggregated bet...", { duration: 0 });
 
-      // Place cross-chain bets using the connected wallet address
-      const results = await placeCrossChainBet(
+      // 1. Execute the current cross-chain function
+      const crossChainResults = await placeCrossChainBet(
         address || '',
         adjustedPolymarketAllocation,
         adjustedOmenAllocation
       );
 
-      setCrossChainResults(results);
+      setCrossChainResults(crossChainResults);
 
-      // Show success/error notifications for each chain
-      const successfulBets = results.filter(r => r.success);
-      const failedBets = results.filter(r => !r.success);
+      // 2. Also execute the Oasis Sapphire place aggregated bet function
+      let sapphireResult = null;
+      if (isOnSapphire && deployedContractData) {
+        try {
+          notification.info("🔒 Processing encrypted aggregated bet on Sapphire...", { duration: 0 });
+          
+          // Prepare data for Sapphire aggregated bet
+          const totalAmount = adjustedPolymarketAllocation + adjustedOmenAllocation;
+          const totalValue = ethers.parseEther((totalAmount / priceData.ethUsdPrice).toString());
+          
+          // Create platforms array for the aggregated bet
+          const platforms = ['Polymarket', 'Omen'];
+          const amounts = [
+            ethers.parseEther((adjustedPolymarketAllocation / priceData.ethUsdPrice).toString()),
+            ethers.parseEther((adjustedOmenAllocation / priceData.ethUsdPrice).toString())
+          ];
+          const marketIds = ['cross-chain-bet', 'cross-chain-bet']; // Placeholder market IDs
+          
+          // Place the aggregated bet on Sapphire
+          const receipt = await placeBetWithSapphire(
+            betDescription, 
+            betOutcome, 
+            platforms, 
+            amounts, 
+            marketIds, 
+            totalValue
+          );
+          
+          sapphireResult = {
+            success: true,
+            chain: 'Oasis Sapphire',
+            amount: totalAmount,
+            ethAmount: totalAmount / priceData.ethUsdPrice,
+            explorer: `https://explorer.oasis.io/testnet/sapphire/tx/${receipt.hash || receipt.transactionHash}`,
+            txHash: receipt.hash || receipt.transactionHash
+          };
+          
+          // Update the state variable
+          setSapphireResult(sapphireResult);
+          
+          notification.success(
+            <div>
+              <div>🔒 Sapphire aggregated bet placed successfully!</div>
+              <div className="text-sm mt-1">
+                Amount: ${totalAmount.toFixed(2)} USD ({totalValue ? ethers.formatEther(totalValue) : '0'} ETH)
+                <a 
+                  href={sapphireResult.explorer}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:text-blue-700 underline ml-2"
+                >
+                  View on Sapphire →
+                </a>
+              </div>
+            </div>,
+            { duration: 8000 }
+          );
+          
+        } catch (sapphireError) {
+          console.error("Error placing Sapphire aggregated bet:", sapphireError);
+          sapphireResult = {
+            success: false,
+            chain: 'Oasis Sapphire',
+            error: sapphireError instanceof Error ? sapphireError.message : 'Unknown error'
+          };
+          
+          // Update the state variable
+          setSapphireResult(sapphireResult);
+          
+          notification.error(
+            <div>
+              <div>❌ Sapphire aggregated bet failed:</div>
+              <div className="text-sm mt-1">
+                {sapphireResult.error}
+              </div>
+            </div>,
+            { duration: 6000 }
+          );
+        }
+      } else if (!isOnSapphire) {
+        notification.info("ℹ️ Not on Sapphire network - skipping encrypted aggregated bet", { duration: 4000 });
+        setSapphireResult(null);
+      }
+
+      // Show success/error notifications for cross-chain bets
+      const successfulBets = crossChainResults.filter(r => r.success);
+      const failedBets = crossChainResults.filter(r => !r.success);
 
       if (successfulBets.length > 0) {
         notification.success(
@@ -816,7 +901,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         );
       }
 
-      // Save cross-chain bet results to history for AI training
+      // Save cross-chain bet results to history for AI training (including Sapphire result)
       if (result) {
         await saveOptimalSplitToHistory({
           ...result,
@@ -825,7 +910,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           betDescription,
           actualAmounts: [adjustedPolymarketAllocation, adjustedOmenAllocation],
           actualPlatforms: ['Gnosis', 'Polygon'],
-          crossChainResults: results
+          crossChainResults: crossChainResults,
+          sapphireResult: sapphireResult
         });
       }
 
@@ -1093,15 +1179,17 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               }}
             >
               {isPlacingCrossChainBet 
-                ? "Placing Cross-Chain Bet..." 
-                : `Place Cross-Chain ${betOutcome === 0 ? 'YES' : 'NO'} Bet (${priceData?.totalEth?.toFixed(6) || '0.000000'} ETH)`
+                ? "Placing Cross-Chain & Sapphire Bets..." 
+                : `Place Cross-Chain ${betOutcome === 0 ? 'YES' : 'NO'} Bet + Sapphire Aggregated (${priceData?.totalEth?.toFixed(6) || '0.000000'} ETH)`
               }
             </button>
             
             {/* Cross-chain bet results display */}
-            {crossChainResults.length > 0 && (
+            {(crossChainResults.length > 0 || sapphireResult) && (
               <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                <h4 className="font-medium text-sm mb-2">Cross-Chain Bet Results:</h4>
+                <h4 className="font-medium text-sm mb-2">Cross-Chain & Sapphire Bet Results:</h4>
+                
+                {/* Cross-chain results */}
                 {crossChainResults.map((result, index) => (
                   <div key={index} className="text-sm mb-2">
                     {result.success ? (
@@ -1123,6 +1211,34 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
                     )}
                   </div>
                 ))}
+                
+                {/* Sapphire result */}
+                {sapphireResult && (
+                  <div className="text-sm mb-2">
+                    {sapphireResult.success ? (
+                      <div className="text-green-600">
+                        🔒 {sapphireResult.chain}: ${sapphireResult.amount.toFixed(2)} USD ({sapphireResult.ethAmount.toFixed(6)} ETH)
+                        <a 
+                          href={sapphireResult.explorer}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:text-blue-700 underline ml-2"
+                        >
+                          View on Sapphire →
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="text-red-600">
+                        ❌ {sapphireResult.chain}: {sapphireResult.error}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Note about Sapphire aggregated bet */}
+                <div className="text-xs text-gray-600 mt-2 italic">
+                  💡 Cross-chain bets are placed on Gnosis & Polygon, while the aggregated bet is placed on Oasis Sapphire (if connected)
+                </div>
               </div>
             )}
             
