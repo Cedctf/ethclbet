@@ -33,7 +33,7 @@ That question sparked our project: the invisible layer connecting all major pred
 
 ## 🔑 The Solution
 
-- **Unified Market Aggregation** – Aggregate events details such as title, prices, liquidity, and market depth from multiple prediction market platforms into a single interface through subgraphs.  
+- **Unified Market Aggregation** – Aggregate market details such as title, prices, liquidity, and market depth from multiple prediction market platforms into a single interface through subgraphs.  
 - **Private & Secure Betting** – Use Oasis Sapphire smart contracts and SIWE authentication to keep bet allocations and strategies private, viewable only by the user.  
 - **Intelligent Optimization** – Leverage an LLM hosted on Oasis ROFL to match equivalent prediction markets and calculate the optimal allocation of funds across platforms to maximize returns.  
 - **Automated Execution & Settlement** – Place bets, track market resolutions, and update user balances automatically through secure smart contract workflows.
@@ -43,13 +43,13 @@ That question sparked our project: the invisible layer connecting all major pred
 ## 🔄 User Flow
 <img width="1122" height="629" alt="image" src="https://github.com/user-attachments/assets/2bc618fd-bd6d-450f-80da-4fbe3decd90c" />
 
-1. **Browse Events**  
+1. **Browse Markets**  
    - User opens the app and sees a unified list of prediction markets aggregated from platforms like Polymarket and Omen.
-   - All event data is fetched via The Graph subgraphs for real-time updates.
+   - All market data is fetched via The Graph subgraphs for real-time updates.
    - Each market shows liquidity, prices, order book depth, and AMM/LMSR stats in one view.
 
-2. **Event Matching & Selection**  
-   - Our LLM automatically groups equivalent events across platforms.  
+2. **Market Matching & Selection**  
+   - Our LLM automatically groups equivalent markets across platforms.  
    - User selects the prediction market they want to bet on (e.g., “Will Candidate X win the election?”).
 
 3. **Bet Optimization**  
@@ -84,7 +84,7 @@ That question sparked our project: the invisible layer connecting all major pred
 
 **Computation & Intelligence**  
 - **Oasis ROFL** – Confidential compute environment for LLM inference and optimization algorithms.  
-- **Large Language Model (LLM)** – Event title matching, duplicate detection, and optimal bet allocation calculation.  
+- **Large Language Model (LLM)** – Market title matching, duplicate detection, and optimal bet allocation calculation.  
 
 **Smart Contracts & Privacy**  
 - **Oasis Sapphire** – EVM-compatible, privacy-preserving smart contracts for storing and managing bets.  
