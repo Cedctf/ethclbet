@@ -1,80 +1,109 @@
-# 🏗 Scaffold-ETH 2
+  
+- Customized subgraph : https://github.com/Cedctf/ethclbet/tree/qunjie/packages/subgraph/orderbook-subgraph 
+- Subgraphs in use via web socket: https://github.com/Cedctf/ethclbet/tree/qunjie/packages/nextjs/app/api/subgraph
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+# Ethclbet
+Prediction markets are powerful tools for gauging public sentiment and making informed bets on real-world events. However, today’s ecosystem is fragmented. Liquidity, pricing, and market opportunities are scattered across multiple platforms. This makes it difficult for users to compare odds, split bets optimally, and keep their strategies private.
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+Our platform solves this by acting as a **prediction market aggregator and optimizer**. We query events and statistics from multiple prediction market platforms via **subgraphs**, and calculate the **optimal allocation** of funds to maximize potential returns. All sensitive computations and bet storage are handled privately using **Oasis ROFL** and **Sapphire**, ensuring users maintain full control over their strategies.
 
-⚙️ Built using NextJS, RainbowKit, Hardhat, Wagmi, Viem, and Typescript.
-
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
-
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
-
-## Requirements
-
-Before you begin, you need to install the following tools:
-
-- [Node (>= v20.18.3)](https://nodejs.org/en/download/)
-- Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
-- [Git](https://git-scm.com/downloads)
-
-## Quickstart
-
-To get started with Scaffold-ETH 2, follow the steps below:
-
-1. Install dependencies if it was skipped in CLI:
-
-```
-cd my-dapp-example
-yarn install
-```
-
-2. Run a local network in the first terminal:
-
-```
-yarn chain
-```
-
-This command starts a local Ethereum network using Hardhat. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `packages/hardhat/hardhat.config.ts`.
-
-3. On a second terminal, deploy the test contract:
-
-```
-yarn deploy
-```
-
-This command deploys a test smart contract to the local network. The contract is located in `packages/hardhat/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/hardhat/deploy` to deploy the contract to the network. You can also customize the deploy script.
-
-4. On a third terminal, start your NextJS app:
-
-```
-yarn start
-```
-
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
-
-Run smart contract test with `yarn hardhat:test`
-
-- Edit your smart contracts in `packages/hardhat/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/hardhat/deploy`
+With seamless USD-to-crypto conversion via **Pyth Network**, automated bet execution, and private settlement tracking, we give users a one-stop solution for discovering, optimizing, and placing bets across the entire prediction market landscape all in a single, secure transaction.
 
 
-## Documentation
 
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
+---
 
-To know more about its features, check out our [website](https://scaffoldeth.io).
+## 🚧 Problems
 
-## Contributing to Scaffold-ETH 2
+- **Fragmented Liquidity** – Liquidity and pricing are spread across multiple prediction market platforms, making it difficult to compare and find the best opportunities.  
+- **Privacy and Trust Concerns** – Public smart contracts expose betting strategies and allocations, reducing user privacy and potentially giving competitors an advantage.  
+- **Complex Calculations** – Optimally allocating a budget across platforms with different market models (order books, AMMs, LMSRs) requires advanced calculations beyond most users’ capabilities.
 
-We welcome contributions to Scaffold-ETH 2!
+---
 
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+## 💡 Inspiration
+
+While researching defi, our team noticed three pain points in prediction markets:
+
+1. **Market hunters** waste time hopping between platforms to find the best liquidity and odds.  
+2. **Privacy-conscious bettors** hesitate to reveal their strategies on public ledgers.  
+3. **Casual users** struggle with the math needed to spread bets optimally across different market types.  
+
+> “What if you could see every market in one place, privately calculate the best split, and place all your bets in a single, secure transaction?”
+
+That question sparked our project: the invisible layer connecting all major prediction markets while keeping users’ strategies private.
+
+---
+
+## 🔑 The Solution
+
+- **Unified Market Aggregation** – Aggregate events details such as title, prices, liquidity, and market depth from multiple prediction market platforms into a single interface through subgraphs.  
+- **Private & Secure Betting** – Use Oasis Sapphire smart contracts and SIWE authentication to keep bet allocations and strategies private, viewable only by the user.  
+- **Intelligent Optimization** – Leverage an LLM hosted on Oasis ROFL to match equivalent prediction markets and calculate the optimal allocation of funds across platforms to maximize returns.  
+- **Automated Execution & Settlement** – Place bets, track market resolutions, and update user balances automatically through secure smart contract workflows.
+
+---
+
+## 🔄 User Flow
+<img width="1122" height="629" alt="image" src="https://github.com/user-attachments/assets/2bc618fd-bd6d-450f-80da-4fbe3decd90c" />
+
+1. **Browse Events**  
+   - User opens the app and sees a unified list of prediction markets aggregated from platforms like Polymarket and Omen.
+   - All event data is fetched via The Graph subgraphs for real-time updates.
+   - Each market shows liquidity, prices, order book depth, and AMM/LMSR stats in one view.
+
+2. **Event Matching & Selection**  
+   - Our LLM automatically groups equivalent events across platforms.  
+   - User selects the prediction market they want to bet on (e.g., “Will Candidate X win the election?”).
+
+3. **Bet Optimization**  
+   - User seletecs a total budget in USD.  
+   - LLM (hosted on Oasis ROFL) calculates the optimal split across platforms to maximize shares bought for the same or lower cost.  
+   - Pyth Network price feeds convert USD to the required crypto amounts.  
+   - User can adjust allocations if desired.
+
+4. **Private Bet Placement**  
+   - Bet is stored and executed through an Oasis Sapphire smart contract.  
+   - Users can sign in with Ethereum (SIWE) for private access.  
+   - Strategy and allocations remain fully confidential.
+
+5. **Execution on External Platforms**  
+   - Oasis ROFL securely executes bets on the external prediction markets according to the optimized plan.  
+
+6. **Resolution & Settlement**  
+   - Event listeners track market resolutions.  
+   - Winning outcomes update the user’s private balance in the Sapphire contract.  
+
+7. **Withdrawal**  
+   - User can withdraw winnings at any time to their connected wallet.  
+
+ ---
+
+## 🛠 Tech Stack
+<img width="1121" height="635" alt="image" src="https://github.com/user-attachments/assets/eb8b4e4c-bc31-4269-8870-63ea33d4c7dc" />
+
+**Data Aggregation & Indexing**  
+- **The Graph Protocol** – Index and query events, liquidity, order books, and AMM/LMSR stats from multiple prediction market platforms.  
+- **Custom Subgraphs** – Unified schema for normalized market data across sources like Polymarket and Omen.  
+
+**Computation & Intelligence**  
+- **Oasis ROFL** – Confidential compute environment for LLM inference and optimization algorithms.  
+- **Large Language Model (LLM)** – Event title matching, duplicate detection, and optimal bet allocation calculation.  
+
+**Smart Contracts & Privacy**  
+- **Oasis Sapphire** – EVM-compatible, privacy-preserving smart contracts for storing and managing bets.  
+- **Ethereum Scaffold-ETH** – Rapid prototyping, development, and deployment framework for Ethereum smart contracts.  
+- **SIWE (Sign-In With Ethereum)** – Private authentication to access and manage user-specific bet data.  
+
+**Oracles & Pricing**  
+- **Pyth Network** – Real-time USD ↔ crypto price feeds for accurate bet allocations.  
+
+**Frontend & User Interface**  
+- **Next.js / React** – Web app for browsing markets, configuring bets, and tracking performance.  
+- **Tailwind CSS** – Responsive and modern UI design.  
+
+**Execution & Settlement**  
+- **Event Listeners** – Track market resolution events from external platforms.  
+- **Automated Settlement Logic** – Update private balances and enable withdrawals for winning bets.
+  
+---
