@@ -71,6 +71,11 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { data: deployedContractData } = useDeployedContractInfo("SimpleBet");
+
+  // Helper function to round ETH amounts to 6 decimal places to avoid precision issues
+  const roundEthAmount = (ethAmount: number): number => {
+    return Math.round(ethAmount * 1000000) / 1000000;
+  };
   
   // Get user balance
   const { data: userBalance } = useBalance({
@@ -181,7 +186,9 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
         try {
           // Convert USD amount to ETH (using current price data)
           const ethAmount = priceData ? (amountUsd / priceData.ethUsdPrice) : (amountUsd / 2000); // fallback price
-          const amountWei = ethers.parseEther(ethAmount.toString());
+          // Round to 6 decimal places to avoid precision issues with parseEther
+          const ethAmountRounded = roundEthAmount(ethAmount);
+          const amountWei = ethers.parseEther(ethAmountRounded.toString());
           
           console.log(`🚀 Placing bet on ${chainName}: ${amountUsd} USD (${ethAmount} ETH)`);
           
@@ -612,7 +619,9 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       // Add Polymarket subbet if allocation > 0
       if (adjustedPolymarketAllocation > 0) {
         platforms.push("Polymarket");
-        const polymarketAmount = parseEther(priceData.polymarketEth.toString());
+        // Round to 6 decimal places to avoid precision issues with parseEther
+        const polymarketEthRounded = roundEthAmount(priceData.polymarketEth);
+        const polymarketAmount = parseEther(polymarketEthRounded.toString());
         amounts.push(polymarketAmount);
         
         // Get market ID from the market data
@@ -627,7 +636,9 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
       // Add Omen subbet if allocation > 0
       if (adjustedOmenAllocation > 0) {
         platforms.push("Omen");
-        const omenAmount = parseEther(priceData.omenEth.toString());
+        // Round to 6 decimal places to avoid precision issues with parseEther
+        const omenEthRounded = roundEthAmount(priceData.omenEth);
+        const omenAmount = parseEther(omenEthRounded.toString());
         amounts.push(omenAmount);
         
         // Get market ID from the market data
@@ -783,13 +794,17 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           
           // Prepare data for Sapphire aggregated bet
           const totalAmount = adjustedPolymarketAllocation + adjustedOmenAllocation;
-          const totalValue = ethers.parseEther((totalAmount / priceData.ethUsdPrice).toString());
+          // Round to 6 decimal places to avoid precision issues with parseEther
+          const totalEthRounded = roundEthAmount(totalAmount / priceData.ethUsdPrice);
+          const totalValue = ethers.parseEther(totalEthRounded.toString());
           
           // Create platforms array for the aggregated bet
           const platforms = ['Polymarket', 'Omen'];
+          const polymarketEthRounded = roundEthAmount(adjustedPolymarketAllocation / priceData.ethUsdPrice);
+          const omenEthRounded = roundEthAmount(adjustedOmenAllocation / priceData.ethUsdPrice);
           const amounts = [
-            ethers.parseEther((adjustedPolymarketAllocation / priceData.ethUsdPrice).toString()),
-            ethers.parseEther((adjustedOmenAllocation / priceData.ethUsdPrice).toString())
+            ethers.parseEther(polymarketEthRounded.toString()),
+            ethers.parseEther(omenEthRounded.toString())
           ];
           const marketIds = ['cross-chain-bet', 'cross-chain-bet']; // Placeholder market IDs
           
