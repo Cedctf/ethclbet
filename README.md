@@ -1,6 +1,6 @@
-
-  Customized subgraph : https://github.com/Cedctf/ethclbet/tree/qunjie/packages/subgraph/orderbook-subgraph 
-  Subgraphs in use via web socket: https://github.com/Cedctf/ethclbet/tree/qunjie/packages/nextjs/app/api/subgraph
+  
+- Customized subgraph : https://github.com/Cedctf/ethclbet/tree/qunjie/packages/subgraph/orderbook-subgraph 
+- Subgraphs in use via web socket: https://github.com/Cedctf/ethclbet/tree/qunjie/packages/nextjs/app/api/subgraph
 
 # Ethclbet
 Prediction markets are powerful tools for gauging public sentiment and making informed bets on real-world events. However, today’s ecosystem is fragmented. Liquidity, pricing, and market opportunities are scattered across multiple platforms. This makes it difficult for users to compare odds, split bets optimally, and keep their strategies private.
