@@ -775,19 +775,12 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
     setCrossChainResults([]);
 
     try {
-      notification.info("🚀 Placing cross-chain bets and Sapphire aggregated bet...", { duration: 0 });
+      notification.info("🔒 First placing Sapphire aggregated bet, then cross-chain bets...", { duration: 0 });
 
-      // 1. Execute the current cross-chain function
-      const crossChainResults = await placeCrossChainBet(
-        address || '',
-        adjustedPolymarketAllocation,
-        adjustedOmenAllocation
-      );
-
-      setCrossChainResults(crossChainResults);
-
-      // 2. Also execute the Oasis Sapphire place aggregated bet function
+      // 1. FIRST: Execute the Oasis Sapphire aggregated bet and wait for completion
       let sapphireResult = null;
+      let sapphireTxHash = null;
+      
       if (isOnSapphire && deployedContractData) {
         try {
           notification.info("🔒 Processing encrypted aggregated bet on Sapphire...", { duration: 0 });
@@ -808,7 +801,7 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
           ];
           const marketIds = ['cross-chain-bet', 'cross-chain-bet']; // Placeholder market IDs
           
-          // Place the aggregated bet on Sapphire
+          // Place the aggregated bet on Sapphire and WAIT for completion
           const receipt = await placeBetWithSapphire(
             betDescription, 
             betOutcome, 
@@ -818,13 +811,15 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             totalValue
           );
           
+          sapphireTxHash = receipt.hash || receipt.transactionHash;
+          
           sapphireResult = {
             success: true,
             chain: 'Oasis Sapphire',
             amount: totalAmount,
             ethAmount: totalAmount / priceData.ethUsdPrice,
-            explorer: `https://explorer.oasis.io/testnet/sapphire/tx/${receipt.hash || receipt.transactionHash}`,
-            txHash: receipt.hash || receipt.transactionHash
+            explorer: `https://explorer.oasis.io/testnet/sapphire/tx/${sapphireTxHash}`,
+            txHash: sapphireTxHash
           };
           
           // Update the state variable
@@ -835,6 +830,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
               <div>🔒 Sapphire aggregated bet placed successfully!</div>
               <div className="text-sm mt-1">
                 Amount: ${totalAmount.toFixed(2)} USD ({totalValue ? ethers.formatEther(totalValue) : '0'} ETH)
+                <br />
+                Tx Hash: {sapphireTxHash}
                 <a 
                   href={sapphireResult.explorer}
                   target="_blank" 
@@ -847,6 +844,8 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             </div>,
             { duration: 8000 }
           );
+          
+          console.log("✅ Sapphire transaction completed with hash:", sapphireTxHash);
           
         } catch (sapphireError) {
           console.error("Error placing Sapphire aggregated bet:", sapphireError);
@@ -868,11 +867,25 @@ export default function OptimalSplitRouter({ market }: OptimalSplitRouterProps) 
             </div>,
             { duration: 6000 }
           );
+          
+          // Don't proceed with cross-chain if Sapphire failed
+          throw new Error(`Sapphire transaction failed: ${sapphireResult.error}`);
         }
       } else if (!isOnSapphire) {
         notification.info("ℹ️ Not on Sapphire network - skipping encrypted aggregated bet", { duration: 4000 });
         setSapphireResult(null);
       }
+
+      // 2. SECOND: Only after Sapphire transaction completes, execute cross-chain transactions
+      notification.info("🚀 Sapphire transaction completed. Now placing cross-chain bets...", { duration: 0 });
+      
+      const crossChainResults = await placeCrossChainBet(
+        address || '',
+        adjustedPolymarketAllocation,
+        adjustedOmenAllocation
+      );
+
+      setCrossChainResults(crossChainResults);
 
       // Show success/error notifications for cross-chain bets
       const successfulBets = crossChainResults.filter(r => r.success);
