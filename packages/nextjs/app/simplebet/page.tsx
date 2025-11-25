@@ -214,31 +214,44 @@ export default function SimpleBetPage() {
     return now < parseInt(storedExpiry);
   }, [siweToken]);
 
-  // Load SIWE token from localStorage on mount
+  // Load SIWE token from localStorage on mount and when address changes
   useEffect(() => {
-    const storedToken = localStorage.getItem("siwe-token");
-    const storedExpiry = localStorage.getItem("siwe-token-expiry");
+    if (address) {
+      const tokenKey = `siwe-token-${address.toLowerCase()}`;
+      const expiryKey = `siwe-token-expiry-${address.toLowerCase()}`;
+      const storedToken = localStorage.getItem(tokenKey);
+      const storedExpiry = localStorage.getItem(expiryKey);
 
-    if (storedToken && storedExpiry) {
-      const now = new Date().getTime();
-      if (now < parseInt(storedExpiry)) {
-        setSiweToken(storedToken);
-        setIsAuthenticated(true);
+      if (storedToken && storedExpiry) {
+        const now = new Date().getTime();
+        if (now < parseInt(storedExpiry)) {
+          setSiweToken(storedToken);
+          setIsAuthenticated(true);
+        } else {
+          // Token expired
+          localStorage.removeItem(tokenKey);
+          localStorage.removeItem(expiryKey);
+          setSiweToken("");
+          setIsAuthenticated(false);
+        }
       } else {
-        // Token expired
-        localStorage.removeItem("siwe-token");
-        localStorage.removeItem("siwe-token-expiry");
+        // No token found for this address
+        setSiweToken("");
         setIsAuthenticated(false);
       }
+    } else {
+      // No address connected
+      setSiweToken("");
+      setIsAuthenticated(false);
     }
-  }, []);
+  }, [address]);
 
   // Update authentication state when token changes
   useEffect(() => {
     setIsAuthenticated(isTokenValid());
   }, [siweToken, isTokenValid]);
 
-  // SIWE Login
+  // SIWE Login - Fixed to work with SiweAuth base contract
   const handleSiweLogin = async () => {
     if (!address || !deployedContractData || !publicClient || !contractDomain) {
       notification.error("Please connect your wallet and ensure contract is deployed");
@@ -249,22 +262,21 @@ export default function SimpleBetPage() {
       // Get chain ID from the public client
       const chainId = await publicClient.getChainId();
 
-      // Create SIWE message using the siwe library - matching Sapphire docs exactly
+      // Create SIWE message using the siwe library
       const siweMessage = new SiweMessage({
         domain: contractDomain,
         address: address,
-        uri: `http://${contractDomain}`, // Use http:// as shown in docs
+        uri: `http://${contractDomain}`,
         version: "1",
         chainId: chainId,
         nonce: generateNonce(),
-        // Remove issuedAt and expirationTime as they're not in the docs example
-        statement: "I accept the Terms of Service: https://service.invalid/", // Add statement as shown in docs
+        statement: "I accept the Terms of Service: https://service.invalid/",
       });
 
       const message = siweMessage.toMessage();
       const signature = await signMessageAsync({ message });
 
-      // Parse signature using ethers.Signature.from as shown in Sapphire docs
+      // Parse signature using ethers.Signature.from
       const sig = ethers.Signature.from(signature);
 
       // Convert to SignatureRSV format expected by the contract
@@ -279,16 +291,19 @@ export default function SimpleBetPage() {
         address: deployedContractData.address,
         abi: deployedContractData.abi,
         functionName: "login",
-        args: [message, signatureRSV], // Pass signatureRSV as expected by contract
+        args: [message, signatureRSV],
       });
 
       // The login method returns a bytes token that we can use for authenticated calls
       const token = loginResult as string;
       const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours
 
-      // Store in localStorage
-      localStorage.setItem("siwe-token", token);
-      localStorage.setItem("siwe-token-expiry", expiryTime.toString());
+      // Store in localStorage with a unique key to avoid conflicts
+      const tokenKey = `siwe-token-${address?.toLowerCase()}`;
+      const expiryKey = `siwe-token-expiry-${address?.toLowerCase()}`;
+      
+      localStorage.setItem(tokenKey, token);
+      localStorage.setItem(expiryKey, expiryTime.toString());
 
       setSiweToken(token);
       setIsAuthenticated(true);
@@ -302,8 +317,12 @@ export default function SimpleBetPage() {
 
   // Logout
   const handleLogout = () => {
-    localStorage.removeItem("siwe-token");
-    localStorage.removeItem("siwe-token-expiry");
+    if (address) {
+      const tokenKey = `siwe-token-${address.toLowerCase()}`;
+      const expiryKey = `siwe-token-expiry-${address.toLowerCase()}`;
+      localStorage.removeItem(tokenKey);
+      localStorage.removeItem(expiryKey);
+    }
     setSiweToken("");
     setIsAuthenticated(false);
     setUserBets([]);
