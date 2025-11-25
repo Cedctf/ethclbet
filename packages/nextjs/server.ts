@@ -101,14 +101,14 @@ interface WithdrawResponse {
 const SIMPLE_BET_ABI = [
   {
     "inputs": [
-      {"name": "description", "type": "string"},
-      {"name": "outcome", "type": "uint8"},
-      {"name": "platforms", "type": "string[]"},
-      {"name": "amounts", "type": "uint256[]"},
-      {"name": "marketIds", "type": "string[]"}
+      { "name": "description", "type": "string" },
+      { "name": "outcome", "type": "uint8" },
+      { "name": "platforms", "type": "string[]" },
+      { "name": "amounts", "type": "uint256[]" },
+      { "name": "marketIds", "type": "string[]" }
     ],
     "name": "placeBet",
-    "outputs": [{"name": "betId", "type": "uint256"}],
+    "outputs": [{ "name": "betId", "type": "uint256" }],
     "stateMutability": "payable",
     "type": "function"
   },
@@ -120,23 +120,25 @@ const SIMPLE_BET_ABI = [
     "type": "function"
   },
   {
-    "inputs": [{"name": "user", "type": "address"}],
+    "inputs": [{ "name": "user", "type": "address" }],
     "name": "userBalances",
-    "outputs": [{"name": "", "type": "uint256"}],
+    "outputs": [{ "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {"name": "message", "type": "string"},
-      {"name": "signature", "type": "tuple", "components": [
-        {"name": "r", "type": "bytes32"},
-        {"name": "s", "type": "bytes32"},
-        {"name": "v", "type": "uint256"}
-      ]}
+      { "name": "message", "type": "string" },
+      {
+        "name": "signature", "type": "tuple", "components": [
+          { "name": "r", "type": "bytes32" },
+          { "name": "s", "type": "bytes32" },
+          { "name": "v", "type": "uint256" }
+        ]
+      }
     ],
     "name": "login",
-    "outputs": [{"name": "", "type": "bytes"}],
+    "outputs": [{ "name": "", "type": "bytes" }],
     "stateMutability": "view",
     "type": "function"
   }
@@ -240,10 +242,10 @@ app.post('/api/siwe-login', async (req: Request, res: Response) => {
     });
 
     const message = siweMessage.toMessage();
-    
+
     // Server signs the message (simulating user signature for demo)
     const signature = await signer.signMessage(message);
-    
+
     // Parse signature using ethers.Signature.from
     const sig = ethers.Signature.from(signature);
 
@@ -259,7 +261,7 @@ app.post('/api/siwe-login', async (req: Request, res: Response) => {
 
     // Call the contract's login method to get the proper SIWE token
     const loginResult = await contract.login(message, signatureRSV);
-    
+
     // The login method returns a bytes token
     const token = loginResult as string;
     const expiryTime = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
@@ -339,7 +341,7 @@ app.post('/api/siwe-verify', (req: Request, res: Response) => {
     }
 
     const session = userSessions.get(userAddress.toLowerCase());
-    
+
     res.json({
       success: true,
       valid: true,
@@ -484,7 +486,7 @@ app.post('/api/place-bet', async (req: Request, res: Response) => {
     }
 
     // Validate subBets
-    const validSubBets = subBets.filter(sb => 
+    const validSubBets = subBets.filter(sb =>
       sb.platform && sb.amount && sb.marketId && parseFloat(sb.amount) > 0
     );
 
